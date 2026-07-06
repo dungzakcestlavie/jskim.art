@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정산 김연식 작가 | JungSan Yun-sik Kim | jskim.art</title>
+<meta name="description" content="정산 김연식 작가 (JungSan Yun-sik Kim) 공식 웹사이트 준비 중">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* ---- 빛이 스며든 블루 (Light-infused Blue) ---- */
+    --bg-deep:    #0A1830;
+    --bg-mid:     #16294F;
+    --bg-light:   #1E3A66;
+
+    --accent-blue: #1B3A66;
+
+    --gold-base:   #C9A35A;
+    --gold-bright: #E0C27A;
+
+    --text-main:   #E8E4D8;
+    --text-dim:    #A9A594;
+
+    /* ---- Typography ---- */
+    --font-kr-display: 'Gowun Batang', serif;      /* 이름 (KR) — 모던한 세리프 */
+    --font-kr-body:    'Gowun Dodum', sans-serif;   /* 본문 (KR) — 정제된 산세리프 */
+    --font-en-display: 'Fraunces', serif;           /* 이름/문구 (EN) — 컨템포러리 세리프 */
+    --font-utility:    'Space Grotesk', sans-serif; /* 토글, 푸터 — 라틴 전용 유틸리티 */
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(
+      ellipse at 50% 40%,
+      var(--bg-light) 0%,
+      var(--bg-mid) 48%,
+      var(--bg-deep) 100%
+    );
+    background-size: 160% 160%;
+    animation: breathe 28s ease-in-out infinite;
+    color: var(--text-main);
+    font-family: var(--font-kr-display);
+  }
+
+  @keyframes breathe {
+    0%, 100% { background-position: 50% 45%; filter: brightness(1); }
+    50%      { background-position: 50% 55%; filter: brightness(1.07); }
+  }
+
+  /* ---------------- Language toggle ---------------- */
+  .lang-toggle {
+    position: fixed;
+    top: 28px;
+    right: 32px;
+    display: flex;
+    gap: 10px;
+    font-family: var(--font-utility);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    z-index: 10;
+  }
+
+  .lang-toggle button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 2px;
+    font: inherit;
+    letter-spacing: inherit;
+    opacity: 0.65;
+    transition: opacity 0.4s ease, color 0.4s ease;
+  }
+
+  .lang-toggle button.active {
+    color: var(--gold-bright);
+    opacity: 1;
+  }
+
+  .lang-toggle span.sep {
+    color: var(--text-dim);
+    opacity: 0.35;
+  }
+
+  /* ---------------- Stage ---------------- */
+  .stage {
+    position: relative;
+    width: min(90vw, 640px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: rise 2.4s ease-out;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------------- Moon (signature light source) ---------------- */
+  .moon-wrap {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
+  }
+
+  .moon {
+    width: 100%;
+    height: 100%;
+    animation: moon-glow 7s ease-in-out infinite;
+  }
+
+  @keyframes moon-glow {
+    0%, 100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,0.25)); }
+    50%      { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,0.4)); }
+  }
+
+  /* ---------------- Falling light droplet ----------------
+     정산 작가 작품에 반복되는 "가지 끝에 맺힌 빛방울" 모티프를
+     달빛 아래로 아주 천천히 떨어지는 하나의 점광으로 표현.
+  ------------------------------------------------------------ */
+  .droplet {
+    position: absolute;
+    left: 50%;
+    top: 68px;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 6px 2px rgba(224,194,122,0.6);
+    opacity: 0;
+    animation: fall 13s ease-in infinite;
+  }
+
+  @keyframes fall {
+    0%   { opacity: 0;   transform: translateY(0) scale(1); }
+    8%   { opacity: 0.9; }
+    70%  { opacity: 0.5; }
+    92%  { opacity: 0;   transform: translateY(220px) scale(0.4); }
+    100% { opacity: 0;   transform: translateY(220px) scale(0.4); }
+  }
+
+  /* ---------------- Name ---------------- */
+  .name {
+    margin: 22px 0 0;
+    font-family: var(--font-kr-display);
+    font-weight: 700;
+    font-size: clamp(26px, 5vw, 34px);
+    letter-spacing: 0.08em;
+    color: var(--text-main);
+  }
+
+  html[data-lang="en"] .name {
+    font-family: var(--font-en-display);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+  }
+
+  /* ---------------- Role ---------------- */
+  .role {
+    margin: 10px 0 0;
+    font-family: var(--font-kr-body);
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--gold-bright);
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  html[data-lang="en"] .role {
+    font-family: var(--font-utility);
+    font-weight: 500;
+    letter-spacing: 0.24em;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--gold-base);
+    opacity: 0.55;
+    margin: 22px 0;
+  }
+
+  /* ---------------- Status ---------------- */
+  .status {
+    font-family: var(--font-kr-body);
+    font-weight: 400;
+    font-size: clamp(15px, 2.4vw, 18px);
+    color: var(--text-main);
+    opacity: 0.9;
+    letter-spacing: 0.02em;
+  }
+
+  html[data-lang="en"] .status {
+    font-family: var(--font-en-display);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  /* ---------------- Description ---------------- */
+  .desc {
+    margin-top: 12px;
+    font-family: var(--font-kr-body);
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: var(--text-dim);
+  }
+
+  html[data-lang="en"] .desc {
+    font-family: var(--font-en-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 26px;
+    font-family: var(--font-utility);
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  /* ---------------- i18n visibility ---------------- */
+  [data-i18n] { display: none; }
+  html[data-lang="ko"] [data-i18n="ko"] { display: inline; }
+  html[data-lang="en"] [data-i18n="en"] { display: inline; }
+
+  @media (prefers-reduced-motion: reduce) {
+    body, .moon, .droplet, .stage { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="lang-toggle">
+    <button id="btn-ko" class="active" aria-pressed="true">KR</button>
+    <span class="sep">/</span>
+    <button id="btn-en" aria-pressed="false">EN</button>
+  </div>
+
+  <main class="stage">
+    <div class="moon-wrap">
+      <svg class="moon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M40 8C28 10 20 21 20 33c0 15 12 27 27 27 3 0 6-0.5 8.7-1.4C48.6 62.6 40.6 58 40.6 33 40.6 21.8 34 12 26 9.4 30.4 8.3 35.1 7.8 40 8Z"
+              fill="var(--gold-bright)"/>
+      </svg>
+      <div class="droplet"></div>
+    </div>
+
+    <h1 class="name">
+      <span data-i18n="ko">정산 김연식</span>
+      <span data-i18n="en">JungSan Yun-sik Kim</span>
+    </h1>
+
+    <p class="role">
+      <span data-i18n="ko">작가</span>
+      <span data-i18n="en">Artist</span>
+    </p>
+
+    <div class="divider"></div>
+
+    <p class="status">
+      <span data-i18n="ko">공식 웹사이트 준비 중</span>
+      <span data-i18n="en">The official website is in preparation</span>
+    </p>
+
+    <p class="desc">
+      <span data-i18n="ko">새로운 이야기가 곧 이곳에 놓입니다.</span>
+      <span data-i18n="en">A new story will soon find its place here.</span>
+    </p>
+  </main>
+
+  <footer>&copy; 2026 jskim.art</footer>
+
+  <script>
+    const html = document.documentElement;
+    const btnKo = document.getElementById('btn-ko');
+    const btnEn = document.getElementById('btn-en');
+
+    function setLang(lang) {
+      html.setAttribute('data-lang', lang);
+      html.setAttribute('lang', lang);
+      btnKo.classList.toggle('active', lang === 'ko');
+      btnEn.classList.toggle('active', lang === 'en');
+      btnKo.setAttribute('aria-pressed', lang === 'ko');
+      btnEn.setAttribute('aria-pressed', lang === 'en');
+    }
+
+    btnKo.addEventListener('click', () => setLang('ko'));
+    btnEn.addEventListener('click', () => setLang('en'));
+  </script>
+
+</body>
+</html>
