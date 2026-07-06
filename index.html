@@ -42,10 +42,29 @@
 
   body {
     min-height: 100vh;
+    min-height: 100dvh; /* iOS 동적 툴바(주소창) 높이 변화 대응 */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    color: var(--text-main);
+    font-family: var(--font-kr-display);
+  }
+
+  /* 배경 애니메이션 전용 레이어.
+     ※ 이전 버전은 body에 직접 background + filter 애니메이션(breathe)을 걸었음.
+     filter가 걸린 요소는 그 하위 position:fixed 자식의 containing block이
+     되어버려서(스펙상 규칙), body의 자식인 .lang-toggle이 뷰포트가 아닌
+     body 박스 기준으로 위치가 계산됨. 모바일(iOS Safari/Chrome)에서는 동적
+     주소창 때문에 실제 가시영역과 100vh가 어긋나면서 .lang-toggle이 body의
+     overflow:hidden 밖으로 밀려 잘려 사라졌음(이것이 버튼이 사라진 원인).
+     배경/애니메이션을 별도 레이어로 분리해 body 자체에는 filter를 걸지 않음
+     → .lang-toggle은 항상 진짜 뷰포트 기준 fixed로 동작. */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background: radial-gradient(
       ellipse at 50% 40%,
       var(--bg-light) 0%,
@@ -54,8 +73,6 @@
     );
     background-size: 160% 160%;
     animation: breathe 28s ease-in-out infinite;
-    color: var(--text-main);
-    font-family: var(--font-kr-display);
   }
 
   @keyframes breathe {
@@ -66,8 +83,8 @@
   /* ---------------- Language toggle ---------------- */
   .lang-toggle {
     position: fixed;
-    top: 28px;
-    right: 32px;
+    top: calc(28px + env(safe-area-inset-top, 0px));
+    right: calc(32px + env(safe-area-inset-right, 0px));
     display: flex;
     gap: 10px;
     font-family: var(--font-utility);
@@ -238,7 +255,7 @@
 
   footer {
     position: fixed;
-    bottom: 26px;
+    bottom: calc(26px + env(safe-area-inset-bottom, 0px));
     font-family: var(--font-utility);
     font-weight: 300;
     font-size: 11px;
@@ -253,11 +270,13 @@
   html[data-lang="en"] [data-i18n="en"] { display: inline; }
 
   @media (prefers-reduced-motion: reduce) {
-    body, .moon, .droplet, .stage { animation: none !important; }
+    .bg-layer, .moon, .droplet, .stage { animation: none !important; }
   }
 </style>
 </head>
 <body>
+
+  <div class="bg-layer"></div>
 
   <div class="lang-toggle">
     <button id="btn-ko" class="active" aria-pressed="true">KR</button>
