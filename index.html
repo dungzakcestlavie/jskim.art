@@ -260,15 +260,15 @@
   .social-drawer-links a:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   .social-drawer-links svg { width: 19px; height: 19px; flex-shrink: 0; }
 
-  .contact-toggle {
+  .contact-toggle, .drawer-btn {
     display: flex; align-items: center; gap: 12px; width: 100%;
     background: none; border: none; cursor: pointer; text-align: left;
     color: var(--text-dim); font-family: var(--font-utility); font-weight: 500;
     font-size: 15px; letter-spacing: .08em;
     padding: 12px 10px; border-radius: 8px; transition: all .2s ease;
   }
-  .contact-toggle:hover, .contact-toggle[aria-expanded="true"] { color: var(--gold-bright); background: rgba(224,194,122,.09); }
-  .contact-toggle svg:not(.chev) { width: 19px; height: 19px; flex-shrink: 0; }
+  .contact-toggle:hover, .contact-toggle[aria-expanded="true"], .drawer-btn:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
+  .contact-toggle svg:not(.chev), .drawer-btn svg { width: 19px; height: 19px; flex-shrink: 0; }
   .contact-toggle .chev { width: 14px; height: 14px; margin-left: auto; flex-shrink: 0; transition: transform .25s ease; }
   .contact-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
 
@@ -355,6 +355,8 @@
 
   #bio-modal[hidden] { display: none !important; }
   #bio-modal { position: fixed; inset: 0; z-index: 60; }
+  #info-modal[hidden] { display: none !important; }
+  #info-modal { position: fixed; inset: 0; z-index: 60; }
   .bio-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.9); }
   .bio-card { position: relative; max-width: 560px; margin: 8vh auto; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 30px; max-height: 84vh; overflow-y: auto; }
   .bio-lang { display: flex; gap: 8px; margin-bottom: 16px; }
@@ -420,6 +422,22 @@
         </svg>
         <span data-i18n="ko">왼손 피아노</span><span data-i18n="en">Left Hand Piano</span>
       </a>
+      <button type="button" class="drawer-btn" data-info-target="exhibition">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="14" rx="2"/>
+          <circle cx="8.5" cy="9.5" r="1.5"/>
+          <path d="M21 15l-5-5-4 4-3-3-5 5"/>
+        </svg>
+        <span data-i18n="ko">전시 모습</span><span data-i18n="en">Exhibition Views</span>
+      </button>
+      <button type="button" class="drawer-btn" data-info-target="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h13a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Z"/>
+          <path d="M14 4v14a2 2 0 0 0 2 2h4"/>
+          <path d="M6 8h6M6 12h6M6 16h3"/>
+        </svg>
+        <span data-i18n="ko">뉴스</span><span data-i18n="en">News</span>
+      </button>
       <a href="https://www.sanchon.com" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="9"/>
@@ -491,9 +509,9 @@
   <section id="panel-works">
     <h2 class="visually-hidden"><span data-i18n="ko">작품</span><span data-i18n="en">Art Works</span></h2>
     <p class="stats-inline" id="stats-line">
-      <strong id="stat-total">—</strong> <span data-i18n="ko">works</span><span data-i18n="en">works</span> ·
-      <strong id="stat-filtered">—</strong> <span data-i18n="ko">결과</span><span data-i18n="en">results</span> ·
-      <strong id="stat-sections">—</strong> <span data-i18n="ko">섹션</span><span data-i18n="en">sections</span>
+      <strong id="stat-total">—</strong> <span data-i18n="ko">works</span><span data-i18n="en">works</span>
+      <span id="stats-results-wrap" hidden> · <strong id="stat-filtered">—</strong> <span data-i18n="ko">결과</span><span data-i18n="en">results</span></span>
+      · <strong id="stat-sections">—</strong> <span data-i18n="ko">섹션</span><span data-i18n="en">sections</span>
     </p>
     <div class="controls">
       <select id="section-select"><option value="all">전체 섹션 / All</option></select>
@@ -558,6 +576,16 @@
   </div>
 </div>
 
+<!-- Shared "coming soon" modal for Exhibition Views / News — same card styling as Artist Bio -->
+<div id="info-modal" hidden>
+  <div class="bio-backdrop"></div>
+  <div class="bio-card" role="dialog" aria-modal="true" aria-labelledby="info-title">
+    <button class="bio-close" id="info-modal-close" aria-label="close">&times;</button>
+    <h2 id="info-title" style="font-family:var(--font-kr-display);"></h2>
+    <p id="info-body" style="color:var(--text-dim);"></p>
+  </div>
+</div>
+
 <script>
 (function () {
   const $ = (sel, root) => (root || document).querySelector(sel);
@@ -619,6 +647,7 @@
     applySeoStrings(l);
     renderGrid();
     renderSectionOptions();
+    if (typeof currentInfoKey !== 'undefined' && currentInfoKey) openInfoModal(currentInfoKey);
   }
   btnKo.addEventListener('click', () => setLang('ko'));
   btnEn.addEventListener('click', () => setLang('en'));
@@ -683,6 +712,41 @@
     });
   }
   $$('.contact-panel a', socialDrawer).forEach(el => el.addEventListener('click', closeDrawer));
+
+  // Exhibition Views / News: both are pages-to-come. Clicking either closes the
+  // drawer and opens a shared "coming soon" card (same visual style as Bio).
+  const INFO_CONTENT = {
+    exhibition: {
+      ko: { title: '전시 모습', body: '전시 모습 페이지를 준비하고 있습니다. 전시장, 설치 사진, 오프닝, 관람객, 전시 기록이 이곳에 소개될 예정입니다.' },
+      en: { title: 'Exhibition Views', body: 'This page is being prepared. It will feature exhibition views, installation photos, openings, visitors, and exhibition records.' }
+    },
+    news: {
+      ko: { title: '뉴스', body: '뉴스 페이지를 준비하고 있습니다. 전시 소식, 작품 발표, 언론 기사, 인터뷰, 공지사항이 이곳에 소개될 예정입니다.' },
+      en: { title: 'News', body: 'This page is being prepared. It will feature exhibition news, new work announcements, press coverage, interviews, and notices.' }
+    }
+  };
+  let currentInfoKey = null;
+  function openInfoModal(key) {
+    const data = INFO_CONTENT[key];
+    if (!data) return;
+    currentInfoKey = key;
+    const d = data[lang] || data.ko;
+    $('#info-title').textContent = d.title;
+    $('#info-body').textContent = d.body;
+    $('#info-modal').hidden = false;
+  }
+  function closeInfoModal() {
+    $('#info-modal').hidden = true;
+    currentInfoKey = null;
+  }
+  $('#info-modal-close').addEventListener('click', closeInfoModal);
+  $('#info-modal .bio-backdrop').addEventListener('click', closeInfoModal);
+  $$('.drawer-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeDrawer();
+      openInfoModal(btn.dataset.infoTarget);
+    });
+  });
 
   $('#tab-bio').addEventListener('click', openBioModal);
   function openBioModal() { $('#bio-modal').hidden = false; }
@@ -838,6 +902,8 @@
     $('#stat-total').textContent = allWorks.length;
     $('#stat-filtered').textContent = filtered.length;
     $('#stat-sections').textContent = sections.filter(s => s.active).length;
+    const resultsWrap = $('#stats-results-wrap');
+    if (resultsWrap) resultsWrap.hidden = !searchQuery;
   }
 
   const SVG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="5"></svg>';
