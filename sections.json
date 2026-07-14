@@ -9,36 +9,44 @@
   {
     "key": "yeosu",
     "title_kr": "여수, 섬 위에 섬 — 365 Islands",
-    "title_en": "Yeosu, an Island Above the Islands — 365 Islands",
+    "title_en": "Yeosu, An Island Above Islands — 365 Islands",
     "active": true,
     "order": 2
   },
   {
-    "key": "movement1",
-    "title_kr": "제1악장 — 컵 속의 무한세상",
-    "title_en": "Movement I — An Infinite World in a Cup",
+    "key": "indramang",
+    "title_kr": "인드라망",
+    "title_en": "Indramang",
     "active": true,
-    "order": 3
+    "order": 3,
+    "childKeys": ["indramang", "movement1", "movement2", "movement3", "movement4"]
   },
   {
-    "key": "movement2",
-    "title_kr": "제2악장 — 파동과 입자의 드라이브",
-    "title_en": "Movement II — The Drive of Waves and Particles",
+    "key": "bullip",
+    "title_kr": "불립문자",
+    "title_en": "Understanding Beyond the Words",
     "active": true,
     "order": 4
   },
   {
-    "key": "movement3",
-    "title_kr": "제3악장 — 스왑",
-    "title_en": "Movement III — Swap",
+    "key": "knife",
+    "title_kr": "칼과 면도날",
+    "title_en": "Knife and Razor Blade",
     "active": true,
     "order": 5
   },
   {
-    "key": "movement4",
-    "title_kr": "제4악장 — 달과 바람과 그리고 구름",
-    "title_en": "Movement IV — The Moon, the Wind, and the Clouds",
+    "key": "colorspace",
+    "title_kr": "색즉시공: 파노라마 속으로",
+    "title_en": "Color Is Space: Into the Panorama",
     "active": true,
     "order": 6
+  },
+  {
+    "key": "manicure",
+    "title_kr": "매니큐어 속으로",
+    "title_en": "Into the Manicure",
+    "active": true,
+    "order": 7
   }
 ]
