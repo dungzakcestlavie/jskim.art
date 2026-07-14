@@ -10,16 +10,16 @@
      start in parallel with CSS parsing, not after a large inline <style> block. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Space+Grotesk:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" as="fetch" crossorigin="anonymous" href="works.json">
 
-<title>정산 김연식 작가 | JungSan Yun-sik Kim | jskim.art</title>
-<meta name="description" content="정산 김연식 작가(JungSan Yun-sik Kim) 공식 웹사이트">
+<title>정산(靜山) 김연식(金演植) 작가 | JUNGSAN KIM YUN SIK | jskim.art</title>
+<meta name="description" content="정산(靜山) 김연식(金演植) 작가(JUNGSAN KIM YUN SIK) 공식 웹사이트">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://jskim.art/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="정산 김연식 작가 | JungSan Yun-sik Kim">
+<meta property="og:title" content="정산(靜山) 김연식(金演植) 작가 | JUNGSAN KIM YUN SIK">
 <meta property="og:url" content="https://jskim.art/">
 <meta property="og:locale" content="ko_KR">
 
@@ -27,8 +27,8 @@
 {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": "정산 김연식",
-  "alternateName": "JungSan Yun-sik Kim",
+  "name": "정산(靜山) 김연식(金演植)",
+  "alternateName": "JUNGSAN KIM YUN SIK",
   "url": "https://jskim.art/",
   "jobTitle": "Artist"
 }
@@ -47,9 +47,10 @@
     --text-main:  #E8E4D8;
     --text-dim:   #A9A594;
 
-    --font-kr-display: 'Gowun Batang', serif;
+    --font-kr-display: 'Nanum Myeongjo', serif;
     --font-kr-body:    'Gowun Dodum', sans-serif;
-    --font-en-display: 'Fraunces', serif;
+    --font-en-name:    'Cinzel', serif;
+    --font-en-display: 'Cormorant Garamond', serif;
     --font-utility:    'Space Grotesk', sans-serif;
   }
 
@@ -76,32 +77,97 @@
   html[data-lang="ko"] [data-i18n="ko"] { display: inline; }
   html[data-lang="en"] [data-i18n="en"] { display: inline; }
 
-  /* ---------------- Header (dungzak.art pattern: brand + nav + lang, all present at first paint) ---------------- */
+  /* ---------------- Masthead: name (largest text on the site), menu, and language are all directly visible, at every breakpoint ---------------- */
   header.site-header {
     position: sticky; top: 0; z-index: 20;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 10px;
-    padding: 16px 24px;
-    background: rgba(10,24,48,.82);
-    backdrop-filter: blur(6px);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 16px;
+    padding: 32px 24px 20px;
+    background: rgba(10,24,48,.88);
+    backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--card-border);
+    transition: padding .4s ease, gap .4s ease;
   }
-  .brand { font-family: var(--font-kr-display); font-size: 15px; letter-spacing: .04em; cursor: pointer; }
-  html[data-lang="en"] .brand { font-family: var(--font-en-display); font-style: italic; }
+  header.site-header.is-compact { padding: 12px 24px 10px; gap: 8px; }
 
-  nav.primary { display: flex; gap: 4px; }
+  /* Hamburger: opens the social-links panel only. It is a toggle button, never a link itself. */
+  .ms-burger {
+    position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; justify-content: center; gap: 5px;
+    width: 32px; height: 32px; padding: 4px;
+    background: none; border: none; cursor: pointer;
+  }
+  .ms-burger span {
+    display: block; width: 100%; height: 2px; border-radius: 2px;
+    background: var(--gold-bright); transition: transform .3s ease, opacity .3s ease;
+  }
+  .ms-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .ms-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .ms-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .ms-name {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font-family: var(--font-kr-display); font-weight: 700; color: var(--gold-bright);
+    font-size: clamp(22px, 4.6vw, 42px); letter-spacing: .04em; line-height: 1.25;
+    max-width: calc(100% - 90px); /* stays clear of the burger button on narrow screens */
+    text-align: center;
+    transition: font-size .4s ease;
+  }
+  .ms-name:hover { opacity: .88; }
+  header.site-header.is-compact .ms-name { font-size: clamp(16px, 2.8vw, 22px); }
+  html[data-lang="en"] .ms-name {
+    font-family: var(--font-en-name); font-weight: 600; font-style: normal;
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+
+  nav.primary { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
   nav.primary button {
-    background: none; border: none; color: var(--text-dim); font: inherit; font-size: 13px;
-    letter-spacing: .04em; padding: 8px 14px; cursor: pointer; border-radius: 999px; transition: all .25s ease;
+    background: none; border: none; color: var(--text-dim); font: inherit;
+    font-family: var(--font-utility); font-weight: 500; font-size: 17px;
+    letter-spacing: .16em; text-transform: uppercase;
+    padding: 11px 22px; cursor: pointer; border-radius: 999px; transition: all .25s ease;
   }
-  nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.08); }
+  header.site-header.is-compact nav.primary button { font-size: 13px; padding: 7px 15px; letter-spacing: .12em; }
+  nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
+  html[data-lang="ko"] nav.primary button { font-family: var(--font-kr-body); letter-spacing: .05em; }
 
-  .lang-row { display: flex; gap: 10px; font-family: var(--font-utility); font-weight: 500; font-size: 12px; letter-spacing: .1em; }
-  .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 4px 2px; font: inherit; letter-spacing: inherit; opacity: .65; transition: opacity .3s ease, color .3s ease; }
+  /* KR / EN: a small, subtle text switcher set to the far right (dungzak.art pattern) — not a competing button. */
+  .lang-row-wrap { width: 100%; align-self: stretch; display: flex; justify-content: flex-end; padding: 0 6px; }
+  .lang-row { display: flex; gap: 14px; align-items: center; font-family: var(--font-en-name); font-weight: 500; font-size: 15px; letter-spacing: .24em; }
+  header.site-header.is-compact .lang-row { font-size: 13px; }
+  .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px; font: inherit; letter-spacing: inherit; opacity: .6; transition: opacity .3s ease, color .3s ease; }
   .lang-row button.active { color: var(--gold-bright); opacity: 1; }
   .lang-row .sep { color: var(--text-dim); opacity: .35; }
 
-  main { min-height: calc(100vh - 64px); }
+  @media (max-width: 640px) {
+    header.site-header { padding: 24px 20px 16px; gap: 14px; }
+    .lang-row-wrap { justify-content: center; }
+  }
+
+  /* ---------------- Social drawer: opened only by the hamburger button. Three direct links, nothing else. ---------------- */
+  #social-drawer[hidden] { display: none !important; }
+  #social-drawer { position: fixed; inset: 0; z-index: 65; }
+  .social-drawer-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.9); opacity: 0; transition: opacity .3s ease; }
+  #social-drawer.is-open .social-drawer-backdrop { opacity: 1; }
+  .social-drawer-panel {
+    position: relative; max-width: 280px; margin: 16vh auto 0;
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px;
+    padding: 32px 24px 24px; opacity: 0; transform: translateY(-10px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  #social-drawer.is-open .social-drawer-panel { opacity: 1; transform: translateY(0); }
+  .social-drawer-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; line-height: 1; }
+  .social-drawer-links { display: flex; flex-direction: column; gap: 4px; }
+  .social-drawer-links a {
+    display: flex; align-items: center; gap: 12px; text-decoration: none;
+    color: var(--text-dim); font-family: var(--font-utility); font-weight: 500;
+    font-size: 15px; letter-spacing: .08em;
+    padding: 12px 10px; border-radius: 8px; transition: all .2s ease;
+  }
+  .social-drawer-links a:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
+  .social-drawer-links svg { width: 19px; height: 19px; flex-shrink: 0; }
+
+  main { min-height: 60vh; }
 
   /* ---------------- Home (dungzak.art hero pattern: baked-in visible on first paint) ---------------- */
   #panel-home.is-active { display: flex; }
@@ -113,9 +179,7 @@
   @keyframes moon-glow { 0%,100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,.25)); } 50% { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,.4)); } }
   .droplet { position: absolute; left: 50%; top: 68px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,.6); opacity: 0; animation: fall 13s ease-in infinite; }
   @keyframes fall { 0%{opacity:0; transform: translateY(0) scale(1);} 8%{opacity:.9;} 70%{opacity:.5;} 92%{opacity:0; transform: translateY(220px) scale(.4);} 100%{opacity:0; transform: translateY(220px) scale(.4);} }
-  .name { margin: 22px 0 0; font-family: var(--font-kr-display); font-weight: 700; font-size: clamp(26px,5vw,34px); letter-spacing: .08em; }
-  html[data-lang="en"] .name { font-family: var(--font-en-display); font-style: italic; font-weight: 500; letter-spacing: .005em; }
-  .role { margin: 10px 0 0; font-size: 12px; letter-spacing: .28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
+  .role { margin: 22px 0 0; font-size: 12px; letter-spacing: .28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
   html[data-lang="en"] .role { font-family: var(--font-utility); letter-spacing: .24em; }
   .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 22px 0; }
   .status { font-size: clamp(15px,2.4vw,18px); opacity: .9; }
@@ -182,26 +246,71 @@
   .bio-lang button.active { color: var(--gold-bright); border-color: var(--gold-base); }
   .bio-close { position: absolute; top: 14px; right: 18px; background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
 
-  footer { text-align: center; padding: 24px; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); opacity: .5; }
+  footer { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 34px 24px 28px; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); }
+  .footer-social { display: flex; align-items: center; gap: 20px; }
+  .footer-social a { color: var(--gold-base); opacity: .75; display: inline-flex; transition: opacity .25s ease, color .25s ease, transform .25s ease; }
+  .footer-social a:hover { color: var(--gold-bright); opacity: 1; transform: translateY(-1px); }
+  .footer-social svg { width: 18px; height: 18px; }
+  .footer-copy { opacity: .5; }
 </style>
 </head>
 <body>
 
 <div class="bg-layer"></div>
 
-<header class="site-header">
-  <div class="brand" id="brand-home">
-    <span data-i18n="ko">정산 김연식</span><span data-i18n="en">JungSan Yun-sik Kim</span>
-  </div>
+<header class="site-header" id="site-header">
+  <button type="button" class="ms-burger" id="menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="social-drawer" aria-label="소셜 링크 열기 / Open social links">
+    <span></span><span></span><span></span>
+  </button>
+  <button type="button" class="ms-name" id="brand-home">
+    <span data-i18n="ko">정산(靜山) 김연식(金演植)</span><span data-i18n="en">JUNGSAN KIM YUN SIK</span>
+  </button>
   <nav class="primary" role="tablist">
-    <button type="button" data-target="home" class="active" aria-current="page">Home</button>
-    <button type="button" data-target="works">Works</button>
-    <button type="button" id="tab-bio">Bio</button>
+    <button type="button" data-target="works">
+      <span data-i18n="ko">작품</span><span data-i18n="en">ART WORKS</span>
+    </button>
+    <button type="button" id="tab-bio">
+      <span data-i18n="ko">작가 소개</span><span data-i18n="en">ARTIST BIO</span>
+    </button>
   </nav>
-  <div class="lang-row">
-    <button id="btn-ko" class="active">KR</button><span class="sep">/</span><button id="btn-en">EN</button>
+  <div class="lang-row-wrap">
+    <div class="lang-row">
+      <button id="btn-ko" class="active">KR</button><span class="sep">/</span><button id="btn-en">EN</button>
+    </div>
   </div>
 </header>
+
+<!-- Hamburger drawer: three direct social links only. The burger button itself is never a link. -->
+<div id="social-drawer" hidden>
+  <div class="social-drawer-backdrop" id="social-drawer-backdrop"></div>
+  <div class="social-drawer-panel" role="menu" aria-label="Social links">
+    <button type="button" class="social-drawer-close" id="social-drawer-close" aria-label="close">&times;</button>
+    <div class="social-drawer-links">
+      <a href="https://www.youtube.com/@yunsikkim7462" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="5.5" width="19" height="13" rx="4"/>
+          <path d="M10.3 9.2v5.6l5-2.8-5-2.8Z" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>YouTube</span>
+      </a>
+      <a href="https://www.facebook.com/gallery.mona.lisa.sanchon" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9.2"/>
+          <path d="M13.6 21v-7.2h2.2l.3-2.6h-2.5V9.4c0-.75.2-1.26 1.28-1.26h1.37V5.8c-.24-.03-1.06-.1-2-.1-2 0-3.36 1.22-3.36 3.46v1.94H8.7v2.6h2.24V21" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Facebook</span>
+      </a>
+      <a href="https://www.instagram.com/gallery_monalisa_sanchon/" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4.2"/>
+          <circle cx="17.2" cy="6.8" r=".6" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Instagram</span>
+      </a>
+    </div>
+  </div>
+</div>
 
 <main>
   <!-- Home: baked in with is-active so it paints before JS runs (dungzak.art LCP pattern) -->
@@ -213,9 +322,6 @@
         </svg>
         <div class="droplet"></div>
       </div>
-      <h1 class="name">
-        <span data-i18n="ko">정산 김연식</span><span data-i18n="en">JungSan Yun-sik Kim</span>
-      </h1>
       <p class="role"><span data-i18n="ko">작가</span><span data-i18n="en">Artist</span></p>
       <div class="divider"></div>
       <p class="status" id="home-status">
@@ -258,7 +364,30 @@
   </section>
 </main>
 
-<footer>&copy; 2026 jskim.art</footer>
+<footer>
+  <div class="footer-social">
+    <a href="https://www.instagram.com/gallery_monalisa_sanchon/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="5"/>
+        <circle cx="12" cy="12" r="4.2"/>
+        <circle cx="17.2" cy="6.8" r=".6" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+    <a href="https://www.youtube.com/@yunsikkim7462" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="5.5" width="19" height="13" rx="4"/>
+        <path d="M10.3 9.2v5.6l5-2.8-5-2.8Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+    <a href="https://www.facebook.com/gallery.mona.lisa.sanchon" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9.2"/>
+        <path d="M13.6 21v-7.2h2.2l.3-2.6h-2.5V9.4c0-.75.2-1.26 1.28-1.26h1.37V5.8c-.24-.03-1.06-.1-2-.1-2 0-3.36 1.22-3.36 3.46v1.94H8.7v2.6h2.24V21" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+  </div>
+  <div class="footer-copy">&copy; 2026 jskim.art</div>
+</footer>
 
 <!-- Viewer: single DOM instance, reused for every work -->
 <div id="viewer" role="dialog" aria-modal="true">
@@ -337,6 +466,30 @@
     b.addEventListener('click', () => showPanel(b.dataset.target));
   });
   $('#brand-home').addEventListener('click', () => showPanel('home'));
+
+  // ---------------- Social drawer (hamburger): three direct links only. The burger button toggles it; it is never a link itself. ----------------
+  const socialDrawer = $('#social-drawer');
+  const menuToggle = $('#menu-toggle');
+  function openDrawer() {
+    socialDrawer.hidden = false;
+    requestAnimationFrame(() => socialDrawer.classList.add('is-open'));
+    menuToggle.setAttribute('aria-expanded', 'true');
+  }
+  function closeDrawer() {
+    socialDrawer.classList.remove('is-open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    setTimeout(() => { if (!socialDrawer.classList.contains('is-open')) socialDrawer.hidden = true; }, 300);
+  }
+  menuToggle.addEventListener('click', () => {
+    if (socialDrawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+  });
+  $('#social-drawer-close').addEventListener('click', closeDrawer);
+  $('#social-drawer-backdrop').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && socialDrawer.classList.contains('is-open')) closeDrawer();
+  });
+  // Each social link opens in a new tab; close the drawer behind it once clicked.
+  $$('.social-drawer-links a', socialDrawer).forEach(el => el.addEventListener('click', closeDrawer));
 
   $('#tab-bio').addEventListener('click', openBioModal);
   function openBioModal() { $('#bio-modal').hidden = false; }
@@ -614,10 +767,22 @@
     viewerLoadToken += 1; // invalidate any in-flight zoom swap
   }
 
+  // ---------------- Masthead: step down to a compact size once the visitor starts scrolling ----------------
+  const siteHeader = $('#site-header');
+  let headerCompact = false;
+  function updateHeaderCompact() {
+    const shouldCompact = window.scrollY > 24;
+    if (shouldCompact === headerCompact) return;
+    headerCompact = shouldCompact;
+    siteHeader.classList.toggle('is-compact', headerCompact);
+  }
+  window.addEventListener('scroll', updateHeaderCompact, { passive: true });
+
   // ---------------- Init ----------------
   setLang(lang);
   showPanel(savedState.panel === 'works' ? 'works' : 'home');
   loadWorks(); // always fetch in background so Home can reveal "View Works" once data exists
+  updateHeaderCompact();
 })();
 </script>
 
