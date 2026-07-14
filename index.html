@@ -312,17 +312,130 @@
   .stats-inline { text-align: center; font-family: var(--font-utility); font-size: 12px; color: var(--text-dim); letter-spacing: .04em; margin-bottom: 18px; }
   .stats-inline strong { color: var(--gold-bright); font-weight: 500; }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 24px; }
-  .controls select, .controls input {
-    background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main);
-    border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; min-width: 160px;
+  /* ================= Filter area: Series Selector + Search ================= */
+  .controls {
+    display: flex; flex-direction: column; gap: 12px;
+    max-width: 560px; margin: 0 auto 28px;
   }
-  .controls select:focus, .controls input:focus { outline: none; border-color: var(--gold-base); }
-
+  @media (min-width: 641px) {
+    .controls { flex-direction: row; align-items: stretch; max-width: 640px; gap: 14px; }
+    .controls .series-select { flex: 0 0 auto; min-width: 230px; }
+    .controls .search-field { flex: 1 1 auto; }
+  }
   @media (max-width: 480px) {
-    .controls { flex-direction: column; align-items: stretch; }
-    .controls select, .controls input { width: 100%; min-width: 0; }
+    .controls { padding: 0 2px; gap: 12px; }
   }
+
+  /* Shared visual language for both filter controls: quiet navy card, thin
+     low-saturation gold border, gold only appears sharply on focus. */
+  .filter-control {
+    height: 56px;
+    border-radius: 17px;
+    background: rgba(7,17,36,.6);
+    border: 1px solid rgba(224,194,122,.2);
+    padding: 0 16px;
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .filter-control:focus-within {
+    border-color: var(--gold-base);
+    box-shadow: 0 0 0 3px rgba(224,194,122,.12);
+  }
+
+  /* ---- Series Selector (replaces the native <select>) ---- */
+  .series-select { position: relative; width: 100%; }
+  .series-select-trigger {
+    width: 100%; background: none; border: none; color: var(--text-main);
+    font: inherit; font-size: 14px; letter-spacing: .01em; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .series-select-trigger:focus-visible { outline: none; }
+  .series-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .series-select-chevron { width: 15px; height: 15px; flex-shrink: 0; color: var(--gold-base); transition: transform .2s ease; }
+  .series-select.is-open .series-select-chevron { transform: rotate(180deg); }
+
+  .series-select-scrim {
+    position: fixed; inset: 0; z-index: 39;
+    background: rgba(6,12,26,.5);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .series-select.is-open .series-select-scrim { opacity: 1; pointer-events: auto; }
+
+  .series-select-panel {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
+    width: min(320px, 90vw);
+    background: rgba(14,27,52,.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(224,194,122,.22);
+    border-radius: 14px;
+    padding: 8px;
+    max-height: min(60vh, 420px);
+    overflow-y: auto;
+    box-shadow: 0 18px 40px rgba(0,0,0,.4);
+    opacity: 0; transform: translateY(-6px); pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .series-select.is-open .series-select-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+  .series-select-sheet-handle, .series-select-sheet-title { display: none; }
+
+  .series-select-options { list-style: none; margin: 0; padding: 0; }
+  .series-select-option {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    background: none; border: none; text-align: left; cursor: pointer;
+    color: var(--text-dim); font: inherit; font-size: 14px;
+    padding: 11px 12px; border-radius: 9px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .series-select-option:hover, .series-select-option:focus-visible { background: rgba(224,194,122,.09); color: var(--gold-bright); outline: none; }
+  .series-select-option .check-icon { width: 14px; height: 14px; flex-shrink: 0; color: var(--gold-bright); opacity: 0; }
+  .series-select-option[aria-selected="true"] { color: var(--gold-bright); }
+  .series-select-option[aria-selected="true"] .check-icon { opacity: 1; }
+
+  @media (max-width: 640px) {
+    /* Mobile: the same panel becomes a bottom sheet — no native OS <select> popup. */
+    .series-select-panel {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 66;
+      width: auto; max-width: none;
+      border-radius: 20px 20px 0 0;
+      padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+      max-height: 70vh;
+      transform: translateY(100%);
+      box-shadow: 0 -18px 45px rgba(0,0,0,.45);
+    }
+    .series-select.is-open .series-select-panel { transform: translateY(0); }
+    .series-select-sheet-handle {
+      display: block; width: 38px; height: 4px; border-radius: 999px;
+      background: var(--card-border); margin: 2px auto 12px;
+    }
+    .series-select-sheet-title {
+      display: block; font-family: var(--font-utility); font-size: 12px;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim);
+      margin: 0 4px 8px;
+    }
+    .series-select-option { min-height: 48px; padding: 13px 12px; }
+  }
+
+  /* ---- Search field ---- */
+  .search-field { position: relative; }
+  .search-field-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--text-dim); }
+  .search-field input {
+    flex: 1 1 auto; min-width: 0;
+    background: none; border: none; color: var(--text-main);
+    font: inherit; font-size: 14px;
+  }
+  .search-field input:focus { outline: none; }
+  .search-field input::placeholder { color: var(--text-dim); opacity: .8; }
+  .search-field-clear {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; color: var(--text-dim); cursor: pointer;
+    font-size: 16px; line-height: 1; transition: color .15s ease, background .15s ease;
+  }
+  .search-field-clear:hover, .search-field-clear:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.1); outline: none; }
+  .search-field-clear[hidden] { display: none; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
   .card {
@@ -337,7 +450,16 @@
   .card .meta .t { font-size: 13px; }
   .card .meta .s { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 
-  .empty-msg { text-align: center; color: var(--text-dim); font-size: 14px; padding: 40px 0; }
+  /* ---- Empty state ---- */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 10px; padding: 56px 20px; color: var(--text-dim);
+    animation: empty-fade .3s ease;
+  }
+  @keyframes empty-fade { from { opacity: 0; } to { opacity: 1; } }
+  .empty-state-icon { width: 38px; height: 38px; color: var(--gold-base); opacity: .7; }
+  .empty-state-title { margin: 0; font-size: 15px; font-weight: 500; color: var(--text-main); }
+  .empty-state-sub { margin: 0; font-size: 13px; color: var(--text-dim); max-width: 320px; }
 
   .load-more-wrap { text-align: center; margin-top: 28px; }
   .load-more-wrap button {
@@ -517,19 +639,51 @@
   <section id="panel-works">
     <h2 class="visually-hidden"><span data-i18n="ko">작품</span><span data-i18n="en">Art Works</span></h2>
     <p class="stats-inline" id="stats-line">
-      <strong id="stat-total">—</strong> <span data-i18n="ko">works</span><span data-i18n="en">works</span>
-      <span id="stats-results-wrap" hidden> · <strong id="stat-filtered">—</strong> <span data-i18n="ko">결과</span><span data-i18n="en">results</span></span>
-      · <strong id="stat-sections">—</strong> <span data-i18n="ko">섹션</span><span data-i18n="en">sections</span>
+      <strong id="stat-total">—</strong> <span data-i18n="ko">작품</span><span data-i18n="en">Works</span>
+      · <strong id="stat-sections">—</strong> <span data-i18n="ko">시리즈</span><span data-i18n="en">Series</span>
     </p>
     <div class="controls">
-      <select id="section-select"><option value="all">전체 섹션 / All</option></select>
-      <input id="search" type="text" placeholder="검색 / Search">
+      <!-- Custom Series Selector: replaces the native <select>. Renders as a
+           small anchored dropdown on desktop/tablet and a Bottom Sheet on
+           mobile — same markup, CSS media query decides the presentation. -->
+      <div class="series-select" id="series-select">
+        <button type="button" class="filter-control series-select-trigger" id="series-select-trigger"
+                aria-haspopup="listbox" aria-expanded="false" aria-controls="series-select-panel">
+          <span id="series-select-label">전체 섹션</span>
+          <svg class="series-select-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+        <div class="series-select-scrim" id="series-select-scrim"></div>
+        <div class="series-select-panel" id="series-select-panel">
+          <div class="series-select-sheet-handle"></div>
+          <div class="series-select-sheet-title" id="series-select-sheet-title">
+            <span data-i18n="ko">시리즈 선택</span><span data-i18n="en">Select Series</span>
+          </div>
+          <ul class="series-select-options" id="series-select-options" role="listbox" aria-label="Series"></ul>
+        </div>
+      </div>
+      <div class="filter-control search-field">
+        <svg class="search-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10.5" cy="10.5" r="6.5"/>
+          <path d="M20 20l-4.8-4.8"/>
+        </svg>
+        <input id="search" type="text" placeholder="작품 검색" autocomplete="off">
+        <button type="button" class="search-field-clear" id="search-clear" aria-label="검색어 지우기" hidden>&times;</button>
+      </div>
     </div>
     <div class="grid" id="grid"></div>
-    <p class="empty-msg" id="empty-msg" hidden>
-      <span data-i18n="ko">해당 조건에 맞는 작품이 없습니다.</span>
-      <span data-i18n="en">No works match this filter.</span>
-    </p>
+    <div class="empty-state" id="empty-msg" hidden>
+      <svg class="empty-state-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="9" width="32" height="30" rx="3"/>
+        <circle cx="18.5" cy="19" r="3"/>
+        <path d="M40 30l-8.5-8.5-7 7-5-5-11.5 11.5"/>
+      </svg>
+      <p class="empty-state-title">
+        <span data-i18n="ko">검색 결과가 없습니다</span><span data-i18n="en">No works found</span>
+      </p>
+      <p class="empty-state-sub">
+        <span data-i18n="ko">다른 검색어나 시리즈를 선택해 주세요.</span><span data-i18n="en">Try another keyword or select a different series.</span>
+      </p>
+    </div>
     <div class="load-more-wrap" id="load-more-wrap" hidden>
       <button type="button" id="load-more-btn">
         <span data-i18n="ko">더 보기</span><span data-i18n="en">Load More</span>
@@ -654,7 +808,8 @@
     btnEn.classList.toggle('active', l === 'en');
     applySeoStrings(l);
     renderGrid();
-    renderSectionOptions();
+    buildSeriesOptions();
+    updateSearchPlaceholder();
     if (typeof currentInfoKey !== 'undefined' && currentInfoKey) openInfoModal(currentInfoKey);
   }
   btnKo.addEventListener('click', () => setLang('ko'));
@@ -847,20 +1002,13 @@
       $('#home-enter').hidden = false;
     }
 
-    renderSectionOptions();
+    buildSeriesOptions();
     applyFilters();
     injectArtworkStructuredData();
 
-    const section = $('#section-select');
-    section.addEventListener('change', () => {
-      sectionFilter = section.value;
-      saveUiState({ section: sectionFilter });
-      visibleCount = INITIAL_VISIBLE;
-      applyFilters();
-    });
-
     let searchTimer;
     $('#search').addEventListener('input', (e) => {
+      updateSearchClearVisibility();
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
         searchQuery = e.target.value.trim().toLowerCase();
@@ -870,34 +1018,133 @@
       }, 220);
     });
 
+    $('#search-clear').addEventListener('click', () => {
+      const input = $('#search');
+      input.value = '';
+      searchQuery = '';
+      saveUiState({ query: '' });
+      visibleCount = INITIAL_VISIBLE;
+      applyFilters();
+      updateSearchClearVisibility();
+      input.focus();
+    });
+
     $('#load-more-btn').addEventListener('click', () => {
       visibleCount += LOAD_STEP;
       renderGrid();
     });
 
-    section.value = sectionFilter;
     $('#search').value = searchQuery;
+    updateSearchPlaceholder();
+    updateSearchClearVisibility();
   }
 
-  function renderSectionOptions() {
-    const select = $('#section-select');
-    const current = select.value || 'all';
-    select.innerHTML = '<option value="all">' + (lang === 'ko' ? '전체 섹션' : 'All Sections') + '</option>';
-    sections.filter(s => s.active).sort((a,b) => a.order - b.order).forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s.key;
-      opt.textContent = lang === 'ko' ? s.title_kr : s.title_en;
-      select.appendChild(opt);
+  // ---------------- Series Selector: one panel, two presentations ----------------
+  // Desktop/tablet: anchored dropdown under the trigger button.
+  // Mobile (CSS media query): the same panel becomes a Bottom Sheet.
+  // No native <select> is ever shown to the person.
+  const seriesSelect = $('#series-select');
+  const seriesTrigger = $('#series-select-trigger');
+  const seriesPanel = $('#series-select-panel');
+  const seriesScrim = $('#series-select-scrim');
+  const seriesOptionsList = $('#series-select-options');
+  const seriesLabel = $('#series-select-label');
+
+  function seriesOptionsData() {
+    const allLabel = lang === 'ko' ? '전체 섹션' : 'All Series';
+    return [{ key: 'all', label: allLabel }].concat(
+      sections.filter(s => s.active).sort((a, b) => a.order - b.order).map(s => ({
+        key: s.key,
+        label: lang === 'ko' ? s.title_kr : s.title_en
+      }))
+    );
+  }
+
+  function buildSeriesOptions() {
+    if (!seriesOptionsList) return;
+    const items = seriesOptionsData();
+    seriesOptionsList.innerHTML = '';
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'presentation');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'series-select-option';
+      btn.setAttribute('role', 'option');
+      btn.dataset.key = item.key;
+      btn.setAttribute('aria-selected', String(item.key === sectionFilter));
+      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg><span>' + escapeHTML(item.label) + '</span>';
+      btn.addEventListener('click', () => selectSeries(item.key));
+      li.appendChild(btn);
+      seriesOptionsList.appendChild(li);
     });
-    select.value = current;
+    const current = items.find(i => i.key === sectionFilter) || items[0];
+    if (seriesLabel && current) seriesLabel.textContent = current.label;
+  }
+
+  function selectSeries(key) {
+    sectionFilter = key;
+    saveUiState({ section: key });
+    visibleCount = INITIAL_VISIBLE;
+    buildSeriesOptions();
+    applyFilters();
+    closeSeriesPanel();
+  }
+
+  function openSeriesPanel() {
+    seriesSelect.classList.add('is-open');
+    seriesTrigger.setAttribute('aria-expanded', 'true');
+    const selected = seriesPanel.querySelector('[aria-selected="true"]') || seriesPanel.querySelector('.series-select-option');
+    if (selected) selected.focus();
+    document.addEventListener('keydown', onSeriesKeydown);
+  }
+  function closeSeriesPanel() {
+    if (!seriesSelect.classList.contains('is-open')) return;
+    seriesSelect.classList.remove('is-open');
+    seriesTrigger.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('keydown', onSeriesKeydown);
+    seriesTrigger.focus();
+  }
+  function onSeriesKeydown(e) {
+    const options = Array.from(seriesPanel.querySelectorAll('.series-select-option'));
+    const idx = options.indexOf(document.activeElement);
+    if (e.key === 'Escape') { e.preventDefault(); closeSeriesPanel(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); const n = options[Math.min(idx + 1, options.length - 1)]; if (n) n.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); const p = options[Math.max(idx - 1, 0)]; if (p) p.focus(); }
+    else if (e.key === 'Tab') {
+      // Simple focus trap: keep Tab cycling within the open panel.
+      if (!options.length) return;
+      const first = options[0], last = options[options.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+  seriesTrigger.addEventListener('click', () => {
+    if (seriesSelect.classList.contains('is-open')) closeSeriesPanel(); else openSeriesPanel();
+  });
+  seriesScrim.addEventListener('click', closeSeriesPanel);
+
+  // ---------------- Search field: placeholder + clear button ----------------
+  const SEARCH_PLACEHOLDER = { ko: '작품 검색', en: 'Search works' };
+  function updateSearchPlaceholder() {
+    const input = $('#search');
+    if (input) input.placeholder = SEARCH_PLACEHOLDER[lang] || SEARCH_PLACEHOLDER.ko;
+  }
+  function updateSearchClearVisibility() {
+    const input = $('#search');
+    const clearBtn = $('#search-clear');
+    if (input && clearBtn) clearBtn.hidden = !input.value;
   }
 
   function applyFilters() {
+    const activeSection = sections.find(s => s.key === sectionFilter);
     filtered = allWorks.filter(w => {
-      const matchesSection = sectionFilter === 'all' || w.section_key === sectionFilter;
+      const matchesSection = sectionFilter === 'all'
+        || w.section_key === sectionFilter
+        || (activeSection && Array.isArray(activeSection.childKeys) && activeSection.childKeys.includes(w.section_key));
       const title = (field(w, 'title') || '').toLowerCase();
       const material = (field(w, 'material') || '').toLowerCase();
-      const sectionMeta = sections.find(s => s.key === w.section_key);
+      const sectionMeta = sections.find(s => s.key === w.section_key || (Array.isArray(s.childKeys) && s.childKeys.includes(w.section_key)));
       const sectionName = sectionMeta ? (lang === 'ko' ? sectionMeta.title_kr : sectionMeta.title_en) || '' : '';
       const matchesSearch = !searchQuery
         || title.includes(searchQuery)
@@ -912,10 +1159,7 @@
 
   function updateStats() {
     $('#stat-total').textContent = allWorks.length;
-    $('#stat-filtered').textContent = filtered.length;
     $('#stat-sections').textContent = sections.filter(s => s.active).length;
-    const resultsWrap = $('#stats-results-wrap');
-    if (resultsWrap) resultsWrap.hidden = !searchQuery;
   }
 
   const SVG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="5"></svg>';
@@ -1087,16 +1331,17 @@
   function resetHome() {
     closeViewer();
     closeDrawer();
+    if (typeof closeSeriesPanel === 'function') closeSeriesPanel();
 
     sectionFilter = 'all';
     searchQuery = '';
     visibleCount = INITIAL_VISIBLE;
     saveUiState({ section: 'all', query: '' });
 
-    const sectionSelect = $('#section-select');
-    if (sectionSelect) sectionSelect.value = 'all';
+    if (worksLoaded) buildSeriesOptions();
     const searchInput = $('#search');
     if (searchInput) searchInput.value = '';
+    updateSearchClearVisibility();
 
     if (worksLoaded) applyFilters();
 
