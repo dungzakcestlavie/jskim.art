@@ -216,18 +216,56 @@
   @media (max-width: 640px) {
     header.site-header { padding: 26px 20px 18px; gap: 16px; }
 
-    html[data-lang="en"] header.site-header { padding-left: 14px; padding-right: 14px; }
-    html[data-lang="en"] .ms-name {
+    /* ---- English mobile only: restructure the burger + nav row as a grid ----
+       KR mobile keeps the original flex/absolute-burger layout untouched below.
+       Root cause of the crowding: the absolutely-positioned burger and the
+       centered nav row could overlap once the longer English labels
+       ("ART WORKS" / "ARTIST BIO") pushed nav width close to the burger.
+       Fix: give the burger, ART WORKS, and ARTIST BIO their own grid columns
+       so none of them can crowd or overlap, at any of the tested widths. */
+    html[data-lang="en"] header.site-header {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      grid-template-areas:
+        "name name"
+        "burger nav"
+        "lang lang";
+      row-gap: 14px;
+      column-gap: 14px;
+      align-items: center;
+      padding-left: 16px; padding-right: 16px;
+    }
+    html[data-lang="en"] header.site-header .ms-burger {
+      grid-area: burger;
+      position: static; transform: none;
+      justify-self: start;
+    }
+    html[data-lang="en"] header.site-header .ms-name {
+      grid-area: name;
+      max-width: 100%;
       white-space: nowrap;
-      max-width: calc(100% - 60px);
       font-size: clamp(11px, 4.2vw, 20px);
       letter-spacing: .04em;
     }
     html[data-lang="en"] header.site-header.is-compact .ms-name {
       font-size: clamp(10px, 3.4vw, 15px);
     }
-    html[data-lang="en"] nav.primary { gap: 6px; }
-    html[data-lang="en"] nav.primary button { padding: 9px 14px; }
+    html[data-lang="en"] header.site-header nav.primary {
+      grid-area: nav;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: 18px;
+      width: 100%;
+    }
+    html[data-lang="en"] header.site-header nav.primary button {
+      padding: 9px 6px;
+      font-size: 16px;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    html[data-lang="en"] header.site-header nav.primary button:first-child { justify-self: center; }
+    html[data-lang="en"] header.site-header nav.primary button:last-child { justify-self: end; }
+    html[data-lang="en"] header.site-header .lang-row-wrap { grid-area: lang; }
   }
 
   /* 햄버거 메뉴: 왼쪽 상단 헤더 아래 고정, 중앙 모달 아님 */
@@ -359,10 +397,10 @@
   .series-select-trigger {
     width: 100%; background: none; border: none; color: var(--text-main);
     font: inherit; font-size: 14px; letter-spacing: .01em; cursor: pointer;
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    display: grid; grid-template-columns: minmax(0, 1fr) 15px; align-items: center; gap: 10px;
   }
   .series-select-trigger:focus-visible { outline: none; }
-  .series-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .series-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; min-width: 0; }
   .series-select-chevron { width: 15px; height: 15px; flex-shrink: 0; color: var(--gold-base); transition: transform .2s ease; }
   .series-select.is-open .series-select-chevron { transform: rotate(180deg); }
 
