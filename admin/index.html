@@ -1,1 +1,90 @@
 <!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jskim.art Admin</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1>jskim.art <span>Admin</span></h1>
+  <div class="helper-status" id="helper-status">helper: <span id="helper-status-text">확인 중…</span></div>
+</header>
+
+<main class="layout">
+
+  <section class="panel">
+    <h2>작품 등록 <span class="en">Register Work</span></h2>
+
+    <form id="work-form" novalidate>
+
+      <div class="row">
+        <label>작품 ID <span class="req">*</span>
+          <input type="text" id="f-id" placeholder="예: YD-0001" required>
+          <small id="id-warning" class="warn"></small>
+        </label>
+        <label>섹션 <span class="req">*</span>
+          <select id="f-section" required></select>
+        </label>
+        <label>캡션 유형 <span class="req">*</span>
+          <select id="f-caption-type" required></select>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>제작연도 <span class="req">*</span>
+          <input type="text" id="f-year" placeholder="예: 2026" required>
+        </label>
+        <label>상태 <span class="req">*</span>
+          <select id="f-status" required></select>
+        </label>
+      </div>
+
+      <div class="lang-columns">
+        <div class="lang-col">
+          <h3>KR</h3>
+          <label>제목 <input type="text" id="f-title-kr"></label>
+          <label>재료 <input type="text" id="f-material-kr"></label>
+          <label>크기 <input type="text" id="f-size-kr" placeholder="예: 108×78cm"></label>
+        </div>
+        <div class="lang-col">
+          <h3>EN</h3>
+          <label>Title <input type="text" id="f-title-en"></label>
+          <label>Material <input type="text" id="f-material-en"></label>
+          <label>Size <input type="text" id="f-size-en" placeholder="e.g. 108×78cm"></label>
+        </div>
+      </div>
+      <p class="hint">한쪽 언어만 입력해도 저장됩니다. (KR만 또는 EN만 가능)</p>
+
+      <div class="row">
+        <label class="file-label">이미지 파일 <span class="req">*</span>
+          <input type="file" id="f-image" accept="image/*" required>
+          <small id="filename-warning" class="warn"></small>
+        </label>
+        <div class="preview" id="preview"></div>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="btn-check">등록 전 검토</button>
+        <button type="button" id="btn-submit" disabled>이미지 처리 + works.json 저장</button>
+        <button type="button" id="btn-push" disabled>GitHub에 반영 (git push)</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>미리보기 <span class="en">Preview</span></h2>
+    <div id="review-box" class="review-box">등록 전 검토를 눌러 최종 KR/EN 데이터를 확인하세요.</div>
+
+    <h2>처리 로그 <span class="en">Log</span></h2>
+    <div id="log-box" class="log-box"></div>
+  </section>
+
+</main>
+
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
