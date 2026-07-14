@@ -2,27 +2,50 @@
 <html lang="ko" data-lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>정산 김연식 작가 | JungSan Yun-sik Kim | jskim.art</title>
-<meta name="description" content="정산 김연식 작가 (JungSan Yun-sik Kim) 공식 웹사이트">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A1830">
 
+<!-- Resource hints first (dungzak.art pattern): let font + works.json requests
+     start in parallel with CSS parsing, not after a large inline <style> block. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Space+Grotesk:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400;1,600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="fetch" crossorigin="anonymous" href="works.json">
+
+<title>정산 김연식 작가 | JungSan Yun-sik Kim | jskim.art</title>
+<meta name="description" content="정산 김연식 작가(JungSan Yun-sik Kim) 공식 웹사이트">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://jskim.art/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="정산 김연식 작가 | JungSan Yun-sik Kim">
+<meta property="og:url" content="https://jskim.art/">
+<meta property="og:locale" content="ko_KR">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "정산 김연식",
+  "alternateName": "JungSan Yun-sik Kim",
+  "url": "https://jskim.art/",
+  "jobTitle": "Artist"
+}
+</script>
 
 <style>
   :root {
-    /* ---- 빛이 스며든 블루 (Light-infused Blue) ---- */
+    /* ---- 빛이 스며든 블루 (Light-infused Blue) — jskim.art 고유 팔레트 ---- */
     --bg-deep:    #0A1830;
     --bg-mid:     #16294F;
     --bg-light:   #1E3A66;
-    --accent-blue:#1B3A66;
+    --card-bg:    #101F3C;
+    --card-border:#26406B;
     --gold-base:  #C9A35A;
     --gold-bright:#E0C27A;
     --text-main:  #E8E4D8;
     --text-dim:   #A9A594;
-    --card-bg:    #101F3C;
-    --card-border:#26406B;
 
     --font-kr-display: 'Gowun Batang', serif;
     --font-kr-body:    'Gowun Dodum', sans-serif;
@@ -33,8 +56,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100vh; min-height: 100dvh;
     background: var(--bg-deep);
     color: var(--text-main);
     font-family: var(--font-kr-body);
@@ -42,120 +64,148 @@
   html[data-lang="en"] body { font-family: var(--font-en-display); }
 
   .bg-layer {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
     background: radial-gradient(ellipse at 50% 40%, var(--bg-light) 0%, var(--bg-mid) 48%, var(--bg-deep) 100%);
     background-size: 160% 160%;
     animation: breathe 28s ease-in-out infinite;
   }
-  @keyframes breathe {
-    0%, 100% { background-position: 50% 45%; filter: brightness(1); }
-    50%      { background-position: 50% 55%; filter: brightness(1.07); }
-  }
-
-  /* ---------------- Language toggle (shared) ---------------- */
-  .lang-toggle {
-    position: fixed;
-    top: calc(28px + env(safe-area-inset-top, 0px));
-    right: calc(32px + env(safe-area-inset-right, 0px));
-    display: flex;
-    gap: 10px;
-    font-family: var(--font-utility);
-    font-weight: 500;
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    z-index: 30;
-  }
-  .lang-toggle button {
-    background: none; border: none; color: var(--text-dim);
-    cursor: pointer; padding: 4px 2px; font: inherit; letter-spacing: inherit;
-    opacity: 0.65; transition: opacity 0.4s ease, color 0.4s ease;
-  }
-  .lang-toggle button.active { color: var(--gold-bright); opacity: 1; }
-  .lang-toggle span.sep { color: var(--text-dim); opacity: 0.35; }
+  @keyframes breathe { 0%,100% { background-position:50% 45%; filter:brightness(1);} 50% { background-position:50% 55%; filter:brightness(1.07);} }
+  @media (prefers-reduced-motion: reduce) { .bg-layer, .moon, .droplet, .stage { animation: none !important; } }
 
   [data-i18n] { display: none; }
   html[data-lang="ko"] [data-i18n="ko"] { display: inline; }
   html[data-lang="en"] [data-i18n="en"] { display: inline; }
 
-  /* ---------------- Coming-soon hero (unchanged, shown while works.json is empty) ---------------- */
-  #hero {
-    min-height: 100vh; min-height: 100dvh;
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  /* ---------------- Header (dungzak.art pattern: brand + nav + lang, all present at first paint) ---------------- */
+  header.site-header {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    padding: 16px 24px;
+    background: rgba(10,24,48,.82);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--card-border);
   }
+  .brand { font-family: var(--font-kr-display); font-size: 15px; letter-spacing: .04em; cursor: pointer; }
+  html[data-lang="en"] .brand { font-family: var(--font-en-display); font-style: italic; }
+
+  nav.primary { display: flex; gap: 4px; }
+  nav.primary button {
+    background: none; border: none; color: var(--text-dim); font: inherit; font-size: 13px;
+    letter-spacing: .04em; padding: 8px 14px; cursor: pointer; border-radius: 999px; transition: all .25s ease;
+  }
+  nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.08); }
+
+  .lang-row { display: flex; gap: 10px; font-family: var(--font-utility); font-weight: 500; font-size: 12px; letter-spacing: .1em; }
+  .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 4px 2px; font: inherit; letter-spacing: inherit; opacity: .65; transition: opacity .3s ease, color .3s ease; }
+  .lang-row button.active { color: var(--gold-bright); opacity: 1; }
+  .lang-row .sep { color: var(--text-dim); opacity: .35; }
+
+  main { min-height: calc(100vh - 64px); }
+
+  /* ---------------- Home (dungzak.art hero pattern: baked-in visible on first paint) ---------------- */
+  #panel-home.is-active { display: flex; }
+  #panel-home { display: none; min-height: 80vh; align-items: center; justify-content: center; overflow: hidden; padding: 40px 24px; }
   .stage { position: relative; width: min(90vw, 640px); display: flex; flex-direction: column; align-items: center; text-align: center; animation: rise 2.4s ease-out; }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px);} to { opacity: 1; transform: translateY(0);} }
+  @keyframes rise { from { opacity:0; transform: translateY(14px);} to { opacity:1; transform: translateY(0);} }
   .moon-wrap { position: relative; width: 64px; height: 64px; margin-bottom: 8px; }
   .moon { width: 100%; height: 100%; animation: moon-glow 7s ease-in-out infinite; }
-  @keyframes moon-glow {
-    0%, 100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,0.25)); }
-    50%      { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,0.4)); }
-  }
-  .droplet { position: absolute; left: 50%; top: 68px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,0.6); opacity: 0; animation: fall 13s ease-in infinite; }
-  @keyframes fall { 0% {opacity:0; transform: translateY(0) scale(1);} 8%{opacity:.9;} 70%{opacity:.5;} 92%{opacity:0; transform: translateY(220px) scale(.4);} 100%{opacity:0; transform: translateY(220px) scale(.4);} }
-  .name { margin: 22px 0 0; font-family: var(--font-kr-display); font-weight: 700; font-size: clamp(26px, 5vw, 34px); letter-spacing: 0.08em; }
-  html[data-lang="en"] .name { font-family: var(--font-en-display); font-style: italic; font-weight: 500; letter-spacing: 0.005em; }
-  .role { margin: 10px 0 0; font-family: var(--font-kr-body); font-weight: 400; font-size: 12px; letter-spacing: 0.28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
-  html[data-lang="en"] .role { font-family: var(--font-utility); font-weight: 500; letter-spacing: 0.24em; }
+  @keyframes moon-glow { 0%,100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,.25)); } 50% { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,.4)); } }
+  .droplet { position: absolute; left: 50%; top: 68px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,.6); opacity: 0; animation: fall 13s ease-in infinite; }
+  @keyframes fall { 0%{opacity:0; transform: translateY(0) scale(1);} 8%{opacity:.9;} 70%{opacity:.5;} 92%{opacity:0; transform: translateY(220px) scale(.4);} 100%{opacity:0; transform: translateY(220px) scale(.4);} }
+  .name { margin: 22px 0 0; font-family: var(--font-kr-display); font-weight: 700; font-size: clamp(26px,5vw,34px); letter-spacing: .08em; }
+  html[data-lang="en"] .name { font-family: var(--font-en-display); font-style: italic; font-weight: 500; letter-spacing: .005em; }
+  .role { margin: 10px 0 0; font-size: 12px; letter-spacing: .28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
+  html[data-lang="en"] .role { font-family: var(--font-utility); letter-spacing: .24em; }
   .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 22px 0; }
-  .status { font-size: clamp(15px, 2.4vw, 18px); opacity: .9; }
+  .status { font-size: clamp(15px,2.4vw,18px); opacity: .9; }
   .desc { margin-top: 12px; font-size: 13px; color: var(--text-dim); }
   html[data-lang="en"] .status, html[data-lang="en"] .desc { font-family: var(--font-en-display); font-style: italic; }
-  footer { position: fixed; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); opacity: .5; pointer-events: none; }
-
-  /* ---------------- Gallery (shown once works.json has entries) ---------------- */
-  #gallery { display: none; padding: 96px 24px 80px; max-width: 1400px; margin: 0 auto; }
-  .gallery-header { text-align: center; margin-bottom: 32px; }
-  .gallery-header h1 { font-family: var(--font-kr-display); font-size: clamp(22px, 4vw, 30px); margin: 0 0 6px; }
-  html[data-lang="en"] .gallery-header h1 { font-family: var(--font-en-display); font-style: italic; }
-
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 28px; }
-  .section-filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .section-filters button {
-    background: transparent; border: 1px solid var(--card-border); color: var(--text-dim);
-    border-radius: 999px; padding: 7px 16px; font: inherit; font-size: 13px; cursor: pointer;
-    transition: all .25s ease;
+  .home-enter { margin-top: 30px; }
+  .home-enter button {
+    background: none; border: 1px solid var(--gold-base); color: var(--gold-bright); border-radius: 999px;
+    padding: 10px 26px; font: inherit; font-size: 13px; letter-spacing: .06em; cursor: pointer; transition: all .25s ease;
   }
-  .section-filters button.active, .section-filters button:hover { color: var(--gold-bright); border-color: var(--gold-base); }
+  .home-enter button:hover { background: rgba(224,194,122,.1); }
 
-  #search { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; min-width: 200px; }
-  #search:focus { outline: none; border-color: var(--gold-base); }
+  /* ---------------- Works (Archive Pro engine pattern) ---------------- */
+  #panel-works.is-active { display: block; }
+  #panel-works { display: none; padding: 28px 24px 80px; max-width: 1400px; margin: 0 auto; }
+
+  .stats-inline { text-align: center; font-family: var(--font-utility); font-size: 12px; color: var(--text-dim); letter-spacing: .04em; margin-bottom: 18px; }
+  .stats-inline strong { color: var(--gold-bright); font-weight: 500; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 24px; }
+  .controls select, .controls input {
+    background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main);
+    border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; min-width: 160px;
+  }
+  .controls select:focus, .controls input:focus { outline: none; border-color: var(--gold-base); }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
-  .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: transform .25s ease, border-color .25s ease; }
+  .card {
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; overflow: hidden;
+    cursor: pointer; transition: transform .25s ease, border-color .25s ease;
+  }
   .card:hover { transform: translateY(-3px); border-color: var(--gold-base); }
-  .card .thumb { width: 100%; aspect-ratio: 4/5; background: #08152c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .card .thumb img { width: 100%; height: 100%; object-fit: contain; }
+  .thumb-wrap { width: 100%; aspect-ratio: 4/5; background: #08152c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .thumb-wrap img { width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .35s ease; }
+  .thumb-wrap img.is-loaded { opacity: 1; }
   .card .meta { padding: 10px 12px 14px; }
-  .card .meta .t { font-size: 13px; color: var(--text-main); }
+  .card .meta .t { font-size: 13px; }
   .card .meta .s { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 
   .empty-msg { text-align: center; color: var(--text-dim); font-size: 14px; padding: 40px 0; }
 
-  /* ---------------- Viewer ---------------- */
+  .load-more-wrap { text-align: center; margin-top: 28px; }
+  .load-more-wrap button {
+    background: none; border: 1px solid var(--card-border); color: var(--text-dim); border-radius: 999px;
+    padding: 9px 22px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .load-more-wrap button:hover { color: var(--gold-bright); border-color: var(--gold-base); }
+  .load-more-wrap[hidden] { display: none; }
+
+  /* ---------------- Viewer: single reused DOM instance ---------------- */
   #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; }
+  #viewer.is-open { display: flex; }
   #viewer img { max-width: 92vw; max-height: 78vh; object-fit: contain; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; }
-  #viewer .v-zoom { margin-top: 14px; background: none; border: 1px solid var(--card-border); color: var(--gold-bright); border-radius: 999px; padding: 6px 18px; font: inherit; font-size: 12px; cursor: pointer; }
 
-  @media (prefers-reduced-motion: reduce) { .bg-layer, .moon, .droplet, .stage { animation: none !important; } }
+  /* ---------------- Artist Bio modal (dungzak.art pattern) ---------------- */
+  #bio-modal[hidden] { display: none !important; }
+  #bio-modal { position: fixed; inset: 0; z-index: 60; }
+  .bio-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.9); }
+  .bio-card { position: relative; max-width: 560px; margin: 8vh auto; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 30px; }
+  .bio-lang { display: flex; gap: 8px; margin-bottom: 16px; }
+  .bio-lang button { background: none; border: 1px solid var(--card-border); color: var(--text-dim); border-radius: 999px; padding: 4px 14px; font: inherit; font-size: 12px; cursor: pointer; }
+  .bio-lang button.active { color: var(--gold-bright); border-color: var(--gold-base); }
+  .bio-close { position: absolute; top: 14px; right: 18px; background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+
+  footer { text-align: center; padding: 24px; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); opacity: .5; }
 </style>
 </head>
 <body>
 
-  <div class="bg-layer"></div>
+<div class="bg-layer"></div>
 
-  <div class="lang-toggle">
-    <button id="btn-ko" class="active" aria-pressed="true">KR</button>
-    <span class="sep">/</span>
-    <button id="btn-en" aria-pressed="false">EN</button>
+<header class="site-header">
+  <div class="brand" id="brand-home">
+    <span data-i18n="ko">정산 김연식</span><span data-i18n="en">JungSan Yun-sik Kim</span>
   </div>
+  <nav class="primary" role="tablist">
+    <button type="button" data-target="home" class="active" aria-current="page">Home</button>
+    <button type="button" data-target="works">Works</button>
+    <button type="button" id="tab-bio">Bio</button>
+  </nav>
+  <div class="lang-row">
+    <button id="btn-ko" class="active">KR</button><span class="sep">/</span><button id="btn-en">EN</button>
+  </div>
+</header>
 
-  <!-- Coming-soon hero: shown by default, hidden automatically once works.json has entries -->
-  <main id="hero">
+<main>
+  <!-- Home: baked in with is-active so it paints before JS runs (dungzak.art LCP pattern) -->
+  <section id="panel-home" class="is-active">
     <div class="stage">
       <div class="moon-wrap">
         <svg class="moon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -164,206 +214,410 @@
         <div class="droplet"></div>
       </div>
       <h1 class="name">
-        <span data-i18n="ko">정산 김연식</span>
-        <span data-i18n="en">JungSan Yun-sik Kim</span>
+        <span data-i18n="ko">정산 김연식</span><span data-i18n="en">JungSan Yun-sik Kim</span>
       </h1>
       <p class="role"><span data-i18n="ko">작가</span><span data-i18n="en">Artist</span></p>
       <div class="divider"></div>
-      <p class="status">
+      <p class="status" id="home-status">
         <span data-i18n="ko">공식 웹사이트 준비 중</span>
         <span data-i18n="en">The official website is in preparation</span>
       </p>
-      <p class="desc">
+      <p class="desc" id="home-desc">
         <span data-i18n="ko">새로운 이야기가 곧 이곳에 놓입니다.</span>
         <span data-i18n="en">A new story will soon find its place here.</span>
       </p>
+      <div class="home-enter" id="home-enter" hidden>
+        <button type="button" data-target="works">
+          <span data-i18n="ko">작품 보기 →</span><span data-i18n="en">View Works →</span>
+        </button>
+      </div>
     </div>
-  </main>
+  </section>
 
-  <!-- Gallery: shown once works.json has entries -->
-  <section id="gallery">
-    <div class="gallery-header">
-      <h1><span data-i18n="ko">정산 김연식</span><span data-i18n="en">JungSan Yun-sik Kim</span></h1>
-    </div>
+  <!-- Works: Archive Pro engine -->
+  <section id="panel-works">
+    <p class="stats-inline" id="stats-line">
+      <strong id="stat-total">—</strong> <span data-i18n="ko">works</span><span data-i18n="en">works</span> ·
+      <strong id="stat-filtered">—</strong> <span data-i18n="ko">결과</span><span data-i18n="en">results</span> ·
+      <strong id="stat-sections">—</strong> <span data-i18n="ko">섹션</span><span data-i18n="en">sections</span>
+    </p>
     <div class="controls">
-      <div class="section-filters" id="section-filters"></div>
-      <input id="search" type="text" data-i18n-ph="ko:작품명 검색|en:Search titles">
+      <select id="section-select"><option value="all">전체 섹션 / All</option></select>
+      <input id="search" type="text" placeholder="검색 / Search">
     </div>
     <div class="grid" id="grid"></div>
-    <p class="empty-msg" id="empty-msg" style="display:none;">
+    <p class="empty-msg" id="empty-msg" hidden>
       <span data-i18n="ko">해당 조건에 맞는 작품이 없습니다.</span>
       <span data-i18n="en">No works match this filter.</span>
     </p>
+    <div class="load-more-wrap" id="load-more-wrap" hidden>
+      <button type="button" id="load-more-btn">
+        <span data-i18n="ko">더 보기</span><span data-i18n="en">Load More</span>
+      </button>
+    </div>
   </section>
+</main>
 
-  <footer>&copy; 2026 jskim.art</footer>
+<footer>&copy; 2026 jskim.art</footer>
 
-  <!-- Viewer (single DOM instance, reused) -->
-  <div id="viewer">
-    <button class="v-close" aria-label="close">&times;</button>
-    <img id="viewer-img" src="" alt="">
-    <div class="v-meta" id="viewer-meta"></div>
-    <button class="v-zoom" id="viewer-zoom">
-      <span data-i18n="ko">확대 보기</span><span data-i18n="en">View Zoom</span>
-    </button>
+<!-- Viewer: single DOM instance, reused for every work -->
+<div id="viewer" role="dialog" aria-modal="true">
+  <button class="v-close" aria-label="close">&times;</button>
+  <img id="viewer-img" src="" alt="">
+  <div class="v-meta" id="viewer-meta"></div>
+</div>
+
+<!-- Artist Bio modal (dungzak.art pattern) -->
+<div id="bio-modal" hidden>
+  <div class="bio-backdrop"></div>
+  <div class="bio-card" role="dialog" aria-modal="true" aria-labelledby="bio-title">
+    <button class="bio-close" aria-label="close">&times;</button>
+    <div class="bio-lang">
+      <button class="active" data-bio-lang="kr" aria-pressed="true">KR</button>
+      <button data-bio-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
+    <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
+    <p class="ko">작가 소개가 준비 중입니다.</p>
+    <p class="en" style="display:none;">Artist biography is being prepared.</p>
   </div>
+</div>
 
 <script>
 (function () {
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+  // ---------------- Language: persisted (Archive Pro's proven pattern) ----------------
   const html = document.documentElement;
-  const btnKo = document.getElementById('btn-ko');
-  const btnEn = document.getElementById('btn-en');
-  const hero = document.getElementById('hero');
-  const gallery = document.getElementById('gallery');
-  const grid = document.getElementById('grid');
-  const sectionFiltersEl = document.getElementById('section-filters');
-  const searchInput = document.getElementById('search');
-  const emptyMsg = document.getElementById('empty-msg');
-  const viewer = document.getElementById('viewer');
-  const viewerImg = document.getElementById('viewer-img');
-  const viewerMeta = document.getElementById('viewer-meta');
-  const viewerZoomBtn = document.getElementById('viewer-zoom');
+  const UI_STATE_KEY = 'jskimUiStateV1';
 
-  let lang = localStorage.getItem('jskim_lang') || 'ko';
-  let works = [];
-  let sections = [];
-  let activeSectionKey = 'all';
-  let searchTerm = '';
+  function loadUiState() {
+    try {
+      const raw = localStorage.getItem(UI_STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function saveUiState(patch) {
+    try {
+      const current = loadUiState() || {};
+      localStorage.setItem(UI_STATE_KEY, JSON.stringify(Object.assign(current, patch)));
+    } catch (e) {}
+  }
 
+  const savedState = loadUiState() || {};
+  let lang = savedState.lang === 'en' ? 'en' : 'ko';
+
+  const btnKo = $('#btn-ko'), btnEn = $('#btn-en');
   function setLang(l) {
     lang = l;
-    localStorage.setItem('jskim_lang', l);
+    saveUiState({ lang: l });
     html.setAttribute('data-lang', l);
-    html.setAttribute('lang', l);
+    html.setAttribute('lang', l === 'ko' ? 'ko' : 'en');
     btnKo.classList.toggle('active', l === 'ko');
     btnEn.classList.toggle('active', l === 'en');
-    btnKo.setAttribute('aria-pressed', l === 'ko');
-    btnEn.setAttribute('aria-pressed', l === 'en');
-    applyPlaceholders();
+    renderGrid(); // labels inside cards depend on lang
+    renderSectionOptions();
   }
   btnKo.addEventListener('click', () => setLang('ko'));
   btnEn.addEventListener('click', () => setLang('en'));
 
-  function applyPlaceholders() {
-    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-      const raw = el.getAttribute('data-i18n-ph');
-      const map = {};
-      raw.split('|').forEach(pair => {
-        const [k, v] = pair.split(':');
-        map[k] = v;
-      });
-      el.setAttribute('placeholder', map[lang] || '');
+  // ---------------- Nav: Home / Works / Bio ----------------
+  const navButtons = $$('nav.primary button');
+  const panels = { home: $('#panel-home'), works: $('#panel-works') };
+
+  function showPanel(target) {
+    Object.keys(panels).forEach(k => panels[k].classList.toggle('is-active', k === target));
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === target));
+    saveUiState({ panel: target });
+    if (target === 'works' && !worksLoaded) loadWorks();
+  }
+  navButtons.forEach(b => {
+    if (!b.dataset.target) return;
+    b.addEventListener('click', () => showPanel(b.dataset.target));
+  });
+  $('#brand-home').addEventListener('click', () => showPanel('home'));
+
+  $('#tab-bio').addEventListener('click', openBioModal);
+  function openBioModal() { $('#bio-modal').hidden = false; }
+  $('#bio-modal .bio-close').addEventListener('click', () => { $('#bio-modal').hidden = true; });
+  $('#bio-modal .bio-backdrop').addEventListener('click', () => { $('#bio-modal').hidden = true; });
+  $$('.bio-lang button', $('#bio-modal')).forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.bioLang;
+      $$('.bio-lang button', $('#bio-modal')).forEach(b => b.classList.toggle('active', b === btn));
+      $$('#bio-modal .ko').forEach(el => el.style.display = target === 'kr' ? '' : 'none');
+      $$('#bio-modal .en').forEach(el => el.style.display = target === 'en' ? '' : 'none');
     });
+  });
+
+  // ---------------- Day-stable cache-busting (Archive Pro pattern) ----------------
+  function getStableAssetVersion() {
+    const KEY = 'jskimAssetVersionV1';
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const stored = localStorage.getItem(KEY);
+      if (stored) {
+        const [day, value] = stored.split('|');
+        if (day === today && value) return value;
+      }
+      const value = 'jskim-' + today;
+      localStorage.setItem(KEY, today + '|' + value);
+      return value;
+    } catch (e) { return 'jskim-' + today; }
+  }
+  const ASSET_VERSION = getStableAssetVersion();
+  function withCacheBust(url) {
+    if (!url) return url;
+    return url + (url.indexOf('?') === -1 ? '?' : '&') + 'v=' + ASSET_VERSION;
   }
 
+  // ---------------- Data ----------------
+  let allWorks = [];
+  let sections = [];
+  let filtered = [];
+  let worksLoaded = false;
+  const INITIAL_VISIBLE = 24;
+  const LOAD_STEP = 24;
+  const INITIAL_EAGER_COUNT = 6; // Archive Pro finding: keep first-paint image requests narrow
+  let visibleCount = INITIAL_VISIBLE;
+
+  let sectionFilter = savedState.section || 'all';
+  let searchQuery = savedState.query || '';
+
+  function escapeHTML(v) {
+    return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
   function field(obj, base) {
-    // KR/EN field lookup with no cross-language fallback (per spec: blank stays blank)
     const v = obj[base + '_' + lang];
     return v === undefined ? '' : v;
   }
 
-  async function loadData() {
+  let worksLoading = false;
+  async function loadWorks() {
+    if (worksLoaded || worksLoading) return;
+    worksLoading = true;
     try {
       const [worksRes, sectionsRes] = await Promise.all([
-        fetch('works.json?_=' + dayStamp()),
-        fetch('sections.json?_=' + dayStamp())
+        fetch('works.json?v=' + ASSET_VERSION),
+        fetch('sections.json?v=' + ASSET_VERSION)
       ]);
-      works = await worksRes.json();
+      allWorks = await worksRes.json();
       sections = await sectionsRes.json();
     } catch (e) {
-      works = [];
-      sections = [];
+      allWorks = []; sections = [];
     }
-    render();
-  }
+    worksLoaded = true;
+    worksLoading = false;
 
-  function dayStamp() {
-    // day-stable cache key so browsers don't refetch on every load, but do refresh daily
-    const d = new Date();
-    return d.getFullYear() + '' + (d.getMonth()+1) + '' + d.getDate();
-  }
-
-  function render() {
-    if (!works || works.length === 0) {
-      hero.style.display = 'flex';
-      gallery.style.display = 'none';
+    if (!allWorks.length) {
+      // No data yet: stay on the Home hero, don't show an empty engine.
+      showPanel('home');
       return;
     }
-    hero.style.display = 'none';
-    gallery.style.display = 'block';
-    renderSectionFilters();
+
+    $('#home-enter').hidden = false; // once data exists, Home offers a way into Works
+    renderSectionOptions();
+    applyFilters();
+
+    const section = $('#section-select');
+    section.addEventListener('change', () => {
+      sectionFilter = section.value;
+      saveUiState({ section: sectionFilter });
+      visibleCount = INITIAL_VISIBLE;
+      applyFilters();
+    });
+
+    let searchTimer;
+    $('#search').addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim().toLowerCase();
+        saveUiState({ query: searchQuery });
+        visibleCount = INITIAL_VISIBLE;
+        applyFilters();
+      }, 220);
+    });
+
+    $('#load-more-btn').addEventListener('click', () => {
+      visibleCount += LOAD_STEP;
+      renderGrid();
+    });
+
+    // restore saved section/search UI values
+    section.value = sectionFilter;
+    $('#search').value = searchQuery;
+  }
+
+  function renderSectionOptions() {
+    const select = $('#section-select');
+    const current = select.value || 'all';
+    select.innerHTML = '<option value="all">' + (lang === 'ko' ? '전체 섹션' : 'All Sections') + '</option>';
+    sections.filter(s => s.active).sort((a,b) => a.order - b.order).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.key;
+      opt.textContent = lang === 'ko' ? s.title_kr : s.title_en;
+      select.appendChild(opt);
+    });
+    select.value = current;
+  }
+
+  function applyFilters() {
+    filtered = allWorks.filter(w => {
+      const matchesSection = sectionFilter === 'all' || w.section_key === sectionFilter;
+      const title = (field(w, 'title') || '').toLowerCase();
+      const material = (field(w, 'material') || '').toLowerCase();
+      const matchesSearch = !searchQuery || title.includes(searchQuery) || material.includes(searchQuery) || String(w.id||'').toLowerCase().includes(searchQuery);
+      return matchesSection && matchesSearch;
+    });
     renderGrid();
   }
 
-  function renderSectionFilters() {
-    sectionFiltersEl.innerHTML = '';
-    const allBtn = document.createElement('button');
-    allBtn.textContent = lang === 'ko' ? '전체' : 'All';
-    allBtn.className = activeSectionKey === 'all' ? 'active' : '';
-    allBtn.addEventListener('click', () => { activeSectionKey = 'all'; renderSectionFilters(); renderGrid(); });
-    sectionFiltersEl.appendChild(allBtn);
-
-    sections
-      .filter(s => s.active)
-      .sort((a, b) => a.order - b.order)
-      .forEach(s => {
-        const b = document.createElement('button');
-        b.textContent = lang === 'ko' ? s.title_kr : s.title_en;
-        b.className = activeSectionKey === s.key ? 'active' : '';
-        b.addEventListener('click', () => { activeSectionKey = s.key; renderSectionFilters(); renderGrid(); });
-        sectionFiltersEl.appendChild(b);
-      });
+  function updateStats() {
+    $('#stat-total').textContent = allWorks.length;
+    $('#stat-filtered').textContent = filtered.length;
+    $('#stat-sections').textContent = sections.filter(s => s.active).length;
   }
 
-  let debounceTimer;
-  searchInput.addEventListener('input', (e) => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      searchTerm = e.target.value.trim().toLowerCase();
-      renderGrid();
-    }, 250);
-  });
+  const SVG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="5"></svg>';
+
+  // Archive Pro pattern: build cards as an HTML string batch, not per-element DOM creation — faster at 800-item scale.
+  function buildCardHTML(work, index) {
+    try {
+      const title = field(work, 'title');
+      const material = field(work, 'material');
+      const rawImage = work.image || '';
+      const imageUrl = rawImage ? withCacheBust(rawImage) : '';
+      const priority = index < INITIAL_EAGER_COUNT;
+      const imgSrc = priority ? (imageUrl || SVG_PLACEHOLDER) : SVG_PLACEHOLDER;
+      const dataSrc = (!priority && imageUrl) ? ' data-src="' + escapeHTML(imageUrl) + '"' : '';
+      return (
+        '<article class="card" data-index="' + index + '" data-work=\'' + escapeHTML(JSON.stringify({
+          id: work.id, title_kr: work.title_kr, title_en: work.title_en,
+          material_kr: work.material_kr, material_en: work.material_en,
+          size_kr: work.size_kr, size_en: work.size_en, year: work.year,
+          image: work.image, zoom: work.zoom
+        })) + '\'>' +
+          '<div class="thumb-wrap">' +
+            '<img class="thumb' + (priority ? ' is-loaded' : '') + '" src="' + escapeHTML(imgSrc) + '"' + dataSrc +
+            ' alt="' + escapeHTML(title || work.id || '') + '" loading="' + (priority ? 'eager' : 'lazy') + '" decoding="async" fetchpriority="' + (priority ? 'high' : 'low') + '">' +
+          '</div>' +
+          '<div class="meta">' +
+            '<div class="t">' + escapeHTML(title || '\u00A0') + '</div>' +
+            '<div class="s">' + escapeHTML(material) + (work.year ? ' · ' + escapeHTML(work.year) : '') + '</div>' +
+          '</div>' +
+        '</article>'
+      );
+    } catch (e) {
+      console.warn('[jskim.art] skipped malformed work', work && work.id, e);
+      return '';
+    }
+  }
+
+  let lazyObserver = null;
+  function ensureLazyObserver() {
+    if (lazyObserver || !('IntersectionObserver' in window)) return lazyObserver;
+    lazyObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        loadLazyImage(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
+    return lazyObserver;
+  }
+  function loadLazyImage(img) {
+    const src = img.getAttribute('data-src');
+    if (!src) return;
+    img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
+    img.src = src;
+    img.removeAttribute('data-src');
+  }
+  function observeLazyImages(root) {
+    const observer = ensureLazyObserver();
+    const imgs = $$('img.thumb[data-src]', root);
+    if (observer) imgs.forEach(img => observer.observe(img));
+    else imgs.forEach(loadLazyImage); // no IO support: just load
+  }
 
   function renderGrid() {
-    const filtered = works.filter(w => {
-      const matchesSection = activeSectionKey === 'all' || w.section_key === activeSectionKey;
-      const title = (field(w, 'title') || '').toLowerCase();
-      const matchesSearch = !searchTerm || title.includes(searchTerm);
-      return matchesSection && matchesSearch;
-    });
+    const grid = $('#grid');
+    const empty = $('#empty-msg');
+    const loadMoreWrap = $('#load-more-wrap');
 
-    grid.innerHTML = '';
-    emptyMsg.style.display = filtered.length === 0 ? 'block' : 'none';
+    updateStats();
 
-    filtered.forEach(w => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="thumb"><img loading="lazy" src="${w.image}" alt="${field(w, 'title')}"></div>
-        <div class="meta">
-          <div class="t">${field(w, 'title') || '\u00A0'}</div>
-          <div class="s">${field(w, 'material')}${w.year ? ' · ' + w.year : ''}</div>
-        </div>`;
-      card.addEventListener('click', () => openViewer(w));
-      grid.appendChild(card);
-    });
+    if (!filtered.length) {
+      grid.innerHTML = '';
+      empty.hidden = false;
+      loadMoreWrap.hidden = true;
+      return;
+    }
+    empty.hidden = true;
+
+    const visible = filtered.slice(0, visibleCount);
+    const html = visible.map((w, i) => buildCardHTML(w, i)).join('');
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    grid.replaceChildren(template.content);
+    observeLazyImages(grid);
+
+    loadMoreWrap.hidden = visible.length >= filtered.length;
   }
 
-  function openViewer(w) {
-    viewerImg.src = w.image;
-    viewerImg.alt = field(w, 'title');
-    viewerMeta.textContent = [field(w, 'title'), field(w, 'material'), field(w, 'size'), w.year].filter(Boolean).join(' · ');
-    viewerZoomBtn.style.display = w.zoom ? 'inline-block' : 'none';
-    viewerZoomBtn.onclick = () => { viewerImg.src = w.zoom; }; // zoom image loads only on demand
-    viewer.style.display = 'flex';
-  }
-  viewer.querySelector('.v-close').addEventListener('click', () => {
-    viewer.style.display = 'none';
-    viewerImg.src = '';
+  // ---------------- Viewer: single instance, progressive image (Archive Pro pattern) ----------------
+  const viewer = $('#viewer');
+  const viewerImg = $('#viewer-img');
+  const viewerMeta = $('#viewer-meta');
+  let viewerLoadToken = 0;
+
+  $('#grid').addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    try {
+      const work = JSON.parse(card.dataset.work);
+      openViewer(work);
+    } catch (e) {}
   });
 
+  function openViewer(work) {
+    viewerLoadToken += 1;
+    const thisToken = viewerLoadToken;
+
+    const title = field(work, 'title');
+    const material = field(work, 'material');
+    const size = field(work, 'size');
+    viewerMeta.textContent = [title, material, size, work.year].filter(Boolean).join(' · ');
+
+    const standardUrl = work.image ? withCacheBust(work.image) : '';
+    viewerImg.alt = title;
+    viewerImg.src = standardUrl; // shows immediately — same file as the grid thumbnail, likely already cached
+
+    // Progressive Viewer Image (Archive Pro pattern): zoom is never fetched for the
+    // grid, only here, and only in the background once the Viewer is actually open.
+    if (work.zoom && work.zoom !== work.image) {
+      const zoomImg = new Image();
+      zoomImg.onload = () => {
+        if (thisToken !== viewerLoadToken) return; // user moved to another work meanwhile
+        viewerImg.src = withCacheBust(work.zoom);
+      };
+      zoomImg.src = withCacheBust(work.zoom);
+    }
+
+    viewer.classList.add('is-open');
+  }
+  viewer.querySelector('.v-close').addEventListener('click', closeViewer);
+  viewer.addEventListener('click', (e) => { if (e.target === viewer) closeViewer(); });
+  function closeViewer() {
+    viewer.classList.remove('is-open');
+    viewerImg.src = '';
+    viewerLoadToken += 1; // invalidate any in-flight zoom swap
+  }
+
+  // ---------------- Init ----------------
   setLang(lang);
-  loadData();
+  showPanel(savedState.panel === 'works' ? 'works' : 'home');
+  loadWorks(); // always fetch in background so Home can reveal "View Works" once data exists
 })();
 </script>
 
