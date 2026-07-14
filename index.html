@@ -6,37 +6,98 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1830">
 
-<!-- Resource hints first (dungzak.art pattern): let font + works.json requests
-     start in parallel with CSS parsing, not after a large inline <style> block. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" as="fetch" crossorigin="anonymous" href="works.json">
 
-<title>정산(靜山) 김연식(金演植) 작가 | JUNGSAN KIM YUN SIK | jskim.art</title>
-<meta name="description" content="정산(靜山) 김연식(金演植) 작가(JUNGSAN KIM YUN SIK) 공식 웹사이트">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<!-- ================= SEO: title / description / keywords / robots ================= -->
+<title id="doc-title">정산 김연식 | 한국 현대미술가·화가 공식 웹사이트</title>
+<meta id="meta-description" name="description" content="정산 김연식은 서울을 기반으로 활동하는 한국 현대미술가이자 화가입니다. 회화, 추상미술, 시와 음악에서 확장된 작품 세계와 전시, 작품 아카이브를 jskim.art에서 소개합니다.">
+<meta name="keywords" content="정산 김연식, 김연식 작가, 김연식 화가, 한국 현대미술가, 한국 현대화가, 한국 추상화가, 현대미술, 회화, 추상회화, 서울 작가, 김연식 작품, 산촌 김연식, JUNGSAN KIM YUN SIK, JungSan Kim Yun Sik, Korean contemporary artist, Korean painter, Korean abstract artist">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href="https://jskim.art/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="정산(靜山) 김연식(金演植) 작가 | JUNGSAN KIM YUN SIK">
+<link rel="alternate" hreflang="ko" href="https://jskim.art/">
+<link rel="alternate" hreflang="en" href="https://jskim.art/">
+<link rel="alternate" hreflang="x-default" href="https://jskim.art/">
+
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="jskim.art">
+<meta id="og-title" property="og:title" content="정산 김연식 | 한국 현대미술가 공식 웹사이트">
+<meta id="og-description" property="og:description" content="정산 김연식 작가의 회화, 작품 세계, 전시와 공식 작품 아카이브.">
 <meta property="og:url" content="https://jskim.art/">
-<meta property="og:locale" content="ko_KR">
+<!-- TODO: 실제 1200x630 JPG/WebP로 교체 -->
+<meta property="og:image" content="https://jskim.art/assets/og/jungsan-kim-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="정산 김연식 한국 현대미술가 공식 웹사이트">
+<meta id="og-locale" property="og:locale" content="ko_KR">
+<meta property="og:locale:alternate" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta id="twitter-title" name="twitter:title" content="JUNGSAN KIM YUN SIK | Korean Contemporary Artist">
+<meta id="twitter-description" name="twitter:description" content="Official website and artwork archive of Korean contemporary artist JUNGSAN KIM YUN SIK.">
+<meta name="twitter:image" content="https://jskim.art/assets/og/jungsan-kim-og.jpg">
+<meta name="twitter:image:alt" content="JUNGSAN KIM YUN SIK Korean contemporary artist">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": "정산(靜山) 김연식(金演植)",
-  "alternateName": "JUNGSAN KIM YUN SIK",
+  "@id": "https://jskim.art/#artist",
+  "name": "JUNGSAN KIM YUN SIK",
+  "alternateName": [
+    "정산 김연식",
+    "정산(靜山) 김연식(金演植)",
+    "JungSan Kim Yun Sik",
+    "Yun Sik Kim"
+  ],
   "url": "https://jskim.art/",
-  "jobTitle": "Artist"
+  "description": "Korean contemporary artist and painter based in Seoul, known for painting, abstract works, and art inspired by poetry and music.",
+  "jobTitle": ["Contemporary Artist", "Painter", "Visual Artist"],
+  "knowsLanguage": ["Korean", "English"],
+  "nationality": { "@type": "Country", "name": "South Korea" },
+  "homeLocation": { "@type": "Place", "name": "Seoul, South Korea" },
+  "workLocation": { "@type": "Place", "name": "Seoul, South Korea" },
+  "sameAs": [
+    "https://www.youtube.com/@yunsikkim7462"
+  ]
+}
+</script>
+<!--
+  NOTE (엘솔): sameAs는 일단 YouTube(왼손 피아노)만 넣었습니다. Footer의
+  Instagram(@gallery_monalisa_sanchon), Facebook(gallery.mona.lisa.sanchon)은
+  산촌 갤러리 계정으로 보여 정산 작가 본인 정체성과 동일한지 확인 전이라
+  제외했습니다. 확인되면 여기와 https://www.sanchon.com 도 추가해주세요.
+-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://jskim.art/#website",
+  "url": "https://jskim.art/",
+  "name": "JUNGSAN KIM YUN SIK",
+  "alternateName": "정산 김연식",
+  "inLanguage": ["ko", "en"],
+  "publisher": { "@id": "https://jskim.art/#artist" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": "https://jskim.art/#profile",
+  "url": "https://jskim.art/",
+  "name": "정산 김연식 | 한국 현대미술가",
+  "mainEntity": { "@id": "https://jskim.art/#artist" },
+  "isPartOf": { "@id": "https://jskim.art/#website" },
+  "inLanguage": ["ko", "en"]
 }
 </script>
 
 <style>
   :root {
-    /* ---- 빛이 스며든 블루 (Light-infused Blue) — jskim.art 고유 팔레트 ---- */
     --bg-deep:    #0A1830;
     --bg-mid:     #16294F;
     --bg-light:   #1E3A66;
@@ -52,6 +113,8 @@
     --font-en-name:    'Cinzel', serif;
     --font-en-display: 'Cormorant Garamond', serif;
     --font-utility:    'Space Grotesk', sans-serif;
+
+    --header-h: 132px;
   }
 
   * { box-sizing: border-box; }
@@ -63,6 +126,16 @@
     font-family: var(--font-kr-body);
   }
   html[data-lang="en"] body { font-family: var(--font-en-display); }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   .bg-layer {
     position: fixed; inset: 0; z-index: -1; pointer-events: none;
@@ -77,7 +150,6 @@
   html[data-lang="ko"] [data-i18n="ko"] { display: inline; }
   html[data-lang="en"] [data-i18n="en"] { display: inline; }
 
-  /* ---------------- Masthead: name (largest text on the site), menu, and language are all directly visible, at every breakpoint ---------------- */
   header.site-header {
     position: sticky; top: 0; z-index: 20;
     display: flex; flex-direction: column; align-items: center;
@@ -90,7 +162,6 @@
   }
   header.site-header.is-compact { padding: 12px 24px 10px; gap: 8px; }
 
-  /* Hamburger: opens the social-links panel only. It is a toggle button, never a link itself. */
   .ms-burger {
     position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
     display: flex; flex-direction: column; justify-content: center; gap: 5px;
@@ -109,7 +180,7 @@
     background: none; border: none; padding: 0; cursor: pointer;
     font-family: var(--font-kr-display); font-weight: 700; color: var(--gold-bright);
     font-size: clamp(22px, 4.6vw, 42px); letter-spacing: .04em; line-height: 1.25;
-    max-width: calc(100% - 90px); /* stays clear of the burger button on narrow screens */
+    max-width: calc(100% - 90px);
     text-align: center;
     transition: font-size .4s ease;
   }
@@ -131,7 +202,6 @@
   nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   html[data-lang="ko"] nav.primary button { font-family: var(--font-kr-body); letter-spacing: .05em; }
 
-  /* KR / EN: a small, subtle text switcher set to the far right (dungzak.art pattern) — not a competing button. */
   .lang-row-wrap { width: 100%; align-self: stretch; display: flex; justify-content: flex-end; padding: 0 6px; }
   .lang-row { display: flex; gap: 14px; align-items: center; font-family: var(--font-en-name); font-weight: 500; font-size: 15px; letter-spacing: .24em; }
   header.site-header.is-compact .lang-row { font-size: 13px; }
@@ -142,10 +212,6 @@
   @media (max-width: 640px) {
     header.site-header { padding: 24px 20px 16px; gap: 14px; }
 
-    /* English artist name must always render as one line: "JUNGSAN KIM YUN SIK".
-       Mobile-only: narrower header side padding + tighter nav gap free up room,
-       and the clamp() floor is low enough to guarantee no wrap at any phone width.
-       Desktop (.ms-name rule above) is untouched. */
     html[data-lang="en"] header.site-header { padding-left: 14px; padding-right: 14px; }
     html[data-lang="en"] .ms-name {
       white-space: nowrap;
@@ -160,19 +226,30 @@
     html[data-lang="en"] nav.primary button { padding: 9px 14px; }
   }
 
-  /* ---------------- Social drawer: opened only by the hamburger button. Left Hand Piano + Sanchon links, plus an in-menu Contact accordion. ---------------- */
+  /* 햄버거 메뉴: 왼쪽 상단 헤더 아래 고정, 중앙 모달 아님 */
   #social-drawer[hidden] { display: none !important; }
   #social-drawer { position: fixed; inset: 0; z-index: 65; }
-  .social-drawer-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.9); opacity: 0; transition: opacity .3s ease; }
+  .social-drawer-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.72); opacity: 0; transition: opacity .3s ease; }
   #social-drawer.is-open .social-drawer-backdrop { opacity: 1; }
   .social-drawer-panel {
-    position: relative; max-width: 280px; margin: 16vh auto 0;
+    position: fixed;
+    top: calc(var(--header-h) + 10px);
+    left: 20px;
+    width: min(320px, calc(100vw - 40px));
+    max-height: calc(100dvh - var(--header-h) - 32px);
+    overflow-y: auto;
+    margin: 0;
     background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px;
-    padding: 32px 24px 24px; opacity: 0; transform: translateY(-10px);
-    transition: opacity .3s ease, transform .3s ease;
+    padding: 22px 20px 18px;
+    opacity: 0; transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.4);
+    transition: opacity .25s ease, transform .25s ease;
   }
   #social-drawer.is-open .social-drawer-panel { opacity: 1; transform: translateY(0); }
-  .social-drawer-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; line-height: 1; }
+  @media (min-width: 641px) {
+    .social-drawer-panel { width: 280px; }
+  }
+  .social-drawer-close { position: absolute; top: 10px; right: 14px; background: none; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; line-height: 1; }
   .social-drawer-links { display: flex; flex-direction: column; gap: 4px; }
   .social-drawer-links a {
     display: flex; align-items: center; gap: 12px; text-decoration: none;
@@ -183,7 +260,6 @@
   .social-drawer-links a:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   .social-drawer-links svg { width: 19px; height: 19px; flex-shrink: 0; }
 
-  /* Contact: expands in place inside the hamburger menu, no page navigation. */
   .contact-toggle {
     display: flex; align-items: center; gap: 12px; width: 100%;
     background: none; border: none; cursor: pointer; text-align: left;
@@ -208,7 +284,6 @@
 
   main { min-height: 60vh; }
 
-  /* ---------------- Home (dungzak.art hero pattern: baked-in visible on first paint) ---------------- */
   #panel-home.is-active { display: flex; }
   #panel-home { display: none; min-height: 80vh; align-items: center; justify-content: center; overflow: hidden; padding: 40px 24px; }
   .stage { position: relative; width: min(90vw, 640px); display: flex; flex-direction: column; align-items: center; text-align: center; animation: rise 2.4s ease-out; }
@@ -231,7 +306,6 @@
   }
   .home-enter button:hover { background: rgba(224,194,122,.1); }
 
-  /* ---------------- Works (Archive Pro engine pattern) ---------------- */
   #panel-works.is-active { display: block; }
   #panel-works { display: none; padding: 28px 24px 80px; max-width: 1400px; margin: 0 auto; }
 
@@ -244,6 +318,11 @@
     border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; min-width: 160px;
   }
   .controls select:focus, .controls input:focus { outline: none; border-color: var(--gold-base); }
+
+  @media (max-width: 480px) {
+    .controls { flex-direction: column; align-items: stretch; }
+    .controls select, .controls input { width: 100%; min-width: 0; }
+  }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
   .card {
@@ -268,28 +347,32 @@
   .load-more-wrap button:hover { color: var(--gold-bright); border-color: var(--gold-base); }
   .load-more-wrap[hidden] { display: none; }
 
-  /* ---------------- Viewer: single reused DOM instance ---------------- */
   #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; }
   #viewer.is-open { display: flex; }
   #viewer img { max-width: 92vw; max-height: 78vh; object-fit: contain; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; }
 
-  /* ---------------- Artist Bio modal (dungzak.art pattern) ---------------- */
   #bio-modal[hidden] { display: none !important; }
   #bio-modal { position: fixed; inset: 0; z-index: 60; }
   .bio-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.9); }
-  .bio-card { position: relative; max-width: 560px; margin: 8vh auto; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 30px; }
+  .bio-card { position: relative; max-width: 560px; margin: 8vh auto; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 30px; max-height: 84vh; overflow-y: auto; }
   .bio-lang { display: flex; gap: 8px; margin-bottom: 16px; }
   .bio-lang button { background: none; border: 1px solid var(--card-border); color: var(--text-dim); border-radius: 999px; padding: 4px 14px; font: inherit; font-size: 12px; cursor: pointer; }
   .bio-lang button.active { color: var(--gold-bright); border-color: var(--gold-base); }
   .bio-close { position: absolute; top: 14px; right: 18px; background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
 
   footer { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 34px 24px 28px; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); }
-  .footer-social { display: flex; align-items: center; gap: 20px; }
-  .footer-social a { color: var(--gold-base); opacity: .75; display: inline-flex; transition: opacity .25s ease, color .25s ease, transform .25s ease; }
+
+  .footer-social { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .footer-social a {
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--gold-base); opacity: .8;
+    transition: opacity .25s ease, color .25s ease, transform .25s ease;
+  }
   .footer-social a:hover { color: var(--gold-bright); opacity: 1; transform: translateY(-1px); }
-  .footer-social svg { width: 18px; height: 18px; }
+  .footer-social svg { width: 26px; height: 26px; }
   .footer-copy { opacity: .5; }
   .footer-copy a { color: inherit; text-decoration: none; transition: color .2s ease; }
   .footer-copy a:hover { color: var(--gold-bright); }
@@ -298,6 +381,10 @@
 <body>
 
 <div class="bg-layer"></div>
+
+<h1 class="visually-hidden">
+  <span data-i18n="ko">정산 김연식 — 한국 현대미술가</span><span data-i18n="en">JUNGSAN KIM YUN SIK — Korean Contemporary Artist</span>
+</h1>
 
 <header class="site-header" id="site-header">
   <button type="button" class="ms-burger" id="menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="social-drawer" aria-label="소셜 링크 열기 / Open social links">
@@ -321,7 +408,6 @@
   </div>
 </header>
 
-<!-- Hamburger drawer: Left Hand Piano, Sanchon (external links) + Contact (in-menu accordion). The burger button itself is never a link. -->
 <div id="social-drawer" hidden>
   <div class="social-drawer-backdrop" id="social-drawer-backdrop"></div>
   <div class="social-drawer-panel" role="menu" aria-label="Social links">
@@ -376,7 +462,6 @@
 </div>
 
 <main>
-  <!-- Home: baked in with is-active so it paints before JS runs (dungzak.art LCP pattern) -->
   <section id="panel-home" class="is-active">
     <div class="stage">
       <div class="moon-wrap">
@@ -403,8 +488,8 @@
     </div>
   </section>
 
-  <!-- Works: Archive Pro engine -->
   <section id="panel-works">
+    <h2 class="visually-hidden"><span data-i18n="ko">작품</span><span data-i18n="en">Art Works</span></h2>
     <p class="stats-inline" id="stats-line">
       <strong id="stat-total">—</strong> <span data-i18n="ko">works</span><span data-i18n="en">works</span> ·
       <strong id="stat-filtered">—</strong> <span data-i18n="ko">결과</span><span data-i18n="en">results</span> ·
@@ -452,14 +537,12 @@
   <div class="footer-copy">&copy; 2026 <a href="https://jskim.art/">jskim.art</a></div>
 </footer>
 
-<!-- Viewer: single DOM instance, reused for every work -->
 <div id="viewer" role="dialog" aria-modal="true">
   <button class="v-close" aria-label="close">&times;</button>
   <img id="viewer-img" src="" alt="">
   <div class="v-meta" id="viewer-meta"></div>
 </div>
 
-<!-- Artist Bio modal (dungzak.art pattern) -->
 <div id="bio-modal" hidden>
   <div class="bio-backdrop"></div>
   <div class="bio-card" role="dialog" aria-modal="true" aria-labelledby="bio-title">
@@ -470,8 +553,8 @@
     </div>
     <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
     <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
-    <p class="ko">작가 소개가 준비 중입니다.</p>
-    <p class="en" style="display:none;">Artist biography is being prepared.</p>
+    <p class="ko">정산 김연식은 서울을 기반으로 활동하는 한국 현대미술가이자 화가이다. 회화와 추상적 조형언어를 중심으로 자연, 인간, 시, 음악과 기억의 관계를 탐구한다. 작품과 전시, 아카이브는 공식 웹사이트 jskim.art를 통해 소개된다.</p>
+    <p class="en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist and painter based in Seoul. His practice explores nature, humanity, poetry, music, and memory through painting and abstract visual language. His artworks, exhibitions, and archive are presented through his official website, jskim.art.</p>
   </div>
 </div>
 
@@ -480,7 +563,6 @@
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
-  // ---------------- Language: persisted (Archive Pro's proven pattern) ----------------
   const html = document.documentElement;
   const UI_STATE_KEY = 'jskimUiStateV1';
 
@@ -500,6 +582,32 @@
   const savedState = loadUiState() || {};
   let lang = savedState.lang === 'en' ? 'en' : 'ko';
 
+  const SEO_STRINGS = {
+    ko: {
+      title: '정산 김연식 | 한국 현대미술가·화가 공식 웹사이트',
+      description: '정산 김연식은 서울을 기반으로 활동하는 한국 현대미술가이자 화가입니다. 회화, 추상미술, 시와 음악에서 확장된 작품 세계와 전시, 작품 아카이브를 jskim.art에서 소개합니다.',
+      ogTitle: '정산 김연식 | 한국 현대미술가 공식 웹사이트',
+      ogDescription: '정산 김연식 작가의 회화, 작품 세계, 전시와 공식 작품 아카이브.',
+      ogLocale: 'ko_KR'
+    },
+    en: {
+      title: 'JUNGSAN KIM YUN SIK | Korean Contemporary Artist',
+      description: 'JUNGSAN KIM YUN SIK is a Korean contemporary artist and painter based in Seoul. Explore his paintings, abstract works, exhibitions, artistic practice, and official artwork archive.',
+      ogTitle: 'JUNGSAN KIM YUN SIK | Korean Contemporary Artist',
+      ogDescription: 'Official website and artwork archive of Korean contemporary artist JUNGSAN KIM YUN SIK.',
+      ogLocale: 'en_US'
+    }
+  };
+  function applySeoStrings(l) {
+    const s = SEO_STRINGS[l];
+    if (!s) return;
+    document.title = s.title;
+    const metaDesc = $('#meta-description'); if (metaDesc) metaDesc.setAttribute('content', s.description);
+    const ogTitle = $('#og-title'); if (ogTitle) ogTitle.setAttribute('content', s.ogTitle);
+    const ogDesc = $('#og-description'); if (ogDesc) ogDesc.setAttribute('content', s.ogDescription);
+    const ogLocale = $('#og-locale'); if (ogLocale) ogLocale.setAttribute('content', s.ogLocale);
+  }
+
   const btnKo = $('#btn-ko'), btnEn = $('#btn-en');
   function setLang(l) {
     lang = l;
@@ -508,13 +616,13 @@
     html.setAttribute('lang', l === 'ko' ? 'ko' : 'en');
     btnKo.classList.toggle('active', l === 'ko');
     btnEn.classList.toggle('active', l === 'en');
-    renderGrid(); // labels inside cards depend on lang
+    applySeoStrings(l);
+    renderGrid();
     renderSectionOptions();
   }
   btnKo.addEventListener('click', () => setLang('ko'));
   btnEn.addEventListener('click', () => setLang('en'));
 
-  // ---------------- Nav: Home / Works / Bio ----------------
   const navButtons = $$('nav.primary button');
   const panels = { home: $('#panel-home'), works: $('#panel-works') };
 
@@ -530,10 +638,21 @@
   });
   $('#brand-home').addEventListener('click', resetHome);
 
-  // ---------------- Social drawer (hamburger): Left Hand Piano + Sanchon links, plus Contact. The burger button toggles it; it is never a link itself. ----------------
+  const siteHeader = $('#site-header');
+  function updateHeaderHeightVar() {
+    const h = siteHeader.offsetHeight;
+    if (h) document.documentElement.style.setProperty('--header-h', h + 'px');
+  }
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(updateHeaderHeightVar).observe(siteHeader);
+  } else {
+    window.addEventListener('resize', updateHeaderHeightVar);
+  }
+
   const socialDrawer = $('#social-drawer');
   const menuToggle = $('#menu-toggle');
   function openDrawer() {
+    updateHeaderHeightVar();
     socialDrawer.hidden = false;
     requestAnimationFrame(() => socialDrawer.classList.add('is-open'));
     menuToggle.setAttribute('aria-expanded', 'true');
@@ -551,10 +670,8 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && socialDrawer.classList.contains('is-open')) closeDrawer();
   });
-  // Each social link opens in a new tab; close the drawer behind it once clicked.
   $$('.social-drawer-links a', socialDrawer).forEach(el => el.addEventListener('click', closeDrawer));
 
-  // Contact: expands in place inside the hamburger menu (no page navigation, no drawer close).
   const contactToggle = $('#contact-toggle');
   const contactPanel = $('#contact-panel');
   if (contactToggle && contactPanel) {
@@ -565,7 +682,6 @@
       contactPanel.setAttribute('aria-hidden', String(!willOpen));
     });
   }
-  // Contact's own tel:/mailto: links should still close the drawer once tapped.
   $$('.contact-panel a', socialDrawer).forEach(el => el.addEventListener('click', closeDrawer));
 
   $('#tab-bio').addEventListener('click', openBioModal);
@@ -581,7 +697,6 @@
     });
   });
 
-  // ---------------- Day-stable cache-busting (Archive Pro pattern) ----------------
   function getStableAssetVersion() {
     const KEY = 'jskimAssetVersionV1';
     const today = new Date().toISOString().slice(0, 10);
@@ -602,14 +717,13 @@
     return url + (url.indexOf('?') === -1 ? '?' : '&') + 'v=' + ASSET_VERSION;
   }
 
-  // ---------------- Data ----------------
   let allWorks = [];
   let sections = [];
   let filtered = [];
   let worksLoaded = false;
   const INITIAL_VISIBLE = 24;
   const LOAD_STEP = 24;
-  const INITIAL_EAGER_COUNT = 6; // Archive Pro finding: keep first-paint image requests narrow
+  const INITIAL_EAGER_COUNT = 6;
   let visibleCount = INITIAL_VISIBLE;
 
   let sectionFilter = savedState.section || 'all';
@@ -621,6 +735,19 @@
   function field(obj, base) {
     const v = obj[base + '_' + lang];
     return v === undefined ? '' : v;
+  }
+
+  function buildAltText(work) {
+    const title = field(work, 'title');
+    const year = work.year ? String(work.year) : '';
+    if (lang === 'ko') {
+      return title
+        ? ('정산 김연식 작품, ' + title + (year ? ', ' + year : ''))
+        : ('정산 김연식 무제 작품' + (year ? ', ' + year : ''));
+    }
+    return title
+      ? ('JUNGSAN KIM YUN SIK artwork, ' + title + (year ? ', ' + year : ''))
+      : ('Untitled artwork by JUNGSAN KIM YUN SIK' + (year ? ', ' + year : ''));
   }
 
   let worksLoading = false;
@@ -640,15 +767,13 @@
     worksLoaded = true;
     worksLoading = false;
 
-    if (!allWorks.length) {
-      // No data yet: stay on the Home hero, don't show an empty engine.
-      showPanel('home');
-      return;
+    if (allWorks.length) {
+      $('#home-enter').hidden = false;
     }
 
-    $('#home-enter').hidden = false; // once data exists, Home offers a way into Works
     renderSectionOptions();
     applyFilters();
+    injectArtworkStructuredData();
 
     const section = $('#section-select');
     section.addEventListener('change', () => {
@@ -674,7 +799,6 @@
       renderGrid();
     });
 
-    // restore saved section/search UI values
     section.value = sectionFilter;
     $('#search').value = searchQuery;
   }
@@ -697,7 +821,14 @@
       const matchesSection = sectionFilter === 'all' || w.section_key === sectionFilter;
       const title = (field(w, 'title') || '').toLowerCase();
       const material = (field(w, 'material') || '').toLowerCase();
-      const matchesSearch = !searchQuery || title.includes(searchQuery) || material.includes(searchQuery) || String(w.id||'').toLowerCase().includes(searchQuery);
+      const sectionMeta = sections.find(s => s.key === w.section_key);
+      const sectionName = sectionMeta ? (lang === 'ko' ? sectionMeta.title_kr : sectionMeta.title_en) || '' : '';
+      const matchesSearch = !searchQuery
+        || title.includes(searchQuery)
+        || material.includes(searchQuery)
+        || String(w.year || '').includes(searchQuery)
+        || sectionName.toLowerCase().includes(searchQuery)
+        || String(w.id||'').toLowerCase().includes(searchQuery);
       return matchesSection && matchesSearch;
     });
     renderGrid();
@@ -711,7 +842,6 @@
 
   const SVG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="5"></svg>';
 
-  // Archive Pro pattern: build cards as an HTML string batch, not per-element DOM creation — faster at 800-item scale.
   function buildCardHTML(work, index) {
     try {
       const title = field(work, 'title');
@@ -721,6 +851,7 @@
       const priority = index < INITIAL_EAGER_COUNT;
       const imgSrc = priority ? (imageUrl || SVG_PLACEHOLDER) : SVG_PLACEHOLDER;
       const dataSrc = (!priority && imageUrl) ? ' data-src="' + escapeHTML(imageUrl) + '"' : '';
+      const altText = buildAltText(work);
       return (
         '<article class="card" data-index="' + index + '" data-work=\'' + escapeHTML(JSON.stringify({
           id: work.id, title_kr: work.title_kr, title_en: work.title_en,
@@ -730,7 +861,7 @@
         })) + '\'>' +
           '<div class="thumb-wrap">' +
             '<img class="thumb' + (priority ? ' is-loaded' : '') + '" src="' + escapeHTML(imgSrc) + '"' + dataSrc +
-            ' alt="' + escapeHTML(title || work.id || '') + '" loading="' + (priority ? 'eager' : 'lazy') + '" decoding="async" fetchpriority="' + (priority ? 'high' : 'low') + '">' +
+            ' alt="' + escapeHTML(altText) + '" loading="' + (priority ? 'eager' : 'lazy') + '" decoding="async" fetchpriority="' + (priority ? 'high' : 'low') + '">' +
           '</div>' +
           '<div class="meta">' +
             '<div class="t">' + escapeHTML(title || '\u00A0') + '</div>' +
@@ -767,7 +898,7 @@
     const observer = ensureLazyObserver();
     const imgs = $$('img.thumb[data-src]', root);
     if (observer) imgs.forEach(img => observer.observe(img));
-    else imgs.forEach(loadLazyImage); // no IO support: just load
+    else imgs.forEach(loadLazyImage);
   }
 
   function renderGrid() {
@@ -795,7 +926,40 @@
     loadMoreWrap.hidden = visible.length >= filtered.length;
   }
 
-  // ---------------- Viewer: single instance, progressive image (Archive Pro pattern) ----------------
+  function injectArtworkStructuredData() {
+    const existing = document.getElementById('artwork-structured-data');
+    if (existing) existing.remove();
+    if (!allWorks.length) return;
+
+    const items = allWorks
+      .filter(w => w && w.id)
+      .map(w => {
+        const node = {
+          '@type': 'VisualArtwork',
+          '@id': 'https://jskim.art/#work-' + w.id,
+          name: w.title_kr || w.title_en || undefined,
+          alternateName: (w.title_kr && w.title_en) ? w.title_en : undefined,
+          creator: { '@id': 'https://jskim.art/#artist' },
+          artist: { '@id': 'https://jskim.art/#artist' },
+          artMedium: w.material_kr || w.material_en || undefined,
+          dateCreated: w.year ? String(w.year) : undefined,
+          image: w.image || undefined,
+          inLanguage: ['ko', 'en']
+        };
+        Object.keys(node).forEach(k => node[k] === undefined && delete node[k]);
+        return node;
+      })
+      .filter(node => node.name);
+
+    if (!items.length) return;
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'artwork-structured-data';
+    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': items });
+    document.head.appendChild(script);
+  }
+
   const viewer = $('#viewer');
   const viewerImg = $('#viewer-img');
   const viewerMeta = $('#viewer-meta');
@@ -820,15 +984,13 @@
     viewerMeta.textContent = [title, material, size, work.year].filter(Boolean).join(' · ');
 
     const standardUrl = work.image ? withCacheBust(work.image) : '';
-    viewerImg.alt = title;
-    viewerImg.src = standardUrl; // shows immediately — same file as the grid thumbnail, likely already cached
+    viewerImg.alt = buildAltText(work);
+    viewerImg.src = standardUrl;
 
-    // Progressive Viewer Image (Archive Pro pattern): zoom is never fetched for the
-    // grid, only here, and only in the background once the Viewer is actually open.
     if (work.zoom && work.zoom !== work.image) {
       const zoomImg = new Image();
       zoomImg.onload = () => {
-        if (thisToken !== viewerLoadToken) return; // user moved to another work meanwhile
+        if (thisToken !== viewerLoadToken) return;
         viewerImg.src = withCacheBust(work.zoom);
       };
       zoomImg.src = withCacheBust(work.zoom);
@@ -841,12 +1003,9 @@
   function closeViewer() {
     viewer.classList.remove('is-open');
     viewerImg.src = '';
-    viewerLoadToken += 1; // invalidate any in-flight zoom swap
+    viewerLoadToken += 1;
   }
 
-  // ---------------- Home reset (artist name = Home button) ----------------
-  // Clears Viewer, search, filter, and menu state, shows the full Works set, and
-  // returns to the first screen — all without a page reload. Language is untouched.
   function resetHome() {
     closeViewer();
     closeDrawer();
@@ -861,14 +1020,12 @@
     const searchInput = $('#search');
     if (searchInput) searchInput.value = '';
 
-    if (worksLoaded) applyFilters(); // resets to the full, unfiltered work list
+    if (worksLoaded) applyFilters();
 
     showPanel('home');
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }
 
-  // ---------------- Masthead: step down to a compact size once the visitor starts scrolling ----------------
-  const siteHeader = $('#site-header');
   let headerCompact = false;
   function updateHeaderCompact() {
     const shouldCompact = window.scrollY > 24;
@@ -878,10 +1035,10 @@
   }
   window.addEventListener('scroll', updateHeaderCompact, { passive: true });
 
-  // ---------------- Init ----------------
   setLang(lang);
   showPanel(savedState.panel === 'works' ? 'works' : 'home');
-  loadWorks(); // always fetch in background so Home can reveal "View Works" once data exists
+  loadWorks();
+  updateHeaderHeightVar();
   updateHeaderCompact();
 })();
 </script>
