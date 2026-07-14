@@ -124,6 +124,7 @@
     background: var(--bg-deep);
     color: var(--text-main);
     font-family: var(--font-kr-body);
+    line-height: 1.6;
   }
   html[data-lang="en"] body { font-family: var(--font-en-display); }
 
@@ -153,14 +154,14 @@
   header.site-header {
     position: sticky; top: 0; z-index: 20;
     display: flex; flex-direction: column; align-items: center;
-    gap: 16px;
-    padding: 32px 24px 20px;
+    gap: 18px;
+    padding: 34px 24px 26px;
     background: rgba(10,24,48,.88);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--card-border);
-    transition: padding .4s ease, gap .4s ease;
+    transition: padding .2s ease, gap .2s ease;
   }
-  header.site-header.is-compact { padding: 12px 24px 10px; gap: 8px; }
+  header.site-header.is-compact { padding: 14px 24px 12px; gap: 10px; }
 
   .ms-burger {
     position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
@@ -170,7 +171,7 @@
   }
   .ms-burger span {
     display: block; width: 100%; height: 2px; border-radius: 2px;
-    background: var(--gold-bright); transition: transform .3s ease, opacity .3s ease;
+    background: var(--gold-bright); transition: transform .18s ease, opacity .18s ease;
   }
   .ms-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .ms-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
@@ -182,7 +183,7 @@
     font-size: clamp(22px, 4.6vw, 42px); letter-spacing: .04em; line-height: 1.25;
     max-width: calc(100% - 90px);
     text-align: center;
-    transition: font-size .4s ease;
+    transition: font-size .2s ease;
   }
   .ms-name:hover { opacity: .88; }
   header.site-header.is-compact .ms-name { font-size: clamp(16px, 2.8vw, 22px); }
@@ -191,26 +192,29 @@
     text-transform: uppercase; letter-spacing: .1em;
   }
 
-  nav.primary { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  /* A touch more air between the artist name and the tabs, without disturbing
+     the gap between the tabs and the KR/EN row below them. */
+  nav.primary { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-top: 4px; }
   nav.primary button {
     background: none; border: none; color: var(--text-dim); font: inherit;
     font-family: var(--font-utility); font-weight: 500; font-size: 17px;
-    letter-spacing: .16em; text-transform: uppercase;
-    padding: 11px 22px; cursor: pointer; border-radius: 999px; transition: all .25s ease;
+    letter-spacing: .16em; text-transform: uppercase; line-height: 1;
+    display: inline-flex; align-items: center;
+    padding: 11px 22px; cursor: pointer; border-radius: 999px; transition: color .18s ease, background .18s ease;
   }
   header.site-header.is-compact nav.primary button { font-size: 13px; padding: 7px 15px; letter-spacing: .12em; }
   nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   html[data-lang="ko"] nav.primary button { font-family: var(--font-kr-body); letter-spacing: .05em; }
 
-  .lang-row-wrap { width: 100%; align-self: stretch; display: flex; justify-content: flex-end; padding: 0 6px; }
+  .lang-row-wrap { width: 100%; align-self: stretch; display: flex; justify-content: flex-end; padding: 2px 6px 0; }
   .lang-row { display: flex; gap: 14px; align-items: center; font-family: var(--font-en-name); font-weight: 500; font-size: 15px; letter-spacing: .24em; }
   header.site-header.is-compact .lang-row { font-size: 13px; }
-  .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px; font: inherit; letter-spacing: inherit; opacity: .6; transition: opacity .3s ease, color .3s ease; }
+  .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px; font: inherit; letter-spacing: inherit; opacity: .6; transition: opacity .18s ease, color .18s ease; }
   .lang-row button.active { color: var(--gold-bright); opacity: 1; }
   .lang-row .sep { color: var(--text-dim); opacity: .35; }
 
   @media (max-width: 640px) {
-    header.site-header { padding: 24px 20px 16px; gap: 14px; }
+    header.site-header { padding: 26px 20px 18px; gap: 16px; }
 
     html[data-lang="en"] header.site-header { padding-left: 14px; padding-right: 14px; }
     html[data-lang="en"] .ms-name {
@@ -229,7 +233,7 @@
   /* 햄버거 메뉴: 왼쪽 상단 헤더 아래 고정, 중앙 모달 아님 */
   #social-drawer[hidden] { display: none !important; }
   #social-drawer { position: fixed; inset: 0; z-index: 65; }
-  .social-drawer-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.72); opacity: 0; transition: opacity .3s ease; }
+  .social-drawer-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.72); opacity: 0; transition: opacity .2s ease; }
   #social-drawer.is-open .social-drawer-backdrop { opacity: 1; }
   .social-drawer-panel {
     position: fixed;
@@ -240,39 +244,46 @@
     overflow-y: auto;
     margin: 0;
     background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px;
-    padding: 22px 20px 18px;
+    padding: 18px 16px 14px;
     opacity: 0; transform: translateY(-8px);
     box-shadow: 0 16px 40px rgba(0,0,0,.4);
-    transition: opacity .25s ease, transform .25s ease;
+    transition: opacity .2s ease, transform .2s ease;
   }
   #social-drawer.is-open .social-drawer-panel { opacity: 1; transform: translateY(0); }
   @media (min-width: 641px) {
     .social-drawer-panel { width: 280px; }
   }
-  .social-drawer-close { position: absolute; top: 10px; right: 14px; background: none; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; line-height: 1; }
-  .social-drawer-links { display: flex; flex-direction: column; gap: 4px; }
+  .social-drawer-close {
+    position: absolute; top: 10px; right: 10px;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; line-height: 1;
+    border-radius: 50%; transition: background .18s ease, color .18s ease;
+  }
+  .social-drawer-close:hover, .social-drawer-close:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.09); outline: none; }
+  .social-drawer-links { display: flex; flex-direction: column; gap: 2px; }
   .social-drawer-links a {
-    display: flex; align-items: center; gap: 12px; text-decoration: none;
+    display: flex; align-items: center; gap: 11px; text-decoration: none;
     color: var(--text-dim); font-family: var(--font-utility); font-weight: 500;
-    font-size: 15px; letter-spacing: .08em;
-    padding: 12px 10px; border-radius: 8px; transition: all .2s ease;
+    font-size: 15px; letter-spacing: .07em;
+    padding: 11px 10px; border-radius: 8px; transition: color .18s ease, background .18s ease;
   }
   .social-drawer-links a:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
-  .social-drawer-links svg { width: 19px; height: 19px; flex-shrink: 0; }
+  .social-drawer-links svg { width: 18px; height: 18px; flex-shrink: 0; }
 
   .contact-toggle, .drawer-btn {
-    display: flex; align-items: center; gap: 12px; width: 100%;
+    display: flex; align-items: center; gap: 11px; width: 100%;
     background: none; border: none; cursor: pointer; text-align: left;
     color: var(--text-dim); font-family: var(--font-utility); font-weight: 500;
-    font-size: 15px; letter-spacing: .08em;
-    padding: 12px 10px; border-radius: 8px; transition: all .2s ease;
+    font-size: 15px; letter-spacing: .07em;
+    padding: 11px 10px; border-radius: 8px; transition: color .18s ease, background .18s ease;
   }
   .contact-toggle:hover, .contact-toggle[aria-expanded="true"], .drawer-btn:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
-  .contact-toggle svg:not(.chev), .drawer-btn svg { width: 19px; height: 19px; flex-shrink: 0; }
-  .contact-toggle .chev { width: 14px; height: 14px; margin-left: auto; flex-shrink: 0; transition: transform .25s ease; }
+  .contact-toggle svg:not(.chev), .drawer-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .contact-toggle .chev { width: 14px; height: 14px; margin-left: auto; flex-shrink: 0; transition: transform .2s ease; }
   .contact-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
 
-  .contact-panel { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+  .contact-panel { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
   .contact-panel.is-open { max-height: 400px; }
   .contact-panel dl { margin: 0; padding: 2px 10px 6px; }
   .contact-row { padding: 10px 0; border-top: 1px solid var(--card-border); }
@@ -294,6 +305,7 @@
   .droplet { position: absolute; left: 50%; top: 68px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,.6); opacity: 0; animation: fall 13s ease-in infinite; }
   @keyframes fall { 0%{opacity:0; transform: translateY(0) scale(1);} 8%{opacity:.9;} 70%{opacity:.5;} 92%{opacity:0; transform: translateY(220px) scale(.4);} 100%{opacity:0; transform: translateY(220px) scale(.4);} }
   .role { margin: 22px 0 0; font-size: 12px; letter-spacing: .28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
+  html[data-lang="ko"] .role { letter-spacing: .18em; }
   html[data-lang="en"] .role { font-family: var(--font-utility); letter-spacing: .24em; }
   .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 22px 0; }
   .status { font-size: clamp(15px,2.4vw,18px); opacity: .9; }
@@ -302,7 +314,7 @@
   .home-enter { margin-top: 30px; }
   .home-enter button {
     background: none; border: 1px solid var(--gold-base); color: var(--gold-bright); border-radius: 999px;
-    padding: 10px 26px; font: inherit; font-size: 13px; letter-spacing: .06em; cursor: pointer; transition: all .25s ease;
+    padding: 10px 26px; font: inherit; font-size: 13px; letter-spacing: .06em; cursor: pointer; transition: background .2s ease;
   }
   .home-enter button:hover { background: rgba(224,194,122,.1); }
 
@@ -358,7 +370,7 @@
     position: fixed; inset: 0; z-index: 39;
     background: rgba(6,12,26,.5);
     opacity: 0; pointer-events: none;
-    transition: opacity .25s ease;
+    transition: opacity .2s ease;
   }
   .series-select.is-open .series-select-scrim { opacity: 1; pointer-events: auto; }
 
@@ -375,7 +387,7 @@
     overflow-y: auto;
     box-shadow: 0 18px 40px rgba(0,0,0,.4);
     opacity: 0; transform: translateY(-6px); pointer-events: none;
-    transition: opacity .18s ease, transform .18s ease;
+    transition: opacity .2s cubic-bezier(.22,1,.36,1), transform .2s cubic-bezier(.22,1,.36,1);
   }
   .series-select.is-open .series-select-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
@@ -385,8 +397,8 @@
   .series-select-option {
     width: 100%; display: flex; align-items: center; gap: 10px;
     background: none; border: none; text-align: left; cursor: pointer;
-    color: var(--text-dim); font: inherit; font-size: 14px;
-    padding: 11px 12px; border-radius: 9px;
+    color: rgba(232,228,216,.7); font: inherit; font-size: 14px;
+    padding: 9px 12px; border-radius: 9px;
     transition: background .15s ease, color .15s ease;
   }
   .series-select-option:hover, .series-select-option:focus-visible { background: rgba(224,194,122,.09); color: var(--gold-bright); outline: none; }
@@ -400,34 +412,34 @@
       position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 66;
       width: auto; max-width: none;
       border-radius: 20px 20px 0 0;
-      padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+      padding: 8px 14px calc(12px + env(safe-area-inset-bottom, 0px));
       max-height: 70vh;
       transform: translateY(100%);
       box-shadow: 0 -18px 45px rgba(0,0,0,.45);
     }
     .series-select.is-open .series-select-panel { transform: translateY(0); }
     .series-select-sheet-handle {
-      display: block; width: 38px; height: 4px; border-radius: 999px;
-      background: var(--card-border); margin: 2px auto 12px;
+      display: block; width: 36px; height: 4px; border-radius: 999px;
+      background: var(--card-border); margin: 2px auto 8px;
     }
     .series-select-sheet-title {
       display: block; font-family: var(--font-utility); font-size: 12px;
       letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim);
-      margin: 0 4px 8px;
+      margin: 0 4px 6px;
     }
-    .series-select-option { min-height: 48px; padding: 13px 12px; }
+    .series-select-option { min-height: 48px; padding: 11px 12px; }
   }
 
   /* ---- Search field ---- */
   .search-field { position: relative; }
-  .search-field-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--text-dim); }
+  .search-field-icon { width: 15px; height: 15px; flex-shrink: 0; color: var(--text-dim); }
   .search-field input {
     flex: 1 1 auto; min-width: 0;
     background: none; border: none; color: var(--text-main);
-    font: inherit; font-size: 14px;
+    font: inherit; font-size: 14px; letter-spacing: .003em;
   }
   .search-field input:focus { outline: none; }
-  .search-field input::placeholder { color: var(--text-dim); opacity: .8; }
+  .search-field input::placeholder { color: var(--text-dim); opacity: .92; }
   .search-field-clear {
     flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -440,7 +452,7 @@
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
   .card {
     background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; overflow: hidden;
-    cursor: pointer; transition: transform .25s ease, border-color .25s ease;
+    cursor: pointer; transition: transform .2s ease, border-color .2s ease;
   }
   .card:hover { transform: translateY(-3px); border-color: var(--gold-base); }
   .thumb-wrap { width: 100%; aspect-ratio: 4/5; background: #08152c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -453,13 +465,13 @@
   /* ---- Empty state ---- */
   .empty-state {
     display: flex; flex-direction: column; align-items: center; text-align: center;
-    gap: 10px; padding: 56px 20px; color: var(--text-dim);
-    animation: empty-fade .3s ease;
+    padding: 56px 20px; color: var(--text-dim);
+    animation: empty-fade .2s ease;
   }
   @keyframes empty-fade { from { opacity: 0; } to { opacity: 1; } }
-  .empty-state-icon { width: 38px; height: 38px; color: var(--gold-base); opacity: .7; }
-  .empty-state-title { margin: 0; font-size: 15px; font-weight: 500; color: var(--text-main); }
-  .empty-state-sub { margin: 0; font-size: 13px; color: var(--text-dim); max-width: 320px; }
+  .empty-state-icon { width: 36px; height: 36px; color: var(--gold-base); opacity: .7; margin-bottom: 16px; }
+  .empty-state-title { margin: 0 0 6px; font-size: 15px; font-weight: 500; color: var(--text-main); line-height: 1.4; }
+  .empty-state-sub { margin: 0; font-size: 13px; color: var(--text-dim); max-width: 320px; line-height: 1.5; }
 
   .load-more-wrap { text-align: center; margin-top: 28px; }
   .load-more-wrap button {
@@ -480,11 +492,36 @@
   #info-modal[hidden] { display: none !important; }
   #info-modal { position: fixed; inset: 0; z-index: 60; }
   .bio-backdrop { position: absolute; inset: 0; background: rgba(6,12,26,.9); }
-  .bio-card { position: relative; max-width: 560px; margin: 8vh auto; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 30px; max-height: 84vh; overflow-y: auto; }
-  .bio-lang { display: flex; gap: 8px; margin-bottom: 16px; }
-  .bio-lang button { background: none; border: 1px solid var(--card-border); color: var(--text-dim); border-radius: 999px; padding: 4px 14px; font: inherit; font-size: 12px; cursor: pointer; }
+  .bio-card {
+    position: relative; max-width: 560px; margin: 8vh auto;
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px;
+    padding: 32px 30px 30px; max-height: 84vh; overflow-y: auto; scroll-behavior: smooth;
+  }
+  .bio-lang { display: flex; gap: 8px; margin-bottom: 18px; }
+  .bio-lang button { background: none; border: 1px solid var(--card-border); color: var(--text-dim); border-radius: 999px; padding: 4px 14px; font: inherit; font-size: 12px; cursor: pointer; transition: color .18s ease, border-color .18s ease; }
   .bio-lang button.active { color: var(--gold-bright); border-color: var(--gold-base); }
-  .bio-close { position: absolute; top: 14px; right: 18px; background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+  .bio-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; color: var(--text-main); font-size: 22px; line-height: 1; cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+  }
+  .bio-close:hover, .bio-close:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.09); outline: none; }
+
+  /* One-line intro: sits between the title and the full body copy, giving the
+     reader a quick sense of the work before the longer paragraphs. */
+  .bio-tagline {
+    margin: 2px 0 20px; font-size: 15.5px; line-height: 1.5; color: var(--gold-bright);
+  }
+  .bio-tagline.ko { font-family: var(--font-kr-body); }
+  .bio-tagline.en { font-family: var(--font-en-display); font-style: italic; letter-spacing: .01em; }
+
+  .bio-body p {
+    margin: 0 0 18px; font-size: 14px; line-height: 1.85; color: var(--text-dim);
+  }
+  .bio-body p:last-child { margin-bottom: 0; }
+  #info-body { font-size: 14px; line-height: 1.8; }
 
   footer { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 34px 24px 28px; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); }
 
@@ -493,7 +530,7 @@
     width: 44px; height: 44px;
     display: inline-flex; align-items: center; justify-content: center;
     color: var(--gold-base); opacity: .8;
-    transition: opacity .25s ease, color .25s ease, transform .25s ease;
+    transition: opacity .2s ease, color .2s ease, transform .2s ease;
   }
   .footer-social a:hover { color: var(--gold-bright); opacity: 1; transform: translateY(-1px); }
   .footer-social svg { width: 26px; height: 26px; }
@@ -662,7 +699,7 @@
         </div>
       </div>
       <div class="filter-control search-field">
-        <svg class="search-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="search-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="10.5" cy="10.5" r="6.5"/>
           <path d="M20 20l-4.8-4.8"/>
         </svg>
@@ -733,8 +770,14 @@
     </div>
     <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
     <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
-    <p class="ko">정산 김연식은 서울을 기반으로 활동하는 한국 현대미술가이자 화가이다. 회화와 추상적 조형언어를 중심으로 자연, 인간, 시, 음악과 기억의 관계를 탐구한다. 작품과 전시, 아카이브는 공식 웹사이트 jskim.art를 통해 소개된다.</p>
-    <p class="en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist and painter based in Seoul. His practice explores nature, humanity, poetry, music, and memory through painting and abstract visual language. His artworks, exhibitions, and archive are presented through his official website, jskim.art.</p>
+    <p class="bio-tagline ko">자연과 인간, 기억을 그리는 화가</p>
+    <p class="bio-tagline en" style="display:none;">A painter of nature, humanity, and memory</p>
+    <div class="bio-body">
+      <p class="ko">정산 김연식은 서울을 기반으로 활동하는 한국 현대미술가이자 화가이다. 회화와 추상적 조형언어를 중심으로 자연, 인간, 시, 음악과 기억의 관계를 탐구한다.</p>
+      <p class="ko">작품과 전시, 아카이브는 공식 웹사이트 jskim.art를 통해 소개된다.</p>
+      <p class="en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist and painter based in Seoul. His practice explores nature, humanity, poetry, music, and memory through painting and abstract visual language.</p>
+      <p class="en" style="display:none;">His artworks, exhibitions, and archive are presented through his official website, jskim.art.</p>
+    </div>
   </div>
 </div>
 
