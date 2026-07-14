@@ -1,15 +1,15 @@
 [
   {
-    "key": "yundongju",
-    "title_kr": "시인 윤동주 오마주",
-    "title_en": "Homage to Poet Yun Dong-ju",
+    "key": "yeosu",
+    "title_kr": "여수, 섬 위에 섬 — 365 Islands",
+    "title_en": "Yeosu, An Island Above Islands — 365 Islands",
     "active": true,
     "order": 1
   },
   {
-    "key": "yeosu",
-    "title_kr": "여수, 섬 위에 섬 — 365 Islands",
-    "title_en": "Yeosu, An Island Above Islands — 365 Islands",
+    "key": "yundongju",
+    "title_kr": "시인 윤동주와 미술가 김연식",
+    "title_en": "Poet Yun Dong-ju and Artist Kim Yun-sik",
     "active": true,
     "order": 2
   },
