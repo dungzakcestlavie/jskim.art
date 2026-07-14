@@ -216,16 +216,13 @@
   @media (max-width: 640px) {
     header.site-header { padding: 26px 20px 18px; gap: 16px; }
 
-    /* ---- English mobile only: restructure the burger + nav row as a grid ----
-       KR mobile keeps the original flex/absolute-burger layout untouched below.
-       Root cause of the crowding: the absolutely-positioned burger and the
-       centered nav row could overlap once the longer English labels
-       ("ART WORKS" / "ARTIST BIO") pushed nav width close to the burger.
-       Fix: give the burger, ART WORKS, and ARTIST BIO their own grid columns
-       so none of them can crowd or overlap, at any of the tested widths. */
+    /* ---- English mobile only: burger stays in its own left column; ART WORKS
+       + ARTIST BIO are grouped as ONE centered unit (not split into separate
+       grid cells with justify-self:end, which pinned ARTIST BIO to the right
+       edge). KR mobile keeps the original flex/absolute-burger layout below. */
     html[data-lang="en"] header.site-header {
       display: grid;
-      grid-template-columns: 44px 1fr;
+      grid-template-columns: 44px minmax(0, 1fr);
       grid-template-areas:
         "name name"
         "burger nav"
@@ -252,19 +249,22 @@
     }
     html[data-lang="en"] header.site-header nav.primary {
       grid-area: nav;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      column-gap: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(42px, 11vw, 72px);
+      min-width: 0;
+      padding-right: 24px;
       width: 100%;
     }
     html[data-lang="en"] header.site-header nav.primary button {
+      flex: 0 0 auto;
       padding: 9px 6px;
       font-size: 16px;
       letter-spacing: .06em;
       white-space: nowrap;
+      text-align: center;
     }
-    html[data-lang="en"] header.site-header nav.primary button:first-child { justify-self: center; }
-    html[data-lang="en"] header.site-header nav.primary button:last-child { justify-self: end; }
     html[data-lang="en"] header.site-header .lang-row-wrap { grid-area: lang; }
   }
 
