@@ -422,6 +422,14 @@
         </svg>
         <span data-i18n="ko">왼손 피아노</span><span data-i18n="en">Left Hand Piano</span>
       </a>
+      <button type="button" class="drawer-btn" data-info-target="writings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/>
+          <path d="M14 3v5h5"/>
+          <path d="M8 13h8M8 17h5"/>
+        </svg>
+        <span data-i18n="ko">글</span><span data-i18n="en">Writings</span>
+      </button>
       <button type="button" class="drawer-btn" data-info-target="exhibition">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="14" rx="2"/>
@@ -438,7 +446,7 @@
         </svg>
         <span data-i18n="ko">뉴스</span><span data-i18n="en">News</span>
       </button>
-      <a href="https://www.sanchon.com" target="_blank" rel="noopener noreferrer">
+      <a href="https://gallerysanchon.com/" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="9"/>
           <path d="M3 12h18M12 3c2.5 2.5 3.8 6 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-6-3.8-9s1.3-6.5 3.8-9Z"/>
@@ -716,6 +724,10 @@
   // Exhibition Views / News: both are pages-to-come. Clicking either closes the
   // drawer and opens a shared "coming soon" card (same visual style as Bio).
   const INFO_CONTENT = {
+    writings: {
+      ko: { title: '글', body: '정산 김연식 작가의 글 페이지를 준비하고 있습니다. 시, 산문, 작가 노트 등 작가의 글이 이곳에 소개될 예정입니다.' },
+      en: { title: 'Writings', body: 'This page is being prepared. It will feature JUNGSAN KIM YUN SIK\'s poetry, prose, and artist notes.' }
+    },
     exhibition: {
       ko: { title: '전시 모습', body: '전시 모습 페이지를 준비하고 있습니다. 전시장, 설치 사진, 오프닝, 관람객, 전시 기록이 이곳에 소개될 예정입니다.' },
       en: { title: 'Exhibition Views', body: 'This page is being prepared. It will feature exhibition views, installation photos, openings, visitors, and exhibition records.' }
