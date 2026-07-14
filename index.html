@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>정산 김연식 작가 | JungSan Yun-sik Kim | jskim.art</title>
-<meta name="description" content="정산 김연식 작가 (JungSan Yun-sik Kim) 공식 웹사이트 준비 중">
+<meta name="description" content="정산 김연식 작가 (JungSan Yun-sik Kim) 공식 웹사이트">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,71 +16,46 @@
     --bg-deep:    #0A1830;
     --bg-mid:     #16294F;
     --bg-light:   #1E3A66;
+    --accent-blue:#1B3A66;
+    --gold-base:  #C9A35A;
+    --gold-bright:#E0C27A;
+    --text-main:  #E8E4D8;
+    --text-dim:   #A9A594;
+    --card-bg:    #101F3C;
+    --card-border:#26406B;
 
-    --accent-blue: #1B3A66;
-
-    --gold-base:   #C9A35A;
-    --gold-bright: #E0C27A;
-
-    --text-main:   #E8E4D8;
-    --text-dim:    #A9A594;
-
-    /* ---- Typography ---- */
-    --font-kr-display: 'Gowun Batang', serif;      /* 이름 (KR) — 모던한 세리프 */
-    --font-kr-body:    'Gowun Dodum', sans-serif;   /* 본문 (KR) — 정제된 산세리프 */
-    --font-en-display: 'Fraunces', serif;           /* 이름/문구 (EN) — 컨템포러리 세리프 */
-    --font-utility:    'Space Grotesk', sans-serif; /* 토글, 푸터 — 라틴 전용 유틸리티 */
+    --font-kr-display: 'Gowun Batang', serif;
+    --font-kr-body:    'Gowun Dodum', sans-serif;
+    --font-en-display: 'Fraunces', serif;
+    --font-utility:    'Space Grotesk', sans-serif;
   }
 
   * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-
+  html, body { margin: 0; padding: 0; }
   body {
     min-height: 100vh;
-    min-height: 100dvh; /* iOS 동적 툴바(주소창) 높이 변화 대응 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    min-height: 100dvh;
+    background: var(--bg-deep);
     color: var(--text-main);
-    font-family: var(--font-kr-display);
+    font-family: var(--font-kr-body);
   }
+  html[data-lang="en"] body { font-family: var(--font-en-display); }
 
-  /* 배경 애니메이션 전용 레이어.
-     ※ 이전 버전은 body에 직접 background + filter 애니메이션(breathe)을 걸었음.
-     filter가 걸린 요소는 그 하위 position:fixed 자식의 containing block이
-     되어버려서(스펙상 규칙), body의 자식인 .lang-toggle이 뷰포트가 아닌
-     body 박스 기준으로 위치가 계산됨. 모바일(iOS Safari/Chrome)에서는 동적
-     주소창 때문에 실제 가시영역과 100vh가 어긋나면서 .lang-toggle이 body의
-     overflow:hidden 밖으로 밀려 잘려 사라졌음(이것이 버튼이 사라진 원인).
-     배경/애니메이션을 별도 레이어로 분리해 body 자체에는 filter를 걸지 않음
-     → .lang-toggle은 항상 진짜 뷰포트 기준 fixed로 동작. */
   .bg-layer {
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(
-      ellipse at 50% 40%,
-      var(--bg-light) 0%,
-      var(--bg-mid) 48%,
-      var(--bg-deep) 100%
-    );
+    background: radial-gradient(ellipse at 50% 40%, var(--bg-light) 0%, var(--bg-mid) 48%, var(--bg-deep) 100%);
     background-size: 160% 160%;
     animation: breathe 28s ease-in-out infinite;
   }
-
   @keyframes breathe {
     0%, 100% { background-position: 50% 45%; filter: brightness(1); }
     50%      { background-position: 50% 55%; filter: brightness(1.07); }
   }
 
-  /* ---------------- Language toggle ---------------- */
+  /* ---------------- Language toggle (shared) ---------------- */
   .lang-toggle {
     position: fixed;
     top: calc(28px + env(safe-area-inset-top, 0px));
@@ -91,187 +66,82 @@
     font-weight: 500;
     font-size: 12px;
     letter-spacing: 0.12em;
-    z-index: 10;
+    z-index: 30;
   }
-
   .lang-toggle button {
-    background: none;
-    border: none;
-    color: var(--text-dim);
-    cursor: pointer;
-    padding: 4px 2px;
-    font: inherit;
-    letter-spacing: inherit;
-    opacity: 0.65;
-    transition: opacity 0.4s ease, color 0.4s ease;
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; padding: 4px 2px; font: inherit; letter-spacing: inherit;
+    opacity: 0.65; transition: opacity 0.4s ease, color 0.4s ease;
   }
+  .lang-toggle button.active { color: var(--gold-bright); opacity: 1; }
+  .lang-toggle span.sep { color: var(--text-dim); opacity: 0.35; }
 
-  .lang-toggle button.active {
-    color: var(--gold-bright);
-    opacity: 1;
-  }
-
-  .lang-toggle span.sep {
-    color: var(--text-dim);
-    opacity: 0.35;
-  }
-
-  /* ---------------- Stage ---------------- */
-  .stage {
-    position: relative;
-    width: min(90vw, 640px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    animation: rise 2.4s ease-out;
-  }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ---------------- Moon (signature light source) ---------------- */
-  .moon-wrap {
-    position: relative;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 8px;
-  }
-
-  .moon {
-    width: 100%;
-    height: 100%;
-    animation: moon-glow 7s ease-in-out infinite;
-  }
-
-  @keyframes moon-glow {
-    0%, 100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,0.25)); }
-    50%      { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,0.4)); }
-  }
-
-  /* ---------------- Falling light droplet ----------------
-     정산 작가 작품에 반복되는 "가지 끝에 맺힌 빛방울" 모티프를
-     달빛 아래로 아주 천천히 떨어지는 하나의 점광으로 표현.
-  ------------------------------------------------------------ */
-  .droplet {
-    position: absolute;
-    left: 50%;
-    top: 68px;
-    width: 5px;
-    height: 5px;
-    margin-left: -2.5px;
-    border-radius: 50%;
-    background: var(--gold-bright);
-    box-shadow: 0 0 6px 2px rgba(224,194,122,0.6);
-    opacity: 0;
-    animation: fall 13s ease-in infinite;
-  }
-
-  @keyframes fall {
-    0%   { opacity: 0;   transform: translateY(0) scale(1); }
-    8%   { opacity: 0.9; }
-    70%  { opacity: 0.5; }
-    92%  { opacity: 0;   transform: translateY(220px) scale(0.4); }
-    100% { opacity: 0;   transform: translateY(220px) scale(0.4); }
-  }
-
-  /* ---------------- Name ---------------- */
-  .name {
-    margin: 22px 0 0;
-    font-family: var(--font-kr-display);
-    font-weight: 700;
-    font-size: clamp(26px, 5vw, 34px);
-    letter-spacing: 0.08em;
-    color: var(--text-main);
-  }
-
-  html[data-lang="en"] .name {
-    font-family: var(--font-en-display);
-    font-style: italic;
-    font-weight: 500;
-    letter-spacing: 0.005em;
-  }
-
-  /* ---------------- Role ---------------- */
-  .role {
-    margin: 10px 0 0;
-    font-family: var(--font-kr-body);
-    font-weight: 400;
-    font-size: 12px;
-    letter-spacing: 0.28em;
-    color: var(--gold-bright);
-    text-transform: uppercase;
-    opacity: 0.85;
-  }
-
-  html[data-lang="en"] .role {
-    font-family: var(--font-utility);
-    font-weight: 500;
-    letter-spacing: 0.24em;
-  }
-
-  .divider {
-    width: 40px;
-    height: 1px;
-    background: var(--gold-base);
-    opacity: 0.55;
-    margin: 22px 0;
-  }
-
-  /* ---------------- Status ---------------- */
-  .status {
-    font-family: var(--font-kr-body);
-    font-weight: 400;
-    font-size: clamp(15px, 2.4vw, 18px);
-    color: var(--text-main);
-    opacity: 0.9;
-    letter-spacing: 0.02em;
-  }
-
-  html[data-lang="en"] .status {
-    font-family: var(--font-en-display);
-    font-style: italic;
-    font-weight: 400;
-  }
-
-  /* ---------------- Description ---------------- */
-  .desc {
-    margin-top: 12px;
-    font-family: var(--font-kr-body);
-    font-weight: 400;
-    font-size: 13px;
-    letter-spacing: 0.03em;
-    color: var(--text-dim);
-  }
-
-  html[data-lang="en"] .desc {
-    font-family: var(--font-en-display);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 14px;
-  }
-
-  footer {
-    position: fixed;
-    bottom: calc(26px + env(safe-area-inset-bottom, 0px));
-    font-family: var(--font-utility);
-    font-weight: 300;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-    opacity: 0.5;
-  }
-
-  /* ---------------- i18n visibility ---------------- */
   [data-i18n] { display: none; }
   html[data-lang="ko"] [data-i18n="ko"] { display: inline; }
   html[data-lang="en"] [data-i18n="en"] { display: inline; }
 
-  @media (prefers-reduced-motion: reduce) {
-    .bg-layer, .moon, .droplet, .stage { animation: none !important; }
+  /* ---------------- Coming-soon hero (unchanged, shown while works.json is empty) ---------------- */
+  #hero {
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
+  .stage { position: relative; width: min(90vw, 640px); display: flex; flex-direction: column; align-items: center; text-align: center; animation: rise 2.4s ease-out; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px);} to { opacity: 1; transform: translateY(0);} }
+  .moon-wrap { position: relative; width: 64px; height: 64px; margin-bottom: 8px; }
+  .moon { width: 100%; height: 100%; animation: moon-glow 7s ease-in-out infinite; }
+  @keyframes moon-glow {
+    0%, 100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,0.25)); }
+    50%      { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,0.4)); }
+  }
+  .droplet { position: absolute; left: 50%; top: 68px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,0.6); opacity: 0; animation: fall 13s ease-in infinite; }
+  @keyframes fall { 0% {opacity:0; transform: translateY(0) scale(1);} 8%{opacity:.9;} 70%{opacity:.5;} 92%{opacity:0; transform: translateY(220px) scale(.4);} 100%{opacity:0; transform: translateY(220px) scale(.4);} }
+  .name { margin: 22px 0 0; font-family: var(--font-kr-display); font-weight: 700; font-size: clamp(26px, 5vw, 34px); letter-spacing: 0.08em; }
+  html[data-lang="en"] .name { font-family: var(--font-en-display); font-style: italic; font-weight: 500; letter-spacing: 0.005em; }
+  .role { margin: 10px 0 0; font-family: var(--font-kr-body); font-weight: 400; font-size: 12px; letter-spacing: 0.28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
+  html[data-lang="en"] .role { font-family: var(--font-utility); font-weight: 500; letter-spacing: 0.24em; }
+  .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 22px 0; }
+  .status { font-size: clamp(15px, 2.4vw, 18px); opacity: .9; }
+  .desc { margin-top: 12px; font-size: 13px; color: var(--text-dim); }
+  html[data-lang="en"] .status, html[data-lang="en"] .desc { font-family: var(--font-en-display); font-style: italic; }
+  footer { position: fixed; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; font-family: var(--font-utility); font-weight: 300; font-size: 11px; letter-spacing: .1em; color: var(--text-dim); opacity: .5; pointer-events: none; }
+
+  /* ---------------- Gallery (shown once works.json has entries) ---------------- */
+  #gallery { display: none; padding: 96px 24px 80px; max-width: 1400px; margin: 0 auto; }
+  .gallery-header { text-align: center; margin-bottom: 32px; }
+  .gallery-header h1 { font-family: var(--font-kr-display); font-size: clamp(22px, 4vw, 30px); margin: 0 0 6px; }
+  html[data-lang="en"] .gallery-header h1 { font-family: var(--font-en-display); font-style: italic; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 28px; }
+  .section-filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .section-filters button {
+    background: transparent; border: 1px solid var(--card-border); color: var(--text-dim);
+    border-radius: 999px; padding: 7px 16px; font: inherit; font-size: 13px; cursor: pointer;
+    transition: all .25s ease;
+  }
+  .section-filters button.active, .section-filters button:hover { color: var(--gold-bright); border-color: var(--gold-base); }
+
+  #search { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; min-width: 200px; }
+  #search:focus { outline: none; border-color: var(--gold-base); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+  .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: transform .25s ease, border-color .25s ease; }
+  .card:hover { transform: translateY(-3px); border-color: var(--gold-base); }
+  .card .thumb { width: 100%; aspect-ratio: 4/5; background: #08152c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .card .thumb img { width: 100%; height: 100%; object-fit: contain; }
+  .card .meta { padding: 10px 12px 14px; }
+  .card .meta .t { font-size: 13px; color: var(--text-main); }
+  .card .meta .s { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .empty-msg { text-align: center; color: var(--text-dim); font-size: 14px; padding: 40px 0; }
+
+  /* ---------------- Viewer ---------------- */
+  #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; }
+  #viewer img { max-width: 92vw; max-height: 78vh; object-fit: contain; }
+  #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; }
+  #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; }
+  #viewer .v-zoom { margin-top: 14px; background: none; border: 1px solid var(--card-border); color: var(--gold-bright); border-radius: 999px; padding: 6px 18px; font: inherit; font-size: 12px; cursor: pointer; }
+
+  @media (prefers-reduced-motion: reduce) { .bg-layer, .moon, .droplet, .stage { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -284,57 +154,218 @@
     <button id="btn-en" aria-pressed="false">EN</button>
   </div>
 
-  <main class="stage">
-    <div class="moon-wrap">
-      <svg class="moon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M40 8C28 10 20 21 20 33c0 15 12 27 27 27 3 0 6-0.5 8.7-1.4C48.6 62.6 40.6 58 40.6 33 40.6 21.8 34 12 26 9.4 30.4 8.3 35.1 7.8 40 8Z"
-              fill="var(--gold-bright)"/>
-      </svg>
-      <div class="droplet"></div>
+  <!-- Coming-soon hero: shown by default, hidden automatically once works.json has entries -->
+  <main id="hero">
+    <div class="stage">
+      <div class="moon-wrap">
+        <svg class="moon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M40 8C28 10 20 21 20 33c0 15 12 27 27 27 3 0 6-0.5 8.7-1.4C48.6 62.6 40.6 58 40.6 33 40.6 21.8 34 12 26 9.4 30.4 8.3 35.1 7.8 40 8Z" fill="var(--gold-bright)"/>
+        </svg>
+        <div class="droplet"></div>
+      </div>
+      <h1 class="name">
+        <span data-i18n="ko">정산 김연식</span>
+        <span data-i18n="en">JungSan Yun-sik Kim</span>
+      </h1>
+      <p class="role"><span data-i18n="ko">작가</span><span data-i18n="en">Artist</span></p>
+      <div class="divider"></div>
+      <p class="status">
+        <span data-i18n="ko">공식 웹사이트 준비 중</span>
+        <span data-i18n="en">The official website is in preparation</span>
+      </p>
+      <p class="desc">
+        <span data-i18n="ko">새로운 이야기가 곧 이곳에 놓입니다.</span>
+        <span data-i18n="en">A new story will soon find its place here.</span>
+      </p>
     </div>
-
-    <h1 class="name">
-      <span data-i18n="ko">정산 김연식</span>
-      <span data-i18n="en">JungSan Yun-sik Kim</span>
-    </h1>
-
-    <p class="role">
-      <span data-i18n="ko">작가</span>
-      <span data-i18n="en">Artist</span>
-    </p>
-
-    <div class="divider"></div>
-
-    <p class="status">
-      <span data-i18n="ko">공식 웹사이트 준비 중</span>
-      <span data-i18n="en">The official website is in preparation</span>
-    </p>
-
-    <p class="desc">
-      <span data-i18n="ko">새로운 이야기가 곧 이곳에 놓입니다.</span>
-      <span data-i18n="en">A new story will soon find its place here.</span>
-    </p>
   </main>
+
+  <!-- Gallery: shown once works.json has entries -->
+  <section id="gallery">
+    <div class="gallery-header">
+      <h1><span data-i18n="ko">정산 김연식</span><span data-i18n="en">JungSan Yun-sik Kim</span></h1>
+    </div>
+    <div class="controls">
+      <div class="section-filters" id="section-filters"></div>
+      <input id="search" type="text" data-i18n-ph="ko:작품명 검색|en:Search titles">
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty-msg" id="empty-msg" style="display:none;">
+      <span data-i18n="ko">해당 조건에 맞는 작품이 없습니다.</span>
+      <span data-i18n="en">No works match this filter.</span>
+    </p>
+  </section>
 
   <footer>&copy; 2026 jskim.art</footer>
 
-  <script>
-    const html = document.documentElement;
-    const btnKo = document.getElementById('btn-ko');
-    const btnEn = document.getElementById('btn-en');
+  <!-- Viewer (single DOM instance, reused) -->
+  <div id="viewer">
+    <button class="v-close" aria-label="close">&times;</button>
+    <img id="viewer-img" src="" alt="">
+    <div class="v-meta" id="viewer-meta"></div>
+    <button class="v-zoom" id="viewer-zoom">
+      <span data-i18n="ko">확대 보기</span><span data-i18n="en">View Zoom</span>
+    </button>
+  </div>
 
-    function setLang(lang) {
-      html.setAttribute('data-lang', lang);
-      html.setAttribute('lang', lang);
-      btnKo.classList.toggle('active', lang === 'ko');
-      btnEn.classList.toggle('active', lang === 'en');
-      btnKo.setAttribute('aria-pressed', lang === 'ko');
-      btnEn.setAttribute('aria-pressed', lang === 'en');
+<script>
+(function () {
+  const html = document.documentElement;
+  const btnKo = document.getElementById('btn-ko');
+  const btnEn = document.getElementById('btn-en');
+  const hero = document.getElementById('hero');
+  const gallery = document.getElementById('gallery');
+  const grid = document.getElementById('grid');
+  const sectionFiltersEl = document.getElementById('section-filters');
+  const searchInput = document.getElementById('search');
+  const emptyMsg = document.getElementById('empty-msg');
+  const viewer = document.getElementById('viewer');
+  const viewerImg = document.getElementById('viewer-img');
+  const viewerMeta = document.getElementById('viewer-meta');
+  const viewerZoomBtn = document.getElementById('viewer-zoom');
+
+  let lang = localStorage.getItem('jskim_lang') || 'ko';
+  let works = [];
+  let sections = [];
+  let activeSectionKey = 'all';
+  let searchTerm = '';
+
+  function setLang(l) {
+    lang = l;
+    localStorage.setItem('jskim_lang', l);
+    html.setAttribute('data-lang', l);
+    html.setAttribute('lang', l);
+    btnKo.classList.toggle('active', l === 'ko');
+    btnEn.classList.toggle('active', l === 'en');
+    btnKo.setAttribute('aria-pressed', l === 'ko');
+    btnEn.setAttribute('aria-pressed', l === 'en');
+    applyPlaceholders();
+  }
+  btnKo.addEventListener('click', () => setLang('ko'));
+  btnEn.addEventListener('click', () => setLang('en'));
+
+  function applyPlaceholders() {
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const raw = el.getAttribute('data-i18n-ph');
+      const map = {};
+      raw.split('|').forEach(pair => {
+        const [k, v] = pair.split(':');
+        map[k] = v;
+      });
+      el.setAttribute('placeholder', map[lang] || '');
+    });
+  }
+
+  function field(obj, base) {
+    // KR/EN field lookup with no cross-language fallback (per spec: blank stays blank)
+    const v = obj[base + '_' + lang];
+    return v === undefined ? '' : v;
+  }
+
+  async function loadData() {
+    try {
+      const [worksRes, sectionsRes] = await Promise.all([
+        fetch('works.json?_=' + dayStamp()),
+        fetch('sections.json?_=' + dayStamp())
+      ]);
+      works = await worksRes.json();
+      sections = await sectionsRes.json();
+    } catch (e) {
+      works = [];
+      sections = [];
     }
+    render();
+  }
 
-    btnKo.addEventListener('click', () => setLang('ko'));
-    btnEn.addEventListener('click', () => setLang('en'));
-  </script>
+  function dayStamp() {
+    // day-stable cache key so browsers don't refetch on every load, but do refresh daily
+    const d = new Date();
+    return d.getFullYear() + '' + (d.getMonth()+1) + '' + d.getDate();
+  }
+
+  function render() {
+    if (!works || works.length === 0) {
+      hero.style.display = 'flex';
+      gallery.style.display = 'none';
+      return;
+    }
+    hero.style.display = 'none';
+    gallery.style.display = 'block';
+    renderSectionFilters();
+    renderGrid();
+  }
+
+  function renderSectionFilters() {
+    sectionFiltersEl.innerHTML = '';
+    const allBtn = document.createElement('button');
+    allBtn.textContent = lang === 'ko' ? '전체' : 'All';
+    allBtn.className = activeSectionKey === 'all' ? 'active' : '';
+    allBtn.addEventListener('click', () => { activeSectionKey = 'all'; renderSectionFilters(); renderGrid(); });
+    sectionFiltersEl.appendChild(allBtn);
+
+    sections
+      .filter(s => s.active)
+      .sort((a, b) => a.order - b.order)
+      .forEach(s => {
+        const b = document.createElement('button');
+        b.textContent = lang === 'ko' ? s.title_kr : s.title_en;
+        b.className = activeSectionKey === s.key ? 'active' : '';
+        b.addEventListener('click', () => { activeSectionKey = s.key; renderSectionFilters(); renderGrid(); });
+        sectionFiltersEl.appendChild(b);
+      });
+  }
+
+  let debounceTimer;
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      searchTerm = e.target.value.trim().toLowerCase();
+      renderGrid();
+    }, 250);
+  });
+
+  function renderGrid() {
+    const filtered = works.filter(w => {
+      const matchesSection = activeSectionKey === 'all' || w.section_key === activeSectionKey;
+      const title = (field(w, 'title') || '').toLowerCase();
+      const matchesSearch = !searchTerm || title.includes(searchTerm);
+      return matchesSection && matchesSearch;
+    });
+
+    grid.innerHTML = '';
+    emptyMsg.style.display = filtered.length === 0 ? 'block' : 'none';
+
+    filtered.forEach(w => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="thumb"><img loading="lazy" src="${w.image}" alt="${field(w, 'title')}"></div>
+        <div class="meta">
+          <div class="t">${field(w, 'title') || '\u00A0'}</div>
+          <div class="s">${field(w, 'material')}${w.year ? ' · ' + w.year : ''}</div>
+        </div>`;
+      card.addEventListener('click', () => openViewer(w));
+      grid.appendChild(card);
+    });
+  }
+
+  function openViewer(w) {
+    viewerImg.src = w.image;
+    viewerImg.alt = field(w, 'title');
+    viewerMeta.textContent = [field(w, 'title'), field(w, 'material'), field(w, 'size'), w.year].filter(Boolean).join(' · ');
+    viewerZoomBtn.style.display = w.zoom ? 'inline-block' : 'none';
+    viewerZoomBtn.onclick = () => { viewerImg.src = w.zoom; }; // zoom image loads only on demand
+    viewer.style.display = 'flex';
+  }
+  viewer.querySelector('.v-close').addEventListener('click', () => {
+    viewer.style.display = 'none';
+    viewerImg.src = '';
+  });
+
+  setLang(lang);
+  loadData();
+})();
+</script>
 
 </body>
 </html>
