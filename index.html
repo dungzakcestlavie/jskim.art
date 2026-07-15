@@ -180,9 +180,8 @@
     background: rgba(10,24,48,.88);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--card-border);
-    transition: padding .2s ease;
+    transition: none;
   }
-  header.site-header.is-compact { padding: 14px clamp(16px, 4vw, 24px) 12px; }
 
   .ms-name {
     display: block; width: 100%; max-width: 100%;
@@ -191,10 +190,9 @@
     font-family: var(--font-kr-brand); font-weight: 600; color: var(--gold-bright);
     font-size: clamp(20px, 4.6vw, 42px); letter-spacing: .04em; line-height: 1.25;
     text-align: center;
-    transition: font-size .2s ease, margin .2s ease;
+    transition: none;
   }
   .ms-name:hover { opacity: .88; }
-  header.site-header.is-compact .ms-name { font-size: clamp(15px, 2.8vw, 22px); margin-bottom: 10px; }
   html[data-lang="en"] .ms-name {
     font-family: var(--font-en-brand); font-weight: 500; font-style: normal;
     text-transform: uppercase; letter-spacing: clamp(.035em, .58vw, .09em);
@@ -239,7 +237,6 @@
     display: inline-flex; align-items: center; flex: 0 0 auto; white-space: nowrap;
     padding: 11px 18px; cursor: pointer; border-radius: 999px; transition: color .18s ease, background .18s ease;
   }
-  header.site-header.is-compact nav.primary button { font-size: 13px; padding: 7px 14px; letter-spacing: .12em; }
   nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   html[data-lang="ko"] nav.primary button { font-family: var(--font-kr-body); letter-spacing: .05em; }
 
@@ -265,10 +262,20 @@
     letter-spacing: .24em;
     white-space: nowrap;
   }
-  header.site-header.is-compact .lang-row { font-size: 13px; }
   .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px; font: inherit; letter-spacing: inherit; opacity: .6; transition: opacity .18s ease, color .18s ease; }
   .lang-row button.active { color: var(--gold-bright); opacity: 1; }
   .lang-row .sep { color: var(--text-dim); opacity: .35; }
+
+  /* Desktop scroll stability: header geometry never changes above 900px.
+     Existing compact-on-scroll behavior is retained only for phone/tablet. */
+  @media (max-width: 900px) {
+    header.site-header { transition: padding .2s ease; }
+    header.site-header.is-compact { padding: 14px clamp(16px, 4vw, 24px) 12px; }
+    .ms-name { transition: font-size .2s ease, margin .2s ease; }
+    header.site-header.is-compact .ms-name { font-size: clamp(15px, 2.8vw, 22px); margin-bottom: 10px; }
+    header.site-header.is-compact nav.primary button { font-size: 13px; padding: 7px 14px; letter-spacing: .12em; }
+    header.site-header.is-compact .lang-row { font-size: 13px; }
+  }
 
   /* ---- Phone (≤767px): menu row splits from the nav row, which drops to
      its own full-width line below so long labels never crowd the burger. ---- */
@@ -1716,14 +1723,29 @@
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }
 
+  const compactHeaderMedia = window.matchMedia('(max-width: 900px)');
   let headerCompact = false;
+  let headerScrollTicking = false;
+
   function updateHeaderCompact() {
-    const shouldCompact = window.scrollY > 24;
+    // Desktop header geometry must remain invariant while scrolling.
+    const shouldCompact = compactHeaderMedia.matches && window.scrollY > 24;
     if (shouldCompact === headerCompact) return;
     headerCompact = shouldCompact;
     siteHeader.classList.toggle('is-compact', headerCompact);
   }
-  window.addEventListener('scroll', updateHeaderCompact, { passive: true });
+
+  function requestHeaderCompactUpdate() {
+    if (headerScrollTicking) return;
+    headerScrollTicking = true;
+    requestAnimationFrame(() => {
+      updateHeaderCompact();
+      headerScrollTicking = false;
+    });
+  }
+
+  window.addEventListener('scroll', requestHeaderCompactUpdate, { passive: true });
+  compactHeaderMedia.addEventListener?.('change', requestHeaderCompactUpdate);
 
   setLang(lang);
   showPanel(savedState.panel === 'works' ? 'works' : 'home');
