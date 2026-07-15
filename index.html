@@ -9,8 +9,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Maru+Buri:wght@600&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Gowun+Dodum&family=Maru+Buri:wght@600&family=Nanum+Myeongjo:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" as="fetch" crossorigin="anonymous" href="works.json">
 
 <!-- ================= SEO: title / description / keywords / robots ================= -->
@@ -114,7 +114,9 @@
 
     --font-kr-display: 'Nanum Myeongjo', serif;
     --font-kr-body:    'Gowun Dodum', sans-serif;
+    --font-kr-brand:   'Maru Buri', 'Nanum Myeongjo', serif;
     --font-en-name:    'Cinzel', serif;
+    --font-en-brand:   'Cormorant Garamond', serif;
     --font-en-display: 'Cormorant Garamond', serif;
     --font-utility:    'Space Grotesk', sans-serif;
 
@@ -186,7 +188,7 @@
     display: block; width: 100%; max-width: 100%;
     background: none; border: none; padding: 0; margin: 0 0 clamp(16px, 3vw, 22px);
     cursor: pointer;
-    font-family: var(--font-kr-display); font-weight: 700; color: var(--gold-bright);
+    font-family: var(--font-kr-brand); font-weight: 600; color: var(--gold-bright);
     font-size: clamp(20px, 4.6vw, 42px); letter-spacing: .04em; line-height: 1.25;
     text-align: center;
     transition: font-size .2s ease, margin .2s ease;
@@ -194,8 +196,8 @@
   .ms-name:hover { opacity: .88; }
   header.site-header.is-compact .ms-name { font-size: clamp(15px, 2.8vw, 22px); margin-bottom: 10px; }
   html[data-lang="en"] .ms-name {
-    font-family: var(--font-en-name); font-weight: 600; font-style: normal;
-    text-transform: uppercase; letter-spacing: clamp(.03em, .65vw, .1em);
+    font-family: var(--font-en-brand); font-weight: 500; font-style: normal;
+    text-transform: uppercase; letter-spacing: clamp(.035em, .58vw, .09em);
     white-space: nowrap;
   }
 
@@ -318,7 +320,7 @@
   }
   @media (max-width: 380px) {
     .ms-name { font-size: 19px; }
-    html[data-lang="en"] .ms-name { letter-spacing: .03em; }
+    html[data-lang="en"] .ms-name { letter-spacing: .035em; }
     nav.primary { gap: 6px; }
     nav.primary button { font-size: 12px; letter-spacing: .05em; padding: 8px 6px; }
   }
