@@ -121,7 +121,7 @@
     --header-h: 132px;
   }
 
-  * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; width: 100%; max-width: 100%; overflow-x: hidden; }
   html {
     width: 100%; max-width: 100%;
@@ -140,6 +140,10 @@
   /* Defensive width guards: nothing on the page should be able to force the
      document wider than the viewport, regardless of device or orientation. */
   header, main, section, footer { width: 100%; max-width: 100%; min-width: 0; }
+  .site-header, .header-nav-row, .lang-row-wrap, main, #panel-works, .controls {
+    max-width: 100%;
+    min-width: 0;
+  }
   img, svg, video, canvas { max-width: 100%; }
   input, button, select, textarea { max-width: 100%; min-width: 0; }
 
@@ -237,8 +241,28 @@
   nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   html[data-lang="ko"] nav.primary button { font-family: var(--font-kr-body); letter-spacing: .05em; }
 
-  .lang-row-wrap { justify-self: end; display: flex; justify-content: flex-end; min-width: 0; }
-  .lang-row { display: flex; gap: 14px; align-items: center; font-family: var(--font-en-name); font-weight: 500; font-size: 15px; letter-spacing: .24em; white-space: nowrap; }
+  .lang-row-wrap {
+    justify-self: end;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .lang-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font-family: var(--font-en-name);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: .24em;
+    white-space: nowrap;
+  }
   header.site-header.is-compact .lang-row { font-size: 13px; }
   .lang-row button { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px; font: inherit; letter-spacing: inherit; opacity: .6; transition: opacity .18s ease, color .18s ease; }
   .lang-row button.active { color: var(--gold-bright); opacity: 1; }
@@ -248,19 +272,48 @@
      its own full-width line below so long labels never crowd the burger. ---- */
   @media (max-width: 767px) {
     header.site-header {
-      padding-left: max(16px, env(safe-area-inset-left));
-      padding-right: max(16px, env(safe-area-inset-right));
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
     }
     .header-nav-row {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       grid-template-areas:
         "menu language"
         "primary primary";
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
       row-gap: clamp(16px, 4vw, 22px);
     }
     .ms-burger { grid-area: menu; justify-self: start; }
-    .lang-row-wrap { grid-area: language; justify-self: end; }
-    nav.primary { grid-area: primary; justify-self: center; width: 100%; }
+    .lang-row-wrap {
+      grid-area: language;
+      justify-self: stretch;
+      justify-content: flex-end;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .lang-row {
+      flex: 0 1 auto;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .lang-row button,
+    .lang-row .sep {
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+    nav.primary {
+      grid-area: primary;
+      justify-self: center;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
     nav.primary button { font-size: 16px; letter-spacing: .06em; padding: 9px 10px; }
   }
   @media (max-width: 380px) {
@@ -376,8 +429,12 @@
 
   #panel-works.is-active { display: block; }
   #panel-works {
-    display: none; width: 100%; max-width: 1400px; margin: 0 auto;
-    padding: 28px max(24px, env(safe-area-inset-left)) 80px max(24px, env(safe-area-inset-right));
+    display: none;
+    width: 100%;
+    max-width: 1400px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 28px max(24px, env(safe-area-inset-left, 0px)) 80px max(24px, env(safe-area-inset-right, 0px));
     box-sizing: border-box;
   }
 
@@ -396,6 +453,32 @@
   /* Keep the hierarchy stacked on every phone and tablet. */
   @media (min-width: 1367px) {
     .controls { max-width: 760px; }
+  }
+
+  @media (max-width: 767px) {
+    #panel-works,
+    .controls,
+    .controls > .series-select,
+    .controls > .search-field,
+    .series-select-trigger {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .controls {
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .controls > .series-select,
+    .controls > .search-field {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
   /* ---- Series Selector: visible from the first CSS render ---- */
