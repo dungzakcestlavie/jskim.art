@@ -105,6 +105,9 @@
     --card-border:#26406B;
     --gold-base:  #C9A35A;
     --gold-bright:#E0C27A;
+    --gold-primary:#D6B160;
+    --gold-border: rgba(214,177,96,.78);
+    --gold-text: #E0BD72;
     --text-main:  #E8E4D8;
     --text-dim:   #A9A594;
 
@@ -377,60 +380,118 @@
     box-sizing: border-box;
   }
 
-  .stats-inline { text-align: center; font-family: var(--font-utility); font-size: 12px; color: var(--text-dim); letter-spacing: .04em; margin-bottom: 18px; }
+  .stats-inline {
+    text-align: center;
+    font-family: var(--font-utility);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: .04em;
+    margin-bottom: 24px;
+  }
   .stats-inline strong { color: var(--gold-bright); font-weight: 500; }
 
-  /* ================= Filter area: Series Selector + Search =================
-     Stacked (1 column) through tablet-portrait; side-by-side only once there
-     is genuinely enough width (≥901px) for two comfortable controls. */
+  /* Series is the primary artwork navigation. Search remains secondary. */
   .controls {
-    display: grid; grid-template-columns: 1fr;
-    gap: 14px;
-    width: 100%; max-width: 640px; margin: 0 auto 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto clamp(40px, 7vw, 76px);
     min-width: 0;
   }
-  @media (min-width: 901px) {
-    .controls {
-      grid-template-columns: minmax(280px, 1fr) minmax(280px, 420px);
-      max-width: 760px;
-      align-items: stretch;
-      gap: clamp(18px, 3vw, 32px);
-    }
+
+  /* Keep the hierarchy stacked on every phone and tablet. */
+  @media (min-width: 1367px) {
+    .controls { max-width: 760px; }
   }
 
-  /* Shared visual language for both filter controls: quiet navy card, thin
-     low-saturation gold border, gold only appears sharply on focus. Uses
-     min-height (not a fixed height) so enlarged system text never clips. */
-  .filter-control {
-    min-height: 58px;
-    width: 100%; min-width: 0; box-sizing: border-box;
-    border-radius: 14px;
-    background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008)), rgba(7,17,36,.6);
-    border: 1px solid rgba(207,170,91,.32);
-    padding: 0 18px;
-    display: flex; align-items: center; gap: 10px;
-    transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
-    -webkit-tap-highlight-color: transparent;
+  /* ---- Series Selector: visible from the first CSS render ---- */
+  .series-select {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 14px;
+    opacity: 1;
+    visibility: visible;
   }
-  .filter-control:hover {
-    border-color: rgba(224,190,112,.75);
-  }
-  .filter-control:focus-within {
-    border-color: var(--gold-base);
-    box-shadow: 0 0 0 3px rgba(207,170,91,.16);
-  }
-
-  /* ---- Series Selector (replaces the native <select>) ---- */
-  .series-select { position: relative; width: 100%; }
   .series-select-trigger {
-    width: 100%; background: none; border: none; color: var(--text-main);
-    font: inherit; font-size: 14px; letter-spacing: .01em; cursor: pointer;
-    display: grid; grid-template-columns: minmax(0, 1fr) 15px; align-items: center; gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-width: 0;
+    min-height: 68px;
+    padding: 0 clamp(20px, 4vw, 30px);
+    border: 1.5px solid var(--gold-border, rgba(214,177,96,.78));
+    border-radius: 15px;
+    background: linear-gradient(180deg, rgba(214,177,96,.055), rgba(255,255,255,.012));
+    box-shadow: inset 0 0 0 1px rgba(255,225,158,.035), 0 0 18px rgba(190,145,60,.045);
+    color: var(--gold-text, #e0bd72);
+    font: inherit;
+    cursor: pointer;
+    opacity: 1;
+    visibility: visible;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .12s ease;
   }
-  .series-select-trigger:focus-visible { outline: none; }
-  .series-select-trigger:active { transform: scale(.99); }
-  .series-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; min-width: 0; }
-  .series-select-chevron { width: 15px; height: 15px; flex-shrink: 0; color: var(--gold-base); transition: transform .2s ease; }
+  .series-select-trigger:hover,
+  .series-select-trigger:focus-visible,
+  .series-select.is-open .series-select-trigger {
+    border-color: rgba(239,207,133,.92);
+    background: linear-gradient(180deg, rgba(214,177,96,.09), rgba(255,255,255,.018));
+    box-shadow: inset 0 0 0 1px rgba(255,225,158,.055), 0 0 0 3px rgba(214,177,96,.08), 0 0 22px rgba(190,145,60,.07);
+    outline: none;
+  }
+  .series-select-trigger:active { transform: scale(.995); }
+
+  .series-copy,
+  .option-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    gap: 5px;
+    text-align: left;
+  }
+  .series-name-kr,
+  .series-name-en,
+  .option-name-kr,
+  .option-name-en {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    overflow-wrap: anywhere;
+  }
+  .series-name-kr {
+    -webkit-line-clamp: 1;
+    font-family: var(--font-kr-body);
+    font-size: clamp(17px, 2.2vw, 22px);
+    line-height: 1.25;
+    font-weight: 500;
+    letter-spacing: .02em;
+    color: rgba(240,215,157,.98);
+  }
+  .series-name-en {
+    -webkit-line-clamp: 1;
+    font-family: var(--font-en-display);
+    font-size: clamp(16px, 2vw, 20px);
+    line-height: 1.3;
+    font-weight: 400;
+    letter-spacing: .035em;
+    color: rgba(232,213,173,.88);
+  }
+  .series-select-chevron {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    margin-left: 18px;
+    color: #ddb76a;
+    transition: transform .18s ease, color .18s ease;
+  }
+  .series-select-trigger:hover .series-select-chevron,
+  .series-select-trigger:focus-visible .series-select-chevron { color: #efcf85; }
   .series-select.is-open .series-select-chevron { transform: rotate(180deg); }
 
   .series-select-scrim {
@@ -443,46 +504,131 @@
 
   .series-select-panel {
     position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
-    width: min(320px, 100%);
-    background: rgba(14,27,52,.94);
+    width: min(520px, 100%);
+    background: rgba(14,27,52,.97);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(224,194,122,.22);
+    border: 1px solid rgba(224,194,122,.34);
     border-radius: 14px;
     padding: 8px;
-    max-height: min(60vh, 420px);
-    max-height: min(60dvh, 420px);
+    max-height: min(60vh, 520px);
+    max-height: min(60dvh, 520px);
     overflow-y: auto;
     box-shadow: 0 18px 40px rgba(0,0,0,.4);
     opacity: 0; transform: translateY(-6px); pointer-events: none;
     transition: opacity .2s cubic-bezier(.22,1,.36,1), transform .2s cubic-bezier(.22,1,.36,1);
   }
   .series-select.is-open .series-select-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
-
   .series-select-sheet-handle, .series-select-sheet-title { display: none; }
-
   .series-select-options { list-style: none; margin: 0; padding: 0; }
   .series-select-option {
-    width: 100%; display: flex; align-items: center; gap: 10px;
-    background: none; border: none; text-align: left; cursor: pointer;
-    color: rgba(232,228,216,.7); font: inherit; font-size: 14px;
-    padding: 9px 12px; border-radius: 9px;
+    position: relative;
+    width: 100%;
+    min-height: 68px;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: rgba(232,228,216,.78);
+    font: inherit;
+    padding: 14px 20px;
+    border-radius: 10px;
     transition: background .15s ease, color .15s ease;
   }
-  .series-select-option:hover, .series-select-option:focus-visible { background: rgba(224,194,122,.09); color: var(--gold-bright); outline: none; }
-  .series-select-option .check-icon { width: 14px; height: 14px; flex-shrink: 0; color: var(--gold-bright); opacity: 0; }
-  .series-select-option[aria-selected="true"] { color: var(--gold-bright); }
+  .series-select-option:hover,
+  .series-select-option:focus-visible { background: rgba(224,194,122,.09); color: var(--gold-bright); outline: none; }
+  .series-select-option .check-icon { width: 16px; height: 16px; color: var(--gold-bright); opacity: 0; }
+  .series-select-option[aria-selected="true"] { background: rgba(214,177,96,.11); color: #e8c679; }
+  .series-select-option[aria-selected="true"]::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 3px;
+    border-radius: 999px;
+    background: rgba(222,185,101,.9);
+  }
   .series-select-option[aria-selected="true"] .check-icon { opacity: 1; }
+  .option-name-kr {
+    -webkit-line-clamp: 2;
+    font-family: var(--font-kr-body);
+    font-size: clamp(16px, 2vw, 19px);
+    line-height: 1.35;
+    color: rgba(242,224,184,.96);
+  }
+  .option-name-en {
+    -webkit-line-clamp: 2;
+    font-family: var(--font-en-display);
+    font-size: clamp(15px, 1.8vw, 18px);
+    line-height: 1.35;
+    color: rgba(231,217,188,.76);
+  }
 
+  /* ---- Search field: intentionally quieter than Series ---- */
+  .search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0 20px;
+    border: 1px solid rgba(202,174,112,.34);
+    border-radius: 14px;
+    background: rgba(7,25,54,.52);
+    box-shadow: none;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .search-field:focus-within {
+    border-color: rgba(214,177,96,.58);
+    box-shadow: 0 0 0 2px rgba(214,177,96,.08);
+  }
+  .search-field-icon { width: 15px; height: 15px; flex-shrink: 0; color: rgba(222,211,190,.48); }
+  .search-field input {
+    flex: 1 1 auto; min-width: 0;
+    background: none; border: none; color: rgba(242,232,211,.82);
+    font: inherit; font-size: 15px; letter-spacing: .003em;
+  }
+  .search-field input:focus { outline: none; }
+  .search-field input::placeholder { color: rgba(222,211,190,.52); opacity: 1; }
+  .search-field-clear {
+    flex-shrink: 0; width: 40px; height: 40px; margin: 0 -12px 0 -6px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; color: rgba(222,211,190,.52); cursor: pointer;
+    font-size: 16px; line-height: 1; transition: color .15s ease, background .15s ease;
+  }
+  .search-field-clear:hover, .search-field-clear:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.08); outline: none; }
+  .search-field-clear[hidden] { display: none; }
+
+  @media (max-width: 380px) {
+    #panel-works { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+    .series-select-trigger { min-height: 64px; padding-inline: 18px; }
+    .series-name-kr { font-size: 16px; }
+    .series-name-en { font-size: 15px; }
+    .series-select-chevron { width: 28px; height: 28px; margin-left: 12px; }
+  }
+  @media (min-width: 381px) and (max-width: 767px) {
+    .series-select-trigger { min-height: 68px; }
+    .series-name-kr { font-size: 18px; }
+    .series-name-en { font-size: 16px; }
+  }
+  @media (min-width: 768px) and (max-width: 1366px) {
+    .series-select-trigger { min-height: 76px; padding-inline: clamp(24px, 4vw, 34px); }
+    .series-name-kr { font-size: clamp(19px, 2.2vw, 23px); }
+    .series-name-en { font-size: clamp(18px, 2vw, 21px); }
+  }
   @media (max-width: 767px) {
-    /* Mobile: the same panel becomes a bottom sheet — no native OS <select> popup. */
     .series-select-panel {
       position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 66;
       width: auto; max-width: none;
       border-radius: 20px 20px 0 0;
       padding: 8px 14px calc(12px + env(safe-area-inset-bottom, 0px));
-      max-height: 70vh;
-      max-height: 70dvh;
+      max-height: 76vh;
+      max-height: 76dvh;
       transform: translateY(100%);
       box-shadow: 0 -18px 45px rgba(0,0,0,.45);
     }
@@ -496,27 +642,8 @@
       letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim);
       margin: 0 4px 6px;
     }
-    .series-select-option { min-height: 48px; padding: 11px 12px; }
+    .series-select-option { min-height: 68px; padding: 13px 14px; }
   }
-
-  /* ---- Search field ---- */
-  .search-field { position: relative; width: 100%; min-width: 0; }
-  .search-field-icon { width: 15px; height: 15px; flex-shrink: 0; color: var(--text-dim); }
-  .search-field input {
-    flex: 1 1 auto; min-width: 0;
-    background: none; border: none; color: var(--text-main);
-    font: inherit; font-size: 14px; letter-spacing: .003em;
-  }
-  .search-field input:focus { outline: none; }
-  .search-field input::placeholder { color: var(--text-dim); opacity: .92; }
-  .search-field-clear {
-    flex-shrink: 0; width: 44px; height: 44px; margin: 0 -12px 0 -6px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: none; border: none; color: var(--text-dim); cursor: pointer;
-    font-size: 16px; line-height: 1; transition: color .15s ease, background .15s ease;
-  }
-  .search-field-clear:hover, .search-field-clear:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.1); outline: none; }
-  .search-field-clear[hidden] { display: none; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 18px; width: 100%; min-width: 0; }
   .card {
@@ -634,7 +761,7 @@
     </button>
     <nav class="primary" role="tablist">
       <button type="button" data-target="works">
-        <span data-i18n="ko">작품</span><span data-i18n="en">ART WORKS</span>
+        <span data-i18n="ko">작품</span><span data-i18n="en">WORKS</span>
       </button>
       <button type="button" id="tab-bio">
         <span data-i18n="ko">작가 소개</span><span data-i18n="en">ARTIST BIO</span>
@@ -753,31 +880,35 @@
   </section>
 
   <section id="panel-works">
-    <h2 class="visually-hidden"><span data-i18n="ko">작품</span><span data-i18n="en">Art Works</span></h2>
+    <h2 class="visually-hidden"><span data-i18n="ko">작품</span><span data-i18n="en">Works</span></h2>
     <p class="stats-inline" id="stats-line">
       <strong id="stat-total">—</strong> <span data-i18n="ko">작품</span><span data-i18n="en">Works</span>
-      · <strong id="stat-sections">—</strong> <span data-i18n="ko">시리즈</span><span data-i18n="en">Series</span>
+      · <strong id="stat-sections">—</strong> <span data-i18n="ko">섹션</span><span data-i18n="en">Sections</span>
     </p>
     <div class="controls">
       <!-- Custom Series Selector: replaces the native <select>. Renders as a
            small anchored dropdown on desktop/tablet and a Bottom Sheet on
            mobile — same markup, CSS media query decides the presentation. -->
       <div class="series-select" id="series-select">
-        <button type="button" class="filter-control series-select-trigger" id="series-select-trigger"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="series-select-panel">
-          <span id="series-select-label">전체 섹션</span>
-          <svg class="series-select-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        <button type="button" class="series-select-trigger" id="series-select-trigger"
+                aria-haspopup="listbox" aria-expanded="false" aria-controls="series-select-panel"
+                aria-label="작품 섹션 선택 / Select artwork section">
+          <span class="series-copy" id="series-select-label">
+            <span class="series-name-kr" data-i18n="ko">전체 섹션</span>
+            <span class="series-name-en" data-i18n="en">All Sections</span>
+          </span>
+          <svg class="series-select-chevron" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12l8 8 8-8"/></svg>
         </button>
         <div class="series-select-scrim" id="series-select-scrim"></div>
         <div class="series-select-panel" id="series-select-panel">
           <div class="series-select-sheet-handle"></div>
           <div class="series-select-sheet-title" id="series-select-sheet-title">
-            <span data-i18n="ko">시리즈 선택</span><span data-i18n="en">Select Series</span>
+            <span data-i18n="ko">섹션 선택</span><span data-i18n="en">Select Section</span>
           </div>
-          <ul class="series-select-options" id="series-select-options" role="listbox" aria-label="Series"></ul>
+          <ul class="series-select-options" id="series-select-options" role="listbox" aria-label="Sections"></ul>
         </div>
       </div>
-      <div class="filter-control search-field">
+      <div class="search-field">
         <svg class="search-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="10.5" cy="10.5" r="6.5"/>
           <path d="M20 20l-4.8-4.8"/>
@@ -797,7 +928,7 @@
         <span data-i18n="ko">검색 결과가 없습니다</span><span data-i18n="en">No works found</span>
       </p>
       <p class="empty-state-sub">
-        <span data-i18n="ko">다른 검색어나 시리즈를 선택해 주세요.</span><span data-i18n="en">Try another keyword or select a different series.</span>
+        <span data-i18n="ko">다른 검색어나 섹션을 선택해 주세요.</span><span data-i18n="en">Try another keyword or select a different section.</span>
       </p>
     </div>
     <div class="load-more-wrap" id="load-more-wrap" hidden>
@@ -1173,13 +1304,24 @@
   const seriesLabel = $('#series-select-label');
 
   function seriesOptionsData() {
-    const allLabel = lang === 'ko' ? '전체 섹션' : 'All Series';
-    return [{ key: 'all', label: allLabel }].concat(
+    return [{ key: 'all', kr: '전체 섹션', en: 'All Sections' }].concat(
       sections.filter(s => s.active).sort((a, b) => a.order - b.order).map(s => ({
         key: s.key,
-        label: lang === 'ko' ? s.title_kr : s.title_en
+        kr: s.title_kr || s.title_en || '',
+        en: s.title_en || s.title_kr || ''
       }))
     );
+  }
+
+  function localizedSectionMarkup(item, option) {
+    const wrapper = option ? 'option-copy' : 'series-copy';
+    const textClass = option
+      ? (lang === 'ko' ? 'option-name-kr' : 'option-name-en')
+      : (lang === 'ko' ? 'series-name-kr' : 'series-name-en');
+    const label = lang === 'ko' ? item.kr : item.en;
+    return '<span class="' + wrapper + '">' +
+      '<span class="' + textClass + '">' + escapeHTML(label) + '</span>' +
+      '</span>';
   }
 
   function buildSeriesOptions() {
@@ -1195,13 +1337,19 @@
       btn.setAttribute('role', 'option');
       btn.dataset.key = item.key;
       btn.setAttribute('aria-selected', String(item.key === sectionFilter));
-      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg><span>' + escapeHTML(item.label) + '</span>';
+      btn.setAttribute('aria-label', lang === 'ko' ? item.kr : item.en);
+      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>' + localizedSectionMarkup(item, true);
       btn.addEventListener('click', () => selectSeries(item.key));
       li.appendChild(btn);
       seriesOptionsList.appendChild(li);
     });
     const current = items.find(i => i.key === sectionFilter) || items[0];
-    if (seriesLabel && current) seriesLabel.textContent = current.label;
+    if (seriesLabel && current) {
+      const textClass = lang === 'ko' ? 'series-name-kr' : 'series-name-en';
+      const label = lang === 'ko' ? current.kr : current.en;
+      seriesLabel.innerHTML = '<span class="' + textClass + '">' + escapeHTML(label) + '</span>';
+    }
+    if (seriesTrigger && current) seriesTrigger.setAttribute('aria-label', (lang === 'ko' ? current.kr + ' — 작품 섹션 선택' : current.en + ' — Select artwork section'));
   }
 
   function selectSeries(key) {
