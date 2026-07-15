@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1830">
+<meta name="google" content="notranslate">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,7 +122,7 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
+  html, body { margin: 0; padding: 0; width: 100%; max-width: 100%; overflow-x: hidden; }
   html {
     width: 100%; max-width: 100%;
   }
@@ -132,7 +133,7 @@
     color: var(--text-main);
     font-family: var(--font-kr-body);
     line-height: 1.6;
-    overflow-x: clip;
+    overflow-x: hidden;
   }
   html[data-lang="en"] body { font-family: var(--font-en-display); }
 
@@ -380,15 +381,6 @@
     box-sizing: border-box;
   }
 
-  .stats-inline {
-    text-align: center;
-    font-family: var(--font-utility);
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: .04em;
-    margin-bottom: 24px;
-  }
-  .stats-inline strong { color: var(--gold-bright); font-weight: 500; }
 
   /* Series is the primary artwork navigation. Search remains secondary. */
   .controls {
@@ -398,6 +390,7 @@
     max-width: 720px;
     margin: 0 auto clamp(40px, 7vw, 76px);
     min-width: 0;
+    box-sizing: border-box;
   }
 
   /* Keep the hierarchy stacked on every phone and tablet. */
@@ -409,7 +402,11 @@
   .series-select {
     position: relative;
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
     margin-bottom: 14px;
     opacity: 1;
     visibility: visible;
@@ -419,7 +416,11 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
     min-height: 68px;
     padding: 0 clamp(20px, 4vw, 30px);
     border: 1.5px solid var(--gold-border, rgba(214,177,96,.78));
@@ -467,7 +468,7 @@
   .series-name-kr {
     -webkit-line-clamp: 1;
     font-family: var(--font-kr-body);
-    font-size: clamp(17px, 2.2vw, 22px);
+    font-size: 15px;
     line-height: 1.25;
     font-weight: 500;
     letter-spacing: .02em;
@@ -476,7 +477,7 @@
   .series-name-en {
     -webkit-line-clamp: 1;
     font-family: var(--font-en-display);
-    font-size: clamp(16px, 2vw, 20px);
+    font-size: 15px;
     line-height: 1.3;
     font-weight: 400;
     letter-spacing: .035em;
@@ -574,7 +575,11 @@
     align-items: center;
     gap: 10px;
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
     min-height: 52px;
     padding: 0 20px;
     border: 1px solid rgba(202,174,112,.34);
@@ -622,6 +627,22 @@
     .series-name-en { font-size: 15px; }
   }
   @media (max-width: 767px) {
+    #panel-works {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .controls,
+    .controls > .series-select,
+    .controls > .search-field,
+    .series-select-trigger {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      margin-left: 0;
+      margin-right: 0;
+    }
     .series-select-panel {
       position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 66;
       width: auto; max-width: none;
@@ -748,11 +769,11 @@
 <div class="bg-layer"></div>
 
 <h1 class="visually-hidden">
-  <span data-i18n="ko">정산 김연식 — 한국 현대미술가</span><span data-i18n="en">JUNGSAN KIM YUN SIK — Korean Contemporary Artist</span>
+  <span data-i18n="ko"><span class="notranslate" translate="no">정산 김연식</span> — 한국 현대미술가</span><span data-i18n="en"><span class="notranslate" translate="no">JUNGSAN KIM YUN SIK</span> — Korean Contemporary Artist</span>
 </h1>
 
 <header class="site-header" id="site-header">
-  <button type="button" class="ms-name" id="brand-home">
+  <button type="button" class="ms-name notranslate" id="brand-home" translate="no">
     <span data-i18n="ko">정산(靜山) 김연식(金演植)</span><span data-i18n="en">JUNGSAN KIM YUN SIK</span>
   </button>
   <div class="header-nav-row" id="header-nav-row">
@@ -881,10 +902,6 @@
 
   <section id="panel-works">
     <h2 class="visually-hidden"><span data-i18n="ko">작품</span><span data-i18n="en">Works</span></h2>
-    <p class="stats-inline" id="stats-line">
-      <strong id="stat-total">—</strong> <span data-i18n="ko">작품</span><span data-i18n="en">Works</span>
-      · <strong id="stat-sections">—</strong> <span data-i18n="ko">섹션</span><span data-i18n="en">Sections</span>
-    </p>
     <div class="controls">
       <!-- Custom Series Selector: replaces the native <select>. Renders as a
            small anchored dropdown on desktop/tablet and a Bottom Sheet on
@@ -1427,10 +1444,6 @@
     renderGrid();
   }
 
-  function updateStats() {
-    $('#stat-total').textContent = allWorks.length;
-    $('#stat-sections').textContent = sections.filter(s => s.active).length;
-  }
 
   const SVG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="5"></svg>';
 
@@ -1498,7 +1511,6 @@
     const empty = $('#empty-msg');
     const loadMoreWrap = $('#load-more-wrap');
 
-    updateStats();
 
     if (!filtered.length) {
       grid.innerHTML = '';
