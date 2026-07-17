@@ -1550,7 +1550,15 @@
   });
 
   $('#tab-bio').addEventListener('click', openBioModal);
-  function openBioModal() { $('#bio-modal').hidden = false; }
+  function openBioModal() {
+    $('#bio-modal').hidden = false;
+    const toggle = $('#chrono-toggle');
+    const body = $('#chrono-body');
+    if (toggle && body) {
+      toggle.setAttribute('aria-expanded', 'false');
+      body.hidden = true;
+    }
+  }
   $('#bio-modal .bio-close').addEventListener('click', () => { $('#bio-modal').hidden = true; });
   $('#bio-modal .bio-backdrop').addEventListener('click', () => { $('#bio-modal').hidden = true; });
   $$('.bio-lang button', $('#bio-modal')).forEach(btn => {
