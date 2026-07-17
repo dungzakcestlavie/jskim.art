@@ -821,18 +821,30 @@
   }
   .bio-close:hover, .bio-close:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.09); outline: none; }
 
+  /* Typography micro-adjustment: title given a touch more presence; no
+     change to color, font-family, or the surrounding layout/box model. */
+  .bio-card h2 { font-size: 26px; }
+
   /* One-line intro: sits between the title and the full body copy, giving the
-     reader a quick sense of the work before the longer paragraphs. */
+     reader a quick sense of the work before the longer paragraphs. Reads a
+     shade heavier than the body copy, like a short declaration. */
   .bio-tagline {
     margin: 2px 0 20px; font-size: 15.5px; line-height: 1.5; color: var(--gold-bright);
   }
-  .bio-tagline.ko { font-family: var(--font-kr-body); }
-  .bio-tagline.en { font-family: var(--font-en-display); font-style: italic; letter-spacing: .01em; }
+  .bio-tagline.ko { font-family: var(--font-kr-body); font-weight: 600; }
+  .bio-tagline.en { font-family: var(--font-en-display); font-style: italic; letter-spacing: .01em; font-weight: 500; }
 
   .bio-body p {
     margin: 0 0 18px; font-size: 14px; line-height: 1.85; color: var(--text-dim);
   }
   .bio-body p:last-child { margin-bottom: 0; }
+  /* KR: slightly more air between lines and paragraphs, plus a touch of
+     letter-spacing for readability at this size. */
+  .bio-body p.ko { line-height: 1.98; letter-spacing: .2px; margin-bottom: 32px; }
+  .bio-body p.ko:last-child { margin-bottom: 0; }
+  /* EN: same line-height as before, just a shorter line measure via side
+     padding — no layout, width, or popup size change. */
+  .bio-body p.en { padding: 0 16px; }
   #info-body { font-size: 14px; line-height: 1.8; }
 
   /* Chronology disclosure — reuses existing bio-modal tokens (card-border,
