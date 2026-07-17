@@ -425,6 +425,7 @@
   html[data-lang="ko"] .role { letter-spacing: .18em; }
   html[data-lang="en"] .role { font-family: var(--font-utility); letter-spacing: .24em; }
   .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 22px 0; }
+  .stage-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,.5); opacity: .9; margin-top: 26px; }
   .status { font-size: clamp(15px,2.4vw,18px); opacity: .9; }
   .desc { margin-top: 12px; font-size: 13px; color: var(--text-dim); }
   html[data-lang="en"] .status, html[data-lang="en"] .desc { font-family: var(--font-en-display); font-style: italic; }
@@ -889,99 +890,9 @@
   .footer-copy a:hover { color: var(--gold-bright); }
   /* Intro sequence removed per request: the home screen (symbol, "Artist"
      label, divider) now appears immediately on load, with no fade-in delay. */
-  /* ================= Intro Animation (official, fine-tuned) =================
-     Deep Navy bg (page bg) → gold dot → gold symbol (opacity+scale) →
-     JUNGSAN KIM YUN SIK → ARTIST → hold → bottom gold dot fades away as the
-     whole overlay fades to the main screen. Opacity + transform only —
-     no cuts, flash, zoom, bounce, or spin. */
-  #site-intro {
-    position: fixed; inset: 0; z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--bg-deep);
-    animation: introOverlayOut .3s ease forwards;
-    animation-delay: 1.7s;
-  }
-  #site-intro .intro-inner {
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-    /* ① symbol shifted ~10px up so it lands on the screen's true visual center */
-    transform: translateY(-10px);
-  }
-  #site-intro .intro-symbol {
-    width: 40px; height: 40px;
-    opacity: 0; transform: scale(.86);
-    animation: introSymbolIn .4s ease forwards;
-    animation-delay: .5s;
-  }
-  #site-intro .intro-symbol svg {
-    width: 100%; height: 100%; display: block;
-    /* ② glow reduced ~18% vs. the standard moon-glow values, so the symbol itself reads sharper */
-    animation: introSymbolGlow 3.2s ease-in-out infinite;
-    animation-delay: .9s;
-  }
-  #site-intro .intro-name {
-    margin: 22px 0 0; opacity: 0;
-    font-family: var(--font-en-name); font-weight: 500; color: var(--gold-bright);
-    font-size: clamp(18px, 3.6vw, 30px); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
-    animation: introFadeIn .3s ease forwards;
-    animation-delay: .9s;
-  }
-  #site-intro .intro-role {
-    /* ③ ~3px further from the name/symbol group than before, for breathing room; size/color/tracking unchanged */
-    margin: 15px 0 0; opacity: 0;
-    font-family: var(--font-utility); font-weight: 500; color: var(--gold-bright);
-    font-size: 11px; letter-spacing: .32em; text-transform: uppercase;
-    animation: introFadeIn .3s ease forwards;
-    animation-delay: 1.2s;
-  }
-  #site-intro .intro-divider {
-    /* ④ ~12% shorter than a standard 40px divider; thickness (1px) unchanged */
-    margin: 20px 0 0; width: 35px; height: 1px; background: var(--gold-base);
-    opacity: 0;
-    animation: introFadeInDivider .3s ease forwards;
-    animation-delay: 1.3s;
-  }
-  #site-intro .intro-dot {
-    /* ⑤ no longer a static decoration — this dot carries the final fade into the main screen */
-    margin-top: 16px;
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--gold-bright);
-    animation: introDotLife 2s ease forwards;
-  }
-  @keyframes introFadeIn { to { opacity: 1; } }
-  @keyframes introFadeInDivider { to { opacity: .55; } }
-  @keyframes introSymbolIn { to { opacity: 1; transform: scale(1); } }
-  @keyframes introSymbolGlow {
-    0%, 100% { filter: drop-shadow(0 0 5px var(--gold-base)) drop-shadow(0 0 12px rgba(224,194,122,.2)); }
-    50%      { filter: drop-shadow(0 0 10px var(--gold-bright)) drop-shadow(0 0 21px rgba(224,194,122,.33)); }
-  }
-  @keyframes introDotLife {
-    0%   { opacity: 0; }
-    10%  { opacity: 1; }
-    85%  { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @keyframes introOverlayOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
-
-  @media (prefers-reduced-motion: reduce) {
-    #site-intro { display: none !important; }
-  }
 </style>
 </head>
 <body>
-
-<div id="site-intro" aria-hidden="true">
-  <div class="intro-inner">
-    <div class="intro-symbol">
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M40 8C28 10 20 21 20 33c0 15 12 27 27 27 3 0 6-0.5 8.7-1.4C48.6 62.6 40.6 58 40.6 33 40.6 21.8 34 12 26 9.4 30.4 8.3 35.1 7.8 40 8Z" fill="var(--gold-bright)"/>
-      </svg>
-    </div>
-    <p class="intro-name">JUNGSAN KIM YUN SIK</p>
-    <p class="intro-role">ARTIST</p>
-    <div class="intro-divider"></div>
-    <div class="intro-dot"></div>
-  </div>
-</div>
 
 <div class="bg-layer"></div>
 
@@ -1101,6 +1012,7 @@
       </div>
       <p class="role">Artist</p>
       <div class="divider"></div>
+      <div class="stage-dot"></div>
       <div class="home-enter" id="home-enter" hidden>
         <button type="button" data-target="works">
           <span data-i18n="ko">작품 보기 →</span><span data-i18n="en">View ARTWORKS →</span>
@@ -2138,20 +2050,6 @@
   updateHeaderHeightVar();
   updateHeaderCompact();
 })();
-</script>
-
-<script>
-  // Remove the intro overlay from the DOM once its fade into the main
-  // screen has finished (~2.0s), so it never intercepts clicks/taps or focus.
-  (function () {
-    var intro = document.getElementById('site-intro');
-    if (!intro) return;
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var removeDelay = reduceMotion ? 0 : 2050;
-    window.setTimeout(function () {
-      if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
-    }, removeDelay);
-  })();
 </script>
 
 </body>
