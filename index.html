@@ -415,8 +415,7 @@
 
   #panel-home.is-active { display: flex; }
   #panel-home { display: none; min-height: 80vh; align-items: center; justify-content: center; overflow: hidden; padding: 40px 24px; }
-  .stage { position: relative; width: min(90%, 640px); display: flex; flex-direction: column; align-items: center; text-align: center; animation: rise 2.4s ease-out; }
-  @keyframes rise { from { opacity:0; transform: translateY(14px);} to { opacity:1; transform: translateY(0);} }
+  .stage { position: relative; width: min(90%, 640px); display: flex; flex-direction: column; align-items: center; text-align: center; }
   .moon-wrap { position: relative; width: 64px; height: 64px; margin-bottom: 8px; }
   .moon { width: 100%; height: 100%; animation: moon-glow 7s ease-in-out infinite; }
   @keyframes moon-glow { 0%,100% { filter: drop-shadow(0 0 6px var(--gold-base)) drop-shadow(0 0 14px rgba(224,194,122,.25)); } 50% { filter: drop-shadow(0 0 12px var(--gold-bright)) drop-shadow(0 0 26px rgba(224,194,122,.4)); } }
@@ -889,83 +888,67 @@
   .footer-copy a { color: inherit; text-decoration: none; transition: color .2s ease; }
   .footer-copy a:hover { color: var(--gold-bright); }
   /* ================= Intro Animation (official, ~1.8–2.0s) =================
-     Sequence: Deep Navy bg (already page bg) → gold dot → gold symbol
-     (opacity+scale) → JUNGSAN KIM YUN SIK (fade) → ARTIST (fade, tracked) →
-     whole overlay fades into the main screen. No text like "The official
-     website...", no sound, no glow/rotate/bounce/flash. */
-  #site-intro {
-    position: fixed; inset: 0; z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--bg-deep);
-    animation: introOverlayOut .3s ease forwards;
-    animation-delay: 1.7s;
-  }
-  #site-intro .intro-inner {
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-  }
-  #site-intro .intro-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--gold-bright);
+     No separate splash overlay. The real header + home stage elements
+     appear in sequence on first load: symbol (opacity+scale) → brand name
+     → role ("작가"/ARTIST) → divider → status → description. Deep Navy
+     background is already the page background, so nothing to animate there.
+     No sound, no extra "official website..." copy, no glow/rotate/bounce/flash. */
+  header.site-header .ms-name {
     opacity: 0;
     animation: introFadeIn .3s ease forwards;
-    animation-delay: .2s;
+    animation-delay: .5s;
   }
-  #site-intro .intro-symbol {
-    margin-top: 18px; width: 40px; height: 40px;
+  header.site-header .header-nav-row {
+    opacity: 0;
+    animation: introFadeIn .3s ease forwards;
+    animation-delay: 1.2s;
+  }
+  .stage .moon-wrap {
     opacity: 0; transform: scale(.86);
     animation: introSymbolIn .4s ease forwards;
     animation-delay: .5s;
   }
-  #site-intro .intro-symbol svg { width: 100%; height: 100%; display: block; }
-  #site-intro .intro-name {
-    margin: 22px 0 0; opacity: 0;
-    font-family: var(--font-en-name);
-    font-weight: 500; color: var(--gold-bright);
-    font-size: clamp(18px, 3.6vw, 30px);
-    letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
-    animation: introFadeIn .35s ease forwards;
-    animation-delay: .9s;
-  }
-  #site-intro .intro-role {
-    margin: 12px 0 0; opacity: 0;
-    font-family: var(--font-utility);
-    font-weight: 500; color: var(--gold-bright);
-    font-size: 11px; letter-spacing: .32em; text-transform: uppercase;
-    animation: introFadeIn .4s ease forwards;
+  .stage .role {
+    animation: introFadeInRole .35s ease forwards;
     animation-delay: 1.2s;
   }
+  .stage .divider {
+    animation: introFadeInDivider .3s ease forwards;
+    animation-delay: 1.4s;
+  }
+  .stage .status {
+    animation: introFadeInStatus .3s ease forwards;
+    animation-delay: 1.55s;
+  }
+  .stage .desc {
+    animation: introFadeIn .3s ease forwards;
+    animation-delay: 1.7s;
+  }
+  .stage .role, .stage .divider, .stage .status, .stage .desc { opacity: 0; }
   @keyframes introFadeIn { to { opacity: 1; } }
+  /* Preserve each element's original resting opacity (role .85 / divider .55 / status .9)
+     instead of animating all the way to 1, so the final state matches the existing design. */
+  @keyframes introFadeInRole { to { opacity: .85; } }
+  @keyframes introFadeInDivider { to { opacity: .55; } }
+  @keyframes introFadeInStatus { to { opacity: .9; } }
   @keyframes introSymbolIn { to { opacity: 1; transform: scale(1); } }
-  @keyframes introOverlayOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
   @media (prefers-reduced-motion: reduce) {
-    #site-intro,
-    #site-intro .intro-dot,
-    #site-intro .intro-symbol,
-    #site-intro .intro-name,
-    #site-intro .intro-role {
+    header.site-header .ms-name,
+    header.site-header .header-nav-row,
+    .stage .moon-wrap,
+    .stage .role,
+    .stage .divider,
+    .stage .status,
+    .stage .desc {
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
     }
-    #site-intro { display: none !important; }
   }
 </style>
 </head>
 <body>
-
-<div id="site-intro" aria-hidden="true">
-  <div class="intro-inner">
-    <div class="intro-dot"></div>
-    <div class="intro-symbol">
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M40 8C28 10 20 21 20 33c0 15 12 27 27 27 3 0 6-0.5 8.7-1.4C48.6 62.6 40.6 58 40.6 33 40.6 21.8 34 12 26 9.4 30.4 8.3 35.1 7.8 40 8Z" fill="var(--gold-bright)"/>
-      </svg>
-    </div>
-    <p class="intro-name">JUNGSAN KIM YUN SIK</p>
-    <p class="intro-role">ARTIST</p>
-  </div>
-</div>
 
 <div class="bg-layer"></div>
 
@@ -2130,20 +2113,6 @@
   updateHeaderHeightVar();
   updateHeaderCompact();
 })();
-</script>
-
-<script>
-  // Remove the intro overlay from the DOM once it has finished (fully
-  // faded out at 2.0s), so it never intercepts clicks/taps or focus.
-  (function () {
-    var intro = document.getElementById('site-intro');
-    if (!intro) return;
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var removeDelay = reduceMotion ? 0 : 2000;
-    window.setTimeout(function () {
-      if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
-    }, removeDelay);
-  })();
 </script>
 
 </body>
