@@ -19,7 +19,44 @@
     "title_en": "Indramang",
     "active": true,
     "order": 3,
-    "childKeys": ["indramang", "movement1", "movement2", "movement3", "movement4"]
+    "childKeys": [
+      "indramang-movement-1",
+      "indramang-movement-2",
+      "indramang-movement-3",
+      "indramang-movement-4"
+    ]
+  },
+  {
+    "key": "indramang-movement-1",
+    "parentKey": "indramang",
+    "title_kr": "제1악장 · 컵 속의 무한세상",
+    "title_en": "Movement I · Infinite World in a Cup",
+    "active": true,
+    "order": 1
+  },
+  {
+    "key": "indramang-movement-2",
+    "parentKey": "indramang",
+    "title_kr": "제2악장 · 파동과 입자의 드라이브",
+    "title_en": "Movement II · Drive of Waves and Particles",
+    "active": true,
+    "order": 2
+  },
+  {
+    "key": "indramang-movement-3",
+    "parentKey": "indramang",
+    "title_kr": "제3악장 · 스왑",
+    "title_en": "Movement III · Swap",
+    "active": true,
+    "order": 3
+  },
+  {
+    "key": "indramang-movement-4",
+    "parentKey": "indramang",
+    "title_kr": "제4악장 · 달과 바람과 그리고 구름",
+    "title_en": "Movement IV · Moon, Wind, and Clouds",
+    "active": true,
+    "order": 4
   },
   {
     "key": "bullip",
