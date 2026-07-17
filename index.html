@@ -670,6 +670,36 @@
     background: rgba(222,185,101,.9);
   }
   .series-select-option[aria-selected="true"] .check-icon { opacity: 1; }
+
+  /* ---- Section groups (e.g. 인드라망) that open a submenu of movements
+     instead of filtering directly, plus the "← 전체 섹션" back row that
+     returns from that submenu to the top-level list. ---- */
+  .series-select-option.has-children { padding-right: 40px; }
+  .series-select-option.has-children::after {
+    content: "\203A";
+    position: absolute;
+    right: 16px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 1;
+    color: rgba(232,228,216,.45);
+  }
+  .series-select-option.has-children:hover::after,
+  .series-select-option.has-children:focus-visible::after,
+  .series-select-option.has-children[aria-selected="true"]::after { color: var(--gold-bright); }
+  .series-select-option.series-select-back {
+    color: rgba(232,228,216,.62);
+    border-bottom: 1px solid rgba(224,194,122,.16);
+    border-radius: 10px 10px 0 0;
+    margin-bottom: 4px;
+  }
+  .series-select-option.series-select-back:hover,
+  .series-select-option.series-select-back:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.09); }
+  .series-select-option .back-arrow {
+    width: 16px; text-align: center;
+    font-size: 16px; line-height: 1;
+    color: var(--gold-bright); opacity: .85;
+  }
   .option-name-kr {
     -webkit-line-clamp: 2;
     font-family: var(--font-kr-body);
@@ -1643,6 +1673,10 @@
 
   let sectionFilter = savedState.section || 'all';
   let searchQuery = savedState.query || '';
+  // Which group (e.g. 'indramang') the Series panel is currently drilled
+  // into, showing that group's movements instead of the top-level list.
+  // null = top-level list. Recomputed fresh every time the panel opens.
+  let seriesPanelGroup = null;
 
   function escapeHTML(v) {
     return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1734,14 +1768,35 @@
   const seriesOptionsList = $('#series-select-options');
   const seriesLabel = $('#series-select-label');
 
-  function seriesOptionsData() {
-    return [{ key: 'all', kr: '전체 섹션', en: 'All Sections' }].concat(
-      sections.filter(s => s.active).sort((a, b) => a.order - b.order).map(s => ({
+  // A "group" section (e.g. 인드라망) carries childKeys pointing at its
+  // movements; a movement carries parentKey pointing back at the group.
+  // Clicking a group in the panel must never filter by itself — it only
+  // reveals its movements. Clicking a movement filters exactly like any
+  // other section always has.
+  function findSection(key) {
+    return sections.find(s => s.key === key) || null;
+  }
+  function isGroupSection(sec) {
+    return !!(sec && Array.isArray(sec.childKeys) && sec.childKeys.length);
+  }
+  function topLevelSeriesData() {
+    // Movements (parentKey set) are deliberately excluded here — they only
+    // ever appear inside their group's submenu, never in the main list.
+    return [{ key: 'all', kr: '전체 섹션', en: 'All Sections', isGroup: false }].concat(
+      sections.filter(s => s.active && !s.parentKey).sort((a, b) => a.order - b.order).map(s => ({
         key: s.key,
         kr: s.title_kr || s.title_en || '',
-        en: s.title_en || s.title_kr || ''
+        en: s.title_en || s.title_kr || '',
+        isGroup: isGroupSection(s)
       }))
     );
+  }
+  function childSeriesData(parentKey) {
+    return sections.filter(s => s.active && s.parentKey === parentKey).sort((a, b) => a.order - b.order).map(s => ({
+      key: s.key,
+      kr: s.title_kr || s.title_en || '',
+      en: s.title_en || s.title_kr || ''
+    }));
   }
 
   function localizedSectionMarkup(item, option) {
@@ -1755,32 +1810,110 @@
       '</span>';
   }
 
-  function buildSeriesOptions() {
-    if (!seriesOptionsList) return;
-    const items = seriesOptionsData();
-    seriesOptionsList.innerHTML = '';
-    items.forEach(item => {
-      const li = document.createElement('li');
-      li.setAttribute('role', 'presentation');
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'series-select-option';
-      btn.setAttribute('role', 'option');
-      btn.dataset.key = item.key;
-      btn.setAttribute('aria-selected', String(item.key === sectionFilter));
-      btn.setAttribute('aria-label', lang === 'ko' ? item.kr : item.en);
-      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>' + localizedSectionMarkup(item, true);
-      btn.addEventListener('click', () => selectSeries(item.key));
-      li.appendChild(btn);
-      seriesOptionsList.appendChild(li);
-    });
-    const current = items.find(i => i.key === sectionFilter) || items[0];
-    if (seriesLabel && current) {
+  // Current filter's display info, resolved against the FULL sections list
+  // (not just the top-level list) so the trigger button always shows the
+  // right label even when a movement nested under a group is selected.
+  function currentSectionMeta() {
+    if (sectionFilter === 'all') return { key: 'all', kr: '전체 섹션', en: 'All Sections' };
+    const sec = findSection(sectionFilter);
+    if (sec) return { key: sec.key, kr: sec.title_kr || sec.title_en || '', en: sec.title_en || sec.title_kr || '' };
+    return { key: 'all', kr: '전체 섹션', en: 'All Sections' };
+  }
+
+  function updateSeriesLabel() {
+    const current = currentSectionMeta();
+    if (seriesLabel) {
       const textClass = lang === 'ko' ? 'series-name-kr' : 'series-name-en';
       const label = lang === 'ko' ? current.kr : current.en;
       seriesLabel.innerHTML = '<span class="' + textClass + '">' + escapeHTML(label) + '</span>';
     }
-    if (seriesTrigger && current) seriesTrigger.setAttribute('aria-label', (lang === 'ko' ? current.kr + ' — 작품 섹션 선택' : current.en + ' — Select artwork section'));
+    if (seriesTrigger) seriesTrigger.setAttribute('aria-label', (lang === 'ko' ? current.kr + ' — 작품 섹션 선택' : current.en + ' — Select artwork section'));
+  }
+
+  function buildSeriesOptions() {
+    if (!seriesOptionsList) return;
+
+    // Defensive: if the group being browsed no longer has active children
+    // (e.g. sections.json changed under us), fall back to the top level.
+    if (seriesPanelGroup && !childSeriesData(seriesPanelGroup).length) {
+      seriesPanelGroup = null;
+    }
+
+    seriesOptionsList.innerHTML = '';
+
+    if (seriesPanelGroup) {
+      // ---- "← 전체 섹션" back row ----
+      const backLi = document.createElement('li');
+      backLi.setAttribute('role', 'presentation');
+      const backBtn = document.createElement('button');
+      backBtn.type = 'button';
+      backBtn.className = 'series-select-option series-select-back';
+      backBtn.setAttribute('role', 'option');
+      backBtn.setAttribute('aria-selected', 'false');
+      const backLabel = lang === 'ko' ? '전체 섹션' : 'All Sections';
+      backBtn.setAttribute('aria-label', backLabel);
+      backBtn.innerHTML = '<span class="back-arrow" aria-hidden="true">\u2190</span>' +
+        '<span class="option-copy"><span class="' + (lang === 'ko' ? 'option-name-kr' : 'option-name-en') + '">' + escapeHTML(backLabel) + '</span></span>';
+      backBtn.addEventListener('click', () => {
+        seriesPanelGroup = null;
+        buildSeriesOptions();
+        const first = seriesPanel.querySelector('.series-select-option');
+        if (first) first.focus();
+      });
+      backLi.appendChild(backBtn);
+      seriesOptionsList.appendChild(backLi);
+
+      // ---- Movements of the current group ----
+      childSeriesData(seriesPanelGroup).forEach(item => {
+        const li = document.createElement('li');
+        li.setAttribute('role', 'presentation');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'series-select-option';
+        btn.setAttribute('role', 'option');
+        btn.dataset.key = item.key;
+        btn.setAttribute('aria-selected', String(item.key === sectionFilter));
+        btn.setAttribute('aria-label', lang === 'ko' ? item.kr : item.en);
+        btn.innerHTML = '<svg class="check-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>' + localizedSectionMarkup(item, true);
+        btn.addEventListener('click', () => selectSeries(item.key));
+        li.appendChild(btn);
+        seriesOptionsList.appendChild(li);
+      });
+    } else {
+      // ---- Top-level list ----
+      topLevelSeriesData().forEach(item => {
+        const li = document.createElement('li');
+        li.setAttribute('role', 'presentation');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'series-select-option' + (item.isGroup ? ' has-children' : '');
+        btn.setAttribute('role', 'option');
+        btn.dataset.key = item.key;
+        // A group also shows the check mark when the currently-applied
+        // filter is one of its movements, so you can see at a glance that
+        // something inside 인드라망 is selected without opening it.
+        const isChildActive = item.isGroup && childSeriesData(item.key).some(c => c.key === sectionFilter);
+        btn.setAttribute('aria-selected', String(item.key === sectionFilter || isChildActive));
+        btn.setAttribute('aria-label', lang === 'ko' ? item.kr : item.en);
+        btn.innerHTML = '<svg class="check-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>' + localizedSectionMarkup(item, true);
+        if (item.isGroup) {
+          // Opens the submenu inside the SAME panel — never filters, never
+          // closes the panel, per spec.
+          btn.addEventListener('click', () => {
+            seriesPanelGroup = item.key;
+            buildSeriesOptions();
+            const first = seriesPanel.querySelector('.series-select-option:not(.series-select-back)');
+            if (first) first.focus();
+          });
+        } else {
+          btn.addEventListener('click', () => selectSeries(item.key));
+        }
+        li.appendChild(btn);
+        seriesOptionsList.appendChild(li);
+      });
+    }
+
+    updateSeriesLabel();
   }
 
   function selectSeries(key) {
@@ -1793,9 +1926,15 @@
   }
 
   function openSeriesPanel() {
+    // Reopen directly inside the current selection's group (if any) so a
+    // checked movement is visible immediately, without an extra click.
+    const sec = findSection(sectionFilter);
+    seriesPanelGroup = (sec && sec.parentKey) ? sec.parentKey : null;
+    buildSeriesOptions();
+
     seriesSelect.classList.add('is-open');
     seriesTrigger.setAttribute('aria-expanded', 'true');
-    const selected = seriesPanel.querySelector('[aria-selected="true"]') || seriesPanel.querySelector('.series-select-option');
+    const selected = seriesPanel.querySelector('.series-select-option[aria-selected="true"]') || seriesPanel.querySelector('.series-select-option');
     if (selected) selected.focus();
     document.addEventListener('keydown', onSeriesKeydown);
   }
@@ -2030,6 +2169,7 @@
     if (typeof closeSeriesPanel === 'function') closeSeriesPanel();
 
     sectionFilter = 'all';
+    seriesPanelGroup = null;
     searchQuery = '';
     visibleCount = INITIAL_VISIBLE;
     saveUiState({ section: 'all', query: '' });
