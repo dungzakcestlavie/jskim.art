@@ -835,6 +835,28 @@
   .bio-body p:last-child { margin-bottom: 0; }
   #info-body { font-size: 14px; line-height: 1.8; }
 
+  /* Chronology disclosure — reuses existing bio-modal tokens (card-border,
+     gold-bright, text-dim, font-utility) only; no new colors or fonts. */
+  .chrono-toggle-wrap { margin-top: 22px; }
+  .chrono-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 1px solid var(--card-border); color: var(--gold-bright);
+    border-radius: 999px; padding: 6px 16px; font: inherit; font-size: 13px; cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+  }
+  .chrono-toggle:hover, .chrono-toggle:focus-visible { background: rgba(224,194,122,.09); outline: none; }
+  .chrono-body { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--card-border); }
+  .chrono-body[hidden] { display: none !important; }
+  .chrono-year { margin: 0 0 20px; }
+  .chrono-year:last-child { margin-bottom: 0; }
+  .chrono-year h3 {
+    margin: 0 0 8px; font-size: 13px; letter-spacing: .04em; font-weight: 600;
+    font-family: var(--font-utility); color: var(--gold-bright);
+  }
+  .chrono-year ul { margin: 0; padding-left: 18px; list-style: disc; }
+  .chrono-year li { margin: 0 0 6px; font-size: 13.5px; line-height: 1.7; color: var(--text-dim); }
+  .chrono-year li:last-child { margin-bottom: 0; }
+
   footer {
     display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
     width: 100%; box-sizing: border-box;
@@ -1089,13 +1111,265 @@
     </div>
     <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
     <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
-    <p class="bio-tagline ko">자연과 인간, 기억을 그리는 화가</p>
-    <p class="bio-tagline en" style="display:none;">A painter of nature, humanity, and memory</p>
+    <p class="bio-tagline ko">정산(靜山) 김연식은 회화와 사찰음식, 수행을 하나의 언어로 바라보는 한국의 현대미술가이다.</p>
+    <p class="bio-tagline en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist who sees painting, temple cuisine, and spiritual practice as a single artistic language.</p>
     <div class="bio-body">
-      <p class="ko">정산 김연식은 서울을 기반으로 활동하는 한국 현대미술가이자 화가이다. 회화와 추상적 조형언어를 중심으로 자연, 인간, 시, 음악과 기억의 관계를 탐구한다.</p>
-      <p class="ko">작품과 전시, 아카이브는 공식 웹사이트 jskim.art를 통해 소개된다.</p>
-      <p class="en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist and painter based in Seoul. His practice explores nature, humanity, poetry, music, and memory through painting and abstract visual language.</p>
-      <p class="en" style="display:none;">His artworks, exhibitions, and archive are presented through his official website, jskim.art.</p>
+      <p class="ko">1961년 범어사에 입산한 이후, 그의 작업은 사찰음식을 기록하고 연구하는 일에서 출발해 사유를 화면 위에 형상화하는 회화로 확장되었다. 이러한 전환은 2007년 첫 개인전 《관조+명상》을 통해 본격화되었으며, 2023년 《교향곡-인드라망》에서는 회화를 교향곡의 구조로 확장하며 작업 세계를 한층 심화시켰다.</p>
+      <p class="ko">여수는 그가 오래도록 떠나지 않은 예술적 원천이다. 2026년에는 여수의 바다와 섬을 AI로 새롭게 해석한 《여수, 섬 위에 섬–365 Islands》를 선보였고, 시인 윤동주에 대한 오랜 사유는 《시인 윤동주, 그리고 쓰고 노래하다》로 이어졌다.</p>
+      <p class="ko">서울 종로의 갤러리 모나리자 산촌을 기반으로 활동하며 미국, 프랑스, 대만, 홍콩, 일본 등에서 작품을 발표해 왔다. 최근에는 AI를 회화를 넘어 음악 창작의 매체로까지 확장하며 인간의 감성과 기술이 만나는 새로운 예술 언어를 탐구하고 있다. 그에게 사찰음식과 회화, AI, 그리고 음악은 서로 다른 분야가 아니라 하나의 수행이 다양한 형식으로 드러나는 과정이다.</p>
+      <p class="en" style="display:none;">Since entering Beomeosa Temple in 1961, his artistic practice began with documenting and researching temple cuisine before expanding into painting, where thought takes visual form. This transition took full shape with his first solo exhibition, Contemplation + Meditation, in 2007, and deepened further in 2023 with Symphony: Indramang, where he expanded painting through the structural language of the symphony.</p>
+      <p class="en" style="display:none;">Yeosu remains an artistic source he has never left. In 2026, he presented Yeosu, an Island Above Islands – 365 Islands, reinterpreting the sea and islands of Yeosu through AI, while his long engagement with poet Yun Dong-ju evolved into Poet Yun Dong-ju: To Write, to Draw and to Sing.</p>
+      <p class="en" style="display:none;">Based at Gallery Mona Lisa Sanchon in Seoul's Jongno district, he has presented work in the United States, France, Taiwan, Hong Kong, and Japan. More recently, he has extended AI beyond painting into musical creation, exploring a new artistic language where human sensibility meets technology. For him, temple cuisine, painting, AI, and music are not separate disciplines but different expressions of a single contemplative practice.</p>
+    </div>
+
+    <div class="chrono-toggle-wrap">
+      <button type="button" class="chrono-toggle" id="chrono-toggle" aria-expanded="false" aria-controls="chrono-body">
+        <span class="ko">▼ 작가 연보</span><span class="en" style="display:none;">▼ Chronology</span>
+      </button>
+      <div class="chrono-body" id="chrono-body" hidden>
+        <div class="ko">
+          <div class="chrono-year"><h3>2026</h3><ul>
+            <li>현)갤러리 모나리자 산촌 대표</li>
+            <li>산촌 레스토랑 대표</li>
+            <li>김연식 AI아트 특별전-여수, 섬 위에 섬-365Islands</li>
+            <li>김연식 AI아트 특별전-시인 윤동주, 그리고 쓰고 노래하다</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2025</h3><ul>
+            <li>오사카 아트페어(일본, 오사카)</li>
+            <li>'우주파' 그룹전</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2024</h3><ul>
+            <li>인사아트프라자 초대전: 교향곡-인드라망</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2023</h3><ul>
+            <li>&lt;사찰 음식은 없다&gt; (인문 공간 출판)</li>
+            <li>4회 개인전: 인드라망 1~4악장 (서울, 갤러리 모나리자 산촌)</li>
+            <li>장애 청소년 우수작품 초청전 (서울, 갤러리 모나리자 산촌)</li>
+            <li>녹색 전 (서울, 갤러리 모나리자 산촌)</li>
+            <li>서울 아시아 미술 초대전 (서울)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2021</h3><ul>
+            <li>아뜰리에 용산 아트 피크몰 특별전</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2019</h3><ul>
+            <li>파리 아시안 아트페어(파리)</li>
+            <li>인사동 박람회 개인전(서울)</li>
+            <li>대만 신원화랑 개인전(대만)</li>
+            <li>조형 아트쇼 개인전 코엑스(서울)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2018</h3><ul>
+            <li>아트홈: 2019 조인트 전시(상하이)</li>
+            <li>텍사스 컨템포러리 (미국 휴스턴)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2017</h3><ul>
+            <li>아트 온 페이퍼 (미국 뉴욕)</li>
+            <li>아트 뉴욕(미국 뉴욕)</li>
+            <li>아트 마켓 햄튼 (미국 뉴욕)</li>
+            <li>컨텍스트 아트 (미국 마이애미)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2016</h3><ul>
+            <li>스콥 아트 (미국 마이애미)</li>
+            <li>제11회 개인전 &lt;쿠스타프 말러의 몽유도원도&gt; 미국 샌프란시스코 (산드라리 갤러리)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2015</h3><ul>
+            <li>홍콩어포더블 아트페어</li>
+            <li>제10회 개인전 &lt;쿠스타프 말러의 몽유도원도&gt; 미국 샌프란시스코 (산드라리 갤러리)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2014</h3><ul>
+            <li>제9회 개인전 &lt;쿠스타프 말러의 몽유도원도&gt;: 미국 샌프란시스코(산드라리 갤러리)</li>
+            <li>실리콘밸리 아트페어 초대전 (미국 샌프란시스코)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2013</h3><ul>
+            <li>한국 구상 대전 아트페어(서울, 한가람미술관)</li>
+            <li>제7회 태화강 국제 설치미술제 (울산광역시 태화강변)</li>
+            <li>제8회 개인전 &lt;구스타프 말러의 몽유도원도&gt; : 미국 샌프란시스코(산드라리갤러리)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2012</h3><ul>
+            <li>제7회 개인전 &lt;구스타프 말러의 몽유도원도&gt; (서울, 인사아트센터)</li>
+            <li>제6회 개인전 &lt;관조+명상&gt; : 아트 서울 아트페어 (서울, 예술의전당 한가람미술관)</li>
+            <li>제6회 태화강 국제 설치미술제 (울산광역시 태화강변)</li>
+            <li>한국경제신문 초대 &lt;K아트스타-미의 제전&gt; (인사아트센터)</li>
+            <li>2인전 &lt;드뷔시의 달빛&gt; : 미국 샌프란시스코(산드라리 갤러리)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2011</h3><ul>
+            <li>제5회 개인전 &lt;드뷔시의 달빛&gt; (인사아트센터)</li>
+            <li>제4회 개인전 &lt;관조+명상&gt; :아트 서울 아트페어 (예술의전당 한가람미술관)</li>
+            <li>제58회 프랑스 파리 Salon de Charenton 명예 작가 초대전</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2010</h3><ul>
+            <li>제3회 개인전 &lt;관조+명상&gt; (갤러리 담)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2009</h3><ul>
+            <li>&lt;북한 사찰음식&gt;(다할미디어 출판)</li>
+            <li>제2회 개인전 &lt;관조+명상&gt; (인사아트센터)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2008</h3><ul>
+            <li>11.12~18 &lt;인간에 대한 이해, 예술에 대한 이해&gt; (인사아트센터)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2007</h3><ul>
+            <li>한국종교인평화회의(KCRP) 운영위원 취임</li>
+            <li>현대 불교 신문 '사찰음식의 모든 것' 연재 중</li>
+            <li>동산 불교대학 사찰 음식 문화학과 학과장 취임</li>
+            <li>제1회 개인전 &lt;관조+명상&gt; (공화랑)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2002</h3><ul>
+            <li>&lt;눈으로 먹는 절 음식&gt; (우리출판사 출판)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1997</h3><ul>
+            <li>&lt;한국사찰음식&gt;(우리출판사 출판)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1995</h3><ul>
+            <li>중앙대학교 산업경영대학원 세미나에서 논문 &lt;사찰음식의 외식상품화 방안에 관한 연구&gt; 발표</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1990</h3><ul>
+            <li>&lt;21세기 여성대백과 LaBelle&gt;(중앙일보사 발행) '사찰음식' 집필</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1987</h3><ul>
+            <li>&lt;산채요리&gt;(주부생활 출판)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1986</h3><ul>
+            <li>주부생활(6월호) 컬러대특집 '산채김치 산채요리' 소개</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1984</h3><ul>
+            <li>&lt;불광&gt;지, '산사의 맛, 산사의 멋', 1년 연재</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1981</h3><ul>
+            <li>"전통음식 발굴 콘테스트" (중앙일보사, BCC 공동주최) 대상 수상</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1980</h3><ul>
+            <li>&lt;신동아&gt; '산사음식과 다의 향취' 연재</li>
+            <li>인사동 사찰음식전문점 '산촌' 시작</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1972</h3><ul>
+            <li>부산일보 '절따라 맛따라' 1년 연재</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1971</h3><ul>
+            <li>국제신문 '산사음식' 공개강좌</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1961</h3><ul>
+            <li>부산 범어사 입산</li>
+          </ul></div>
+        </div>
+        <div class="en" style="display:none;">
+          <div class="chrono-year"><h3>2026</h3><ul>
+            <li>JungSan Kim AI Art Special Exhibition – Yeosu, an Island Above Islands – 365 Islands</li>
+            <li>JungSan Kim AI Art Special Exhibition – Poet Yun Dong-ju: To Write, to Draw and to Sing</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2025</h3><ul>
+            <li>Osaka Art Fair (Osaka, Japan)</li>
+            <li>Group Exhibition in "Cosmos Artist" (Nodle Island Gallery, Seoul, Korea)</li>
+            <li>Group Exhibition in "Cosmos Artist" (Gallery Mona Lisa Sanchon, Seoul, Korea)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2024</h3><ul>
+            <li>Invitational Exhibition – "Indramang" (Insa-Artplaza, Seoul, Korea)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2023</h3><ul>
+            <li>&lt;There is no temple food&gt; (published by In-Mun-Gong-Gan)</li>
+            <li>4th Solo Exhibition: Indramang 1-4 movements (Gallery Mona Lisa San Chon, Seoul, Korea)</li>
+            <li>Invitation Exhibition for Excellent Works for Disabled Youth (Gallery Mona Lisa San Chon, Seoul, Korea)</li>
+            <li>Green Exhibition (Gallery Mona Lisa San Chon, Seoul, Korea)</li>
+            <li>Seoul Asian Art Invitation Exhibition (Seoul, Korea)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2019</h3><ul>
+            <li>Paris Asian Art Fair (Paris)</li>
+            <li>Insadong Expo, Solo Exhibition (Seoul, Korea)</li>
+            <li>Solo Exhibition, Shin Won Gallery (Taiwan)</li>
+            <li>Sculpture Art Fair, Solo Exhibition, COEX (Seoul, Korea)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2018</h3><ul>
+            <li>Art' Home: 2019 Joint Exhibition (Shanghai, China)</li>
+            <li>Texas Contemporary (Houston, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2017</h3><ul>
+            <li>Art on Paper (New York, USA)</li>
+            <li>Art New York (New York, USA)</li>
+            <li>Art Market Hampton (New York, USA)</li>
+            <li>Context Art (Miami, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2016</h3><ul>
+            <li>Scop Art Fair (Miami, USA)</li>
+            <li>The 11th Solo Exhibition &lt;Gustaph Mahler's Dream Journey to the Peach Blossom Land&gt; (Sandra Lee Gallery, San Francisco, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2015</h3><ul>
+            <li>Hong Kong Affordable Art Fair</li>
+            <li>10th Solo Exhibition &lt;Gustaph Mahler's Dream Journey to the Peach Blossom Land&gt; (Sandra Lee Gallery, San Francisco, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2014</h3><ul>
+            <li>9th Solo Exhibition &lt;Dream Journey to the Peach Blossom Land&gt; (Sandra Lee Gallery, San Francisco, USA)</li>
+            <li>Silicon Valley Art Fair Invitation (San Francisco, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2013</h3><ul>
+            <li>Korea Figurative Art Fair (Hangaram Museum of Art, Seoul, Korea)</li>
+            <li>7th Taehwagang International Installation Art Festival (Ulsan Metropolitan City, Taehwagang River)</li>
+            <li>8th Solo Exhibition &lt;Dream Journey to the Peach Blossom Land&gt; (Sandra Lee Gallery, San Francisco, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2012</h3><ul>
+            <li>7th Solo Exhibition &lt;Gustaf Mahler's Dream Journey to the Peach Blossom Land&gt; (Seoul, Insa Art Center)</li>
+            <li>6th Solo Exhibition &lt;Contemplation + Meditation&gt;: Art Seoul Art Fair (Seoul, Seoul Arts Center Hangaram Art Museum)</li>
+            <li>6th Taehwagang International Installation Art Festival (Ulsan Metropolitan City, Taehwagang River)</li>
+            <li>Invitation to the Korea Economic Daily &lt;K Art Star-Beauty Festival&gt; (Insa Art Center)</li>
+            <li>Two-person Exhibition &lt;Moonlight of Debussy&gt; (Sandra Lee Gallery, San Francisco, USA)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2011</h3><ul>
+            <li>5th Solo Exhibition &lt;Moonlight of Debussy&gt; (Insa Art Center)</li>
+            <li>4th Solo Exhibition &lt;Contemplation + Meditation&gt;: Art Seoul Art Fair (Hangaram Art Museum, Seoul Arts Center)</li>
+            <li>58th Annual Salon de Charenton Invitation Exhibition, Paris, France</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2010</h3><ul>
+            <li>3rd Solo Exhibition &lt;Contemplation + Meditation&gt; (Gallery Dam)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2009</h3><ul>
+            <li>&lt;North Korean Temple Food&gt; (issued by Dahal Media)</li>
+            <li>2nd Solo Exhibition &lt;Contemplation + Meditation&gt; (Insa Art Center)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2008</h3><ul>
+            <li>11.12–18 &lt;Understanding of Humans, Understanding of Art&gt; (Insa Art Center)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2007</h3><ul>
+            <li>Korea Religious Peace Conference (KCRP) Steering Committee member inaugurated</li>
+            <li>Dongsan Buddhist University serial "Everything in Temple Food" in the modern Buddhist newspaper</li>
+            <li>Inauguration of the Department of Food and Culture at the Temple</li>
+            <li>1st Solo Exhibition &lt;Contemplation + Meditation&gt; (Gonghwarang)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>2002</h3><ul>
+            <li>&lt;Temple Food You Eat With Your Eyes&gt; (published by Uri Publishing)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1997</h3><ul>
+            <li>&lt;Korean Buddhist Temple Food&gt; (published by Uri Publishing)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1995</h3><ul>
+            <li>Seminar at Chung-Ang University Graduate School of Industrial Management, paper "A Study on the Commercialization of Temple Food" presented</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1990</h3><ul>
+            <li>&lt;21st Century Women's Encyclopedia LaBelle&gt; (published by JoongAng Ilbo) — wrote "Temple Food"</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1987</h3><ul>
+            <li>&lt;Sanchae Cooking&gt; (published by Jubu Saenghwal)</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1986</h3><ul>
+            <li>Jubu Saenghwal (June issue), color feature "Sanchae Kimchi, Sanchae Cooking"</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1984</h3><ul>
+            <li>&lt;Bulgwang&gt; magazine, "Taste of Sansa, Style of Sansa", one-year serial</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1981</h3><ul>
+            <li>"Traditional Food Discovery Contest" (co-hosted by JoongAng Ilbo and BCC) — grand prize</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1980</h3><ul>
+            <li>&lt;Shindonga&gt; "The Scent of Sansa Food and Tea" serial</li>
+            <li>Sanchon, a temple-food restaurant in Insa-dong, opens</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1972</h3><ul>
+            <li>Busan Ilbo, "Following the Temple, Following the Taste", one-year serial</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1971</h3><ul>
+            <li>Kookje Newspaper, public lecture on temple food</li>
+          </ul></div>
+          <div class="chrono-year"><h3>1961</h3><ul>
+            <li>Entering Beomeosa Temple, Busan</li>
+          </ul></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1289,6 +1563,16 @@
       $$('#bio-modal .en').forEach(el => el.style.display = target === 'en' ? '' : 'none');
     });
   });
+
+  const chronoToggle = $('#chrono-toggle');
+  const chronoBody = $('#chrono-body');
+  if (chronoToggle && chronoBody) {
+    chronoToggle.addEventListener('click', () => {
+      const isOpen = chronoToggle.getAttribute('aria-expanded') === 'true';
+      chronoToggle.setAttribute('aria-expanded', String(!isOpen));
+      chronoBody.hidden = isOpen;
+    });
+  }
 
   function getStableAssetVersion() {
     const KEY = 'jskimAssetVersionV1';
