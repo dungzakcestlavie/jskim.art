@@ -325,6 +325,31 @@
     }
     nav.primary button { font-size: 16px; letter-spacing: .06em; padding: 9px 10px; }
   }
+
+  /* ---- Mobile final polish (≤767px): pixel-level spacing/scale only.
+     No color, font, logo, menu, button-position, layout, animation, or
+     spacing-structure changes — same identity, just tightened. ---- */
+  @media (max-width: 767px) {
+    /* 1. Artist name: ~8px more breathing room below the safe area. Size,
+       tracking, and color untouched. */
+    header.site-header { padding-top: calc(clamp(24px, 4vw, 34px) + 8px); }
+
+    /* 2. Symbol: ~12px up so it sits on the screen's true visual center. */
+    .stage .moon-wrap { margin-top: -12px; }
+
+    /* 3. ARTIST: ~5% larger presence, same font/color. */
+    .stage .role { transform: scale(1.05); }
+
+    /* 4. Symbol ↔ ARTIST gap tightened by ~5px so they read as one mark. */
+    .stage .role { margin-top: 17px; }
+
+    /* 5. Divider: ~12% shorter, thickness/color unchanged. */
+    .stage .divider { width: 35px; }
+
+    /* 6. Bottom gold dot nudged slightly closer, not removed. */
+    .stage .stage-dot { margin-top: 20px; }
+  }
+
   @media (max-width: 380px) {
     .ms-name { font-size: 19px; }
     html[data-lang="en"] .ms-name { letter-spacing: .035em; }
