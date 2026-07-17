@@ -656,9 +656,28 @@
     padding: 14px 20px;
     border-radius: 10px;
     transition: background .15s ease, color .15s ease;
+    /* MOBILE TOUCH-STATE FIX 2026-07-19: WebKit's default tap-highlight
+       box (a gray overlay) plus WebKit's well-known "sticky :hover"
+       behavior — a touch target can retain a hover-like style after
+       tap, since touch never fires the mouseleave that would normally
+       clear it — combined to make a previously-tapped row look "stuck"
+       selected even after navigating away and back. Removing only the
+       native tap-flash here; the :hover/:focus-visible rules themselves
+       are gated to real pointer devices immediately below, so on touch
+       the ONLY thing that can paint this background is the real
+       [aria-selected="true"] state. No color value changes. */
+    -webkit-tap-highlight-color: transparent;
   }
-  .series-select-option:hover,
-  .series-select-option:focus-visible { background: rgba(224,194,122,.09); color: var(--gold-bright); outline: none; }
+  /* :hover (and the focus-visible outline that shared its styling) is
+     scoped to devices that actually have a hovering pointer — a mouse or
+     trackpad. Touch devices (phones, and tablets without an attached
+     pointer) never match this block, so a tap can never leave behind a
+     hover-colored row; only the real selected state can show this
+     background there. Same color values as before, just gated. */
+  @media (hover: hover) and (pointer: fine) {
+    .series-select-option:hover,
+    .series-select-option:focus-visible { background: rgba(224,194,122,.09); color: var(--gold-bright); outline: none; }
+  }
   .series-select-option .check-icon { width: 16px; height: 16px; color: var(--gold-bright); opacity: 0; }
   .series-select-option[aria-selected="true"] { background: rgba(214,177,96,.11); color: #e8c679; }
   .series-select-option[aria-selected="true"]::before {
@@ -684,17 +703,21 @@
     line-height: 1;
     color: rgba(232,228,216,.45);
   }
-  .series-select-option.has-children:hover::after,
-  .series-select-option.has-children:focus-visible::after,
   .series-select-option.has-children[aria-selected="true"]::after { color: var(--gold-bright); }
+  @media (hover: hover) and (pointer: fine) {
+    .series-select-option.has-children:hover::after,
+    .series-select-option.has-children:focus-visible::after { color: var(--gold-bright); }
+  }
   .series-select-option.series-select-back {
     color: rgba(232,228,216,.62);
     border-bottom: 1px solid rgba(224,194,122,.16);
     border-radius: 10px 10px 0 0;
     margin-bottom: 4px;
   }
-  .series-select-option.series-select-back:hover,
-  .series-select-option.series-select-back:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.09); }
+  @media (hover: hover) and (pointer: fine) {
+    .series-select-option.series-select-back:hover,
+    .series-select-option.series-select-back:focus-visible { color: var(--gold-bright); background: rgba(224,194,122,.09); }
+  }
   .series-select-option .back-arrow {
     width: 16px; text-align: center;
     font-size: 16px; line-height: 1;
@@ -1833,6 +1856,24 @@
   // Single source of truth for "is this option the active one" — every
   // aria-selected value in the panel is derived from sectionFilter through
   // this one function, never set independently anywhere else.
+  // MOBILE TOUCH-STATE FIX 2026-07-19: the auto-focus calls below exist
+  // purely for keyboard users (so arrow-key navigation lands somewhere
+  // sensible). On a touch device there is no keyboard, and calling
+  // .focus() there is what let a previously-tapped row's highlight look
+  // "stuck" after navigating back — so on coarse/touch pointers we skip
+  // the programmatic focus (and explicitly blur) instead of forcing it.
+  function prefersPointerFocus() {
+    return !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  }
+  function focusOptionForKeyboardUsersOnly(el) {
+    if (!el) return;
+    if (prefersPointerFocus()) {
+      el.focus();
+    } else if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+  }
+
   function isSectionActive(key) {
     return key === sectionFilter;
   }
@@ -1881,7 +1922,7 @@
         seriesPanelGroup = null;
         buildSeriesOptions();
         const first = seriesPanel.querySelector('.series-select-option');
-        if (first) first.focus();
+        focusOptionForKeyboardUsersOnly(first);
       });
       backLi.appendChild(backBtn);
       seriesOptionsList.appendChild(backLi);
@@ -1928,7 +1969,7 @@
             seriesPanelGroup = item.key;
             buildSeriesOptions();
             const first = seriesPanel.querySelector('.series-select-option:not(.series-select-back)');
-            if (first) first.focus();
+            focusOptionForKeyboardUsersOnly(first);
           });
         } else {
           btn.addEventListener('click', () => selectSeries(item.key));
@@ -1971,7 +2012,7 @@
     seriesSelect.classList.add('is-open');
     seriesTrigger.setAttribute('aria-expanded', 'true');
     const selected = seriesPanel.querySelector('.series-select-option[aria-selected="true"]') || seriesPanel.querySelector('.series-select-option');
-    if (selected) selected.focus();
+    focusOptionForKeyboardUsersOnly(selected);
     document.addEventListener('keydown', onSeriesKeydown);
   }
   function closeSeriesPanel() {
@@ -1979,7 +2020,7 @@
     seriesSelect.classList.remove('is-open');
     seriesTrigger.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', onSeriesKeydown);
-    seriesTrigger.focus();
+    focusOptionForKeyboardUsersOnly(seriesTrigger);
   }
   function onSeriesKeydown(e) {
     const options = Array.from(seriesPanel.querySelectorAll('.series-select-option'));
