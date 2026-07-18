@@ -197,6 +197,7 @@
     font-family: var(--font-en-brand); font-weight: 500; font-style: normal;
     text-transform: uppercase; letter-spacing: clamp(.035em, .58vw, .09em);
     white-space: nowrap;
+    font-size: clamp(23px, 5vw, 45px);
   }
 
   /* ---- Nav row: menu / nav / language as three explicit grid columns.
@@ -276,6 +277,7 @@
     header.site-header.is-compact { padding: 14px clamp(16px, 4vw, 24px) 12px; }
     .ms-name { transition: font-size .2s ease, margin .2s ease; }
     header.site-header.is-compact .ms-name { font-size: clamp(15px, 2.8vw, 22px); margin-bottom: 10px; }
+    html[data-lang="en"] header.site-header.is-compact .ms-name { font-size: clamp(18px, 3vw, 25px); }
     header.site-header.is-compact nav.primary button { font-size: 13px; padding: 7px 14px; letter-spacing: .12em; }
     html[data-lang="en"] header.site-header.is-compact nav.primary button { font-size: 14px; }
     header.site-header.is-compact .lang-row { font-size: 14px; }
@@ -357,7 +359,7 @@
 
   @media (max-width: 380px) {
     .ms-name { font-size: 19px; }
-    html[data-lang="en"] .ms-name { letter-spacing: .035em; }
+    html[data-lang="en"] .ms-name { letter-spacing: .035em; font-size: 22px; }
     nav.primary { gap: 6px; }
     nav.primary button { font-size: 12px; letter-spacing: .05em; padding: 8px 6px; }
     html[data-lang="en"] nav.primary button { font-size: 13px; }
