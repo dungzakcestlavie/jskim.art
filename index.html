@@ -239,6 +239,9 @@
   }
   nav.primary button.active, nav.primary button:hover { color: var(--gold-bright); background: rgba(224,194,122,.09); }
   html[data-lang="ko"] nav.primary button { font-family: var(--font-kr-body); letter-spacing: .05em; }
+  /* English-only: ARTWORKS / ARTIST BIO. Korean nav labels keep their
+     existing sizes (17px base and all breakpoints below) untouched. */
+  html[data-lang="en"] nav.primary button { font-size: 18.4px; }
 
   .lang-row-wrap {
     justify-self: end;
@@ -258,7 +261,7 @@
     box-sizing: border-box;
     font-family: var(--font-en-name);
     font-weight: 500;
-    font-size: 15px;
+    font-size: 16.2px;
     letter-spacing: .24em;
     white-space: nowrap;
   }
@@ -274,7 +277,8 @@
     .ms-name { transition: font-size .2s ease, margin .2s ease; }
     header.site-header.is-compact .ms-name { font-size: clamp(15px, 2.8vw, 22px); margin-bottom: 10px; }
     header.site-header.is-compact nav.primary button { font-size: 13px; padding: 7px 14px; letter-spacing: .12em; }
-    header.site-header.is-compact .lang-row { font-size: 13px; }
+    html[data-lang="en"] header.site-header.is-compact nav.primary button { font-size: 14px; }
+    header.site-header.is-compact .lang-row { font-size: 14px; }
   }
 
   /* ---- Phone (≤767px): menu row splits from the nav row, which drops to
@@ -324,6 +328,7 @@
       min-width: 0;
     }
     nav.primary button { font-size: 16px; letter-spacing: .06em; padding: 9px 10px; }
+    html[data-lang="en"] nav.primary button { font-size: 17.3px; }
   }
 
   /* ---- Mobile final polish (≤767px): pixel-level spacing/scale only.
@@ -355,6 +360,7 @@
     html[data-lang="en"] .ms-name { letter-spacing: .035em; }
     nav.primary { gap: 6px; }
     nav.primary button { font-size: 12px; letter-spacing: .05em; padding: 8px 6px; }
+    html[data-lang="en"] nav.primary button { font-size: 13px; }
   }
 
   /* ---- Tablet portrait / narrow tablet (768–900px): if the centered nav
@@ -425,6 +431,12 @@
   .contact-toggle svg:not(.chev), .drawer-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
   .contact-toggle .chev { width: 14px; height: 14px; margin-left: auto; flex-shrink: 0; transition: transform .2s ease; }
   .contact-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  /* English-only: these six drawer/menu rows shared one un-split font-size
+     for KR and EN. Korean keeps 15px exactly as before; English gets the
+     requested ~9% bump. Icons (18px above) are untouched. */
+  html[data-lang="en"] .social-drawer-links a,
+  html[data-lang="en"] .contact-toggle,
+  html[data-lang="en"] .drawer-btn { font-size: 16.35px; }
 
   .contact-panel { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
   .contact-panel.is-open { max-height: 400px; }
@@ -594,7 +606,7 @@
   .series-name-en {
     -webkit-line-clamp: 1;
     font-family: var(--font-en-display);
-    font-size: 15.75px;
+    font-size: 17px;
     line-height: 1;
     font-weight: 400;
     letter-spacing: .035em;
@@ -733,7 +745,7 @@
   .option-name-en {
     -webkit-line-clamp: 2;
     font-family: var(--font-en-display);
-    font-size: clamp(16.4px, 1.96vw, 19.6px);
+    font-size: clamp(18px, 2.16vw, 21.5px);
     line-height: 1.35;
     color: rgba(231,217,188,.76);
   }
@@ -775,7 +787,7 @@
      these bump the EN-rendered placeholder and empty-state copy a few
      percent. Korean keeps the exact sizes above — only html[data-lang="en"]
      is affected, no color/layout/spacing change. */
-  html[data-lang="en"] .search-field input::placeholder { font-size: 16.4px; }
+  html[data-lang="en"] .search-field input::placeholder { font-size: 17.9px; }
   .search-field-clear {
     flex-shrink: 0; width: 40px; height: 40px; margin: 0 -12px 0 -6px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -789,18 +801,18 @@
     #panel-works { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
     .series-select-trigger { min-height: 64px; padding-inline: 18px; }
     .series-name-kr { font-size: 14.5px; }
-    .series-name-en { font-size: 15.25px; }
+    .series-name-en { font-size: 16.5px; }
     .series-select-chevron { width: 28px; height: 28px; margin-left: 12px; }
   }
   @media (min-width: 381px) and (max-width: 767px) {
     .series-select-trigger { min-height: 68px; }
     .series-name-kr { font-size: 15px; }
-    .series-name-en { font-size: 15.75px; }
+    .series-name-en { font-size: 17px; }
   }
   @media (min-width: 768px) and (max-width: 1366px) {
     .series-select-trigger { min-height: 76px; padding-inline: clamp(24px, 4vw, 34px); }
     .series-name-kr { font-size: 15px; }
-    .series-name-en { font-size: 15.75px; }
+    .series-name-en { font-size: 17px; }
   }
   @media (max-width: 767px) {
     #panel-works {
@@ -839,6 +851,7 @@
       letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim);
       margin: 0 4px 6px;
     }
+    html[data-lang="en"] .series-select-sheet-title { font-size: 13.1px; }
     .series-select-option { min-height: 68px; padding: 13px 14px; }
   }
 
@@ -854,6 +867,10 @@
   .card .meta { padding: 10px 12px 14px; }
   .card .meta .t { font-size: 13px; }
   .card .meta .s { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  /* English-only: work title/material/size/year captions were one shared
+     size for KR and EN. Korean keeps 13px/11px exactly as before. */
+  html[data-lang="en"] .card .meta .t { font-size: 14px; }
+  html[data-lang="en"] .card .meta .s { font-size: 11.9px; }
 
   /* ---- Empty state ---- */
   .empty-state {
@@ -868,8 +885,8 @@
   .empty-state-icon { width: 39.6px; height: 39.6px; color: var(--gold-base); opacity: .7; margin-bottom: 12px; }
   .empty-state-title { margin: 0 0 6px; font-size: 15px; font-weight: 500; color: var(--text-main); line-height: 1.4; }
   .empty-state-sub { margin: 0; font-size: 12.35px; color: var(--text-dim); max-width: 320px; line-height: 1.5; }
-  html[data-lang="en"] .empty-state-title { font-size: 15.9px; }
-  html[data-lang="en"] .empty-state-sub { font-size: 12.85px; }
+  html[data-lang="en"] .empty-state-title { font-size: 17.2px; }
+  html[data-lang="en"] .empty-state-sub { font-size: 13.9px; }
 
   .load-more-wrap { text-align: center; margin-top: 28px; }
   .load-more-wrap button {
@@ -930,7 +947,7 @@
   .bio-body p.ko:last-child { margin-bottom: 0; }
   /* EN: same line-height as before, just a shorter line measure via side
      padding — no layout, width, or popup size change. */
-  .bio-body p.en { padding: 0 16px; font-size: 15.25px; }
+  .bio-body p.en { padding: 0 16px; font-size: 16.6px; }
   #info-body { font-size: 14px; line-height: 1.8; }
 
   /* Chronology disclosure — reuses existing bio-modal tokens (card-border,
