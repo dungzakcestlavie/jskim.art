@@ -594,7 +594,7 @@
   .series-name-en {
     -webkit-line-clamp: 1;
     font-family: var(--font-en-display);
-    font-size: 15px;
+    font-size: 15.75px;
     line-height: 1;
     font-weight: 400;
     letter-spacing: .035em;
@@ -733,7 +733,7 @@
   .option-name-en {
     -webkit-line-clamp: 2;
     font-family: var(--font-en-display);
-    font-size: clamp(15.5px, 1.85vw, 18.5px);
+    font-size: clamp(16.4px, 1.96vw, 19.6px);
     line-height: 1.35;
     color: rgba(231,217,188,.76);
   }
@@ -770,6 +770,12 @@
   }
   .search-field input:focus { outline: none; }
   .search-field input::placeholder { color: rgba(222,211,190,.62); opacity: 1; font-size: 15.5px; }
+  /* English-only typography balance pass: Crimson Text/Cormorant reads
+     visually smaller than the Korean body faces at the same px value, so
+     these bump the EN-rendered placeholder and empty-state copy a few
+     percent. Korean keeps the exact sizes above — only html[data-lang="en"]
+     is affected, no color/layout/spacing change. */
+  html[data-lang="en"] .search-field input::placeholder { font-size: 16.4px; }
   .search-field-clear {
     flex-shrink: 0; width: 40px; height: 40px; margin: 0 -12px 0 -6px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -783,18 +789,18 @@
     #panel-works { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
     .series-select-trigger { min-height: 64px; padding-inline: 18px; }
     .series-name-kr { font-size: 14.5px; }
-    .series-name-en { font-size: 14.5px; }
+    .series-name-en { font-size: 15.25px; }
     .series-select-chevron { width: 28px; height: 28px; margin-left: 12px; }
   }
   @media (min-width: 381px) and (max-width: 767px) {
     .series-select-trigger { min-height: 68px; }
     .series-name-kr { font-size: 15px; }
-    .series-name-en { font-size: 15px; }
+    .series-name-en { font-size: 15.75px; }
   }
   @media (min-width: 768px) and (max-width: 1366px) {
     .series-select-trigger { min-height: 76px; padding-inline: clamp(24px, 4vw, 34px); }
     .series-name-kr { font-size: 15px; }
-    .series-name-en { font-size: 15px; }
+    .series-name-en { font-size: 15.75px; }
   }
   @media (max-width: 767px) {
     #panel-works {
@@ -862,6 +868,8 @@
   .empty-state-icon { width: 39.6px; height: 39.6px; color: var(--gold-base); opacity: .7; margin-bottom: 12px; }
   .empty-state-title { margin: 0 0 6px; font-size: 15px; font-weight: 500; color: var(--text-main); line-height: 1.4; }
   .empty-state-sub { margin: 0; font-size: 12.35px; color: var(--text-dim); max-width: 320px; line-height: 1.5; }
+  html[data-lang="en"] .empty-state-title { font-size: 15.9px; }
+  html[data-lang="en"] .empty-state-sub { font-size: 12.85px; }
 
   .load-more-wrap { text-align: center; margin-top: 28px; }
   .load-more-wrap button {
@@ -910,7 +918,7 @@
     margin: 2px 0 20px; font-size: 15.5px; line-height: 1.5; color: var(--gold-bright);
   }
   .bio-tagline.ko { font-family: var(--font-kr-body); font-weight: 600; }
-  .bio-tagline.en { font-family: var(--font-en-display); font-style: italic; letter-spacing: .01em; font-weight: 500; }
+  .bio-tagline.en { font-family: var(--font-en-display); font-style: italic; letter-spacing: .01em; font-weight: 500; font-size: 16.5px; }
 
   .bio-body p {
     margin: 0 0 18px; font-size: 14px; line-height: 1.85; color: var(--text-dim);
@@ -922,7 +930,7 @@
   .bio-body p.ko:last-child { margin-bottom: 0; }
   /* EN: same line-height as before, just a shorter line measure via side
      padding — no layout, width, or popup size change. */
-  .bio-body p.en { padding: 0 16px; }
+  .bio-body p.en { padding: 0 16px; font-size: 15.25px; }
   #info-body { font-size: 14px; line-height: 1.8; }
 
   /* Chronology disclosure — reuses existing bio-modal tokens (card-border,
