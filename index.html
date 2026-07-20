@@ -2298,7 +2298,7 @@
   }
 
   function applyViewerTransform() {
-    if (isMobileViewerViewport()) clampViewerImageToFrame();
+    clampViewerImageToFrame();
     viewerImg.style.transform = `translate3d(${vX}px, ${vY}px, 0) scale(${vScale})`;
     viewerStage.classList.toggle('is-zoomed', vScale > 1.02);
   }
