@@ -898,11 +898,27 @@
   .load-more-wrap button:hover { color: var(--gold-bright); border-color: var(--gold-base); }
   .load-more-wrap[hidden] { display: none; }
 
-  #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; }
+  #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; touch-action: none; }
   #viewer.is-open { display: flex; }
-  #viewer img { max-width: 92vw; max-height: 78vh; object-fit: contain; }
-  #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; }
-  #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; }
+  #viewer-stage { position: relative; width: 100%; height: 78vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  #viewer img {
+    max-width: 92vw; max-height: 78vh; object-fit: contain;
+    transform: translate3d(0,0,0) scale(1); transform-origin: center center;
+    will-change: transform; user-select: none; -webkit-user-drag: none;
+  }
+  #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; min-height: 1em; }
+  #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; z-index: 2; }
+  #viewer .v-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text-main); opacity: .55;
+    font-size: 34px; line-height: 1; cursor: pointer; padding: 10px 16px; z-index: 2;
+  }
+  #viewer .v-arrow:hover { opacity: 1; color: var(--gold-bright); }
+  #viewer .v-prev { left: 6px; }
+  #viewer .v-next { right: 6px; }
+  @media (hover: none) and (pointer: coarse) {
+    #viewer .v-arrow { display: none; }
+  }
 
   #bio-modal[hidden] { display: none !important; }
   #bio-modal { position: fixed; inset: 0; z-index: 60; }
@@ -1207,9 +1223,13 @@
   <div class="footer-copy">&copy; 2026 <a href="https://jskim.art/">jskim.art</a></div>
 </footer>
 
-<div id="viewer" role="dialog" aria-modal="true">
+<div id="viewer" role="dialog" aria-modal="true" aria-hidden="true">
   <button class="v-close" aria-label="close">&times;</button>
-  <img id="viewer-img" src="" alt="">
+  <button class="v-arrow v-prev" aria-label="previous work">&#8249;</button>
+  <div id="viewer-stage">
+    <img id="viewer-img" src="" alt="">
+  </div>
+  <button class="v-arrow v-next" aria-label="next work">&#8250;</button>
   <div class="v-meta" id="viewer-meta"></div>
 </div>
 
@@ -2222,27 +2242,102 @@
   }
 
   const viewer = $('#viewer');
+  const viewerStage = $('#viewer-stage');
   const viewerImg = $('#viewer-img');
   const viewerMeta = $('#viewer-meta');
+  const viewerPrevBtn = viewer.querySelector('.v-prev');
+  const viewerNextBtn = viewer.querySelector('.v-next');
   let viewerLoadToken = 0;
 
-  $('#grid').addEventListener('click', (e) => {
-    const card = e.target.closest('.card');
-    if (!card) return;
-    try {
-      const work = JSON.parse(card.dataset.work);
-      openViewer(work);
-    } catch (e) {}
-  });
+  // ---- Viewer engine state (ported from dungzak.art works viewer) ----
+  let vItems = [];       // currently navigable work list (full filtered set, not just rendered DOM)
+  let vIndex = 0;
+  let vScale = 1, vX = 0, vY = 0;
+  let vStartX = 0, vStartY = 0, vLastX = 0, vLastY = 0;
+  let vStartTX = 0, vStartTY = 0;
+  let vIsDragging = false, vIsZooming = false, vTouchMoved = false;
+  let vInitialDistance = 0, vStartScale = 1;
+  let vLastTap = 0;
+  let vSwipeDX = 0, vSwipeDY = 0, vSwipeLocked = false;
+  let vBusy = false, vLastSwipeTime = 0;
+  const V_SWIPE_THRESHOLD = 45;
+  const V_SWIPE_VERTICAL_LIMIT = 70;
+  const V_SWIPE_COOLDOWN = 45;
+  const IS_TOUCH_VIEWER = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
-  function openViewer(work) {
-    viewerLoadToken += 1;
-    const thisToken = viewerLoadToken;
+  function isMobileViewerViewport() {
+    return window.matchMedia && window.matchMedia('(max-width:768px)').matches;
+  }
+  function clampViewerValue(v, min, max) { return Math.min(Math.max(v, min), max); }
+  function getTouchDist(t1, t2) { return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY); }
 
+  function markViewerBusy() {
+    vBusy = true;
+    clearTimeout(window.__jskimViewerBusyTimer);
+    window.__jskimViewerBusyTimer = setTimeout(() => { vBusy = false; }, 180);
+  }
+
+  function clampViewerImageToFrame() {
+    if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; return; }
+    const frame = viewerStage.getBoundingClientRect();
+    const baseW = viewerImg.offsetWidth || frame.width;
+    const baseH = viewerImg.offsetHeight || frame.height;
+    const maxX = Math.max(0, (baseW * vScale - frame.width) / 2);
+    const maxY = Math.max(0, (baseH * vScale - frame.height) / 2);
+    vX = clampViewerValue(vX, -maxX, maxX);
+    vY = clampViewerValue(vY, -maxY, maxY);
+  }
+
+  function applyViewerTransform() {
+    if (isMobileViewerViewport()) clampViewerImageToFrame();
+    viewerImg.style.transform = `translate3d(${vX}px, ${vY}px, 0) scale(${vScale})`;
+  }
+
+  function resetViewerTransform() {
+    vScale = 1; vX = 0; vY = 0;
+    vIsDragging = false; vIsZooming = false; vInitialDistance = 0;
+    vStartScale = 1; vStartTX = 0; vStartTY = 0; vTouchMoved = false;
+    viewerImg.style.transition = 'none';
+    applyViewerTransform();
+  }
+
+  function toggleViewerZoom() {
+    vScale = vScale > 1 ? 1 : 2;
+    vX = 0; vY = 0;
+    applyViewerTransform();
+  }
+
+  function preloadNeighborViewerImages() {
+    if (vItems.length < 2) return;
+    [vItems[vIndex + 1], vItems[vIndex - 1]].forEach((item) => {
+      if (!item) return;
+      const url = item.zoom || item.image;
+      if (!url) return;
+      const pre = new Image();
+      pre.decoding = 'async';
+      pre.src = withCacheBust(url);
+    });
+  }
+
+  function updateViewerCaption(work) {
+    // Sections with all-empty fields (e.g. Section I 시인 윤동주와 미술가 김연식,
+    // matching dungzak.art's "A Origins" no-caption mode) render no caption at all.
     const title = field(work, 'title');
     const material = field(work, 'material');
     const size = field(work, 'size');
     viewerMeta.textContent = [title, material, size, work.year].filter(Boolean).join(' · ');
+  }
+
+  function setViewerSlide(index) {
+    if (!vItems[index]) return;
+    markViewerBusy();
+    vIndex = index;
+    const work = vItems[index];
+    viewerLoadToken += 1;
+    const thisToken = viewerLoadToken;
+
+    resetViewerTransform();
+    updateViewerCaption(work);
 
     const standardUrl = work.image ? withCacheBust(work.image) : '';
     viewerImg.alt = buildAltText(work);
@@ -2257,15 +2352,218 @@
       zoomImg.src = withCacheBust(work.zoom);
     }
 
+    preloadNeighborViewerImages();
+  }
+
+  function changeViewerSlideSafely(targetIndex) {
+    if (!vItems.length || targetIndex === vIndex) return;
+    setViewerSlide(targetIndex);
+  }
+
+  function goNextViewerImage() {
+    if (isMobileViewerViewport() && (vIsZooming || vScale > 1.02)) return;
+    if (!vItems.length) return;
+    changeViewerSlideSafely(Math.min(vIndex + 1, vItems.length - 1));
+  }
+  function goPrevViewerImage() {
+    if (isMobileViewerViewport() && (vIsZooming || vScale > 1.02)) return;
+    if (!vItems.length) return;
+    changeViewerSlideSafely(Math.max(vIndex - 1, 0));
+  }
+
+  $('#grid').addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    try {
+      // Navigable set = full filtered list (not just the currently rendered/paged cards),
+      // mirroring dungzak.art's section-scoped lightbox behavior.
+      vItems = filtered;
+      const clickedIndex = Number(card.dataset.index);
+      openViewer(Number.isFinite(clickedIndex) ? clickedIndex : 0);
+    } catch (e) {}
+  });
+
+  function openViewer(index) {
     viewer.classList.add('is-open');
+    viewer.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('viewer-open');
+    document.body.classList.add('viewer-open');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    setViewerSlide(index);
   }
   viewer.querySelector('.v-close').addEventListener('click', closeViewer);
-  viewer.addEventListener('click', (e) => { if (e.target === viewer) closeViewer(); });
+  viewer.addEventListener('click', (e) => { if (e.target === viewer || e.target === viewerStage) closeViewer(); });
+  viewer.addEventListener('dblclick', (e) => {
+    if (!viewer.classList.contains('is-open')) return;
+    e.preventDefault();
+    toggleViewerZoom();
+  });
+
   function closeViewer() {
     viewer.classList.remove('is-open');
+    viewer.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('viewer-open');
+    document.body.classList.remove('viewer-open');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
     viewerImg.src = '';
     viewerLoadToken += 1;
+    resetViewerTransform();
+    vItems = [];
+    vIndex = 0;
   }
+
+  if (!IS_TOUCH_VIEWER) {
+    viewerPrevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); goPrevViewerImage(); });
+    viewerNextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); goNextViewerImage(); });
+  } else {
+    viewerPrevBtn.hidden = true;
+    viewerNextBtn.hidden = true;
+  }
+
+  // ---- Touch gestures: swipe / pinch zoom / double-tap zoom / pan (ported from dungzak.art) ----
+  function isViewerCloseTarget(e) {
+    return !!(e && e.target && e.target.closest && e.target.closest('.v-close'));
+  }
+
+  viewer.addEventListener('touchstart', (e) => {
+    if (isViewerCloseTarget(e)) return;
+    if (!viewer.classList.contains('is-open')) return;
+
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      vIsZooming = true; vIsDragging = false; vTouchMoved = false;
+      vSwipeLocked = false; vSwipeDX = 0; vSwipeDY = 0;
+      vInitialDistance = getTouchDist(e.touches[0], e.touches[1]);
+      vStartScale = vScale; vStartTX = vX; vStartTY = vY;
+      return;
+    }
+    if (e.touches.length !== 1) return;
+
+    vStartX = e.touches[0].clientX;
+    vStartY = e.touches[0].clientY;
+    vLastX = vStartX; vLastY = vStartY;
+    vSwipeDX = 0; vSwipeDY = 0; vSwipeLocked = false; vTouchMoved = false;
+
+    if (vScale > 1.02) {
+      e.preventDefault();
+      vIsDragging = true;
+      vStartTX = vX; vStartTY = vY;
+      return;
+    }
+    vIsDragging = true;
+  }, { passive: false });
+
+  viewer.addEventListener('touchmove', (e) => {
+    if (isViewerCloseTarget(e)) return;
+    if (!viewer.classList.contains('is-open')) return;
+
+    if (vIsZooming && e.touches.length === 2) {
+      e.preventDefault();
+      const newDist = getTouchDist(e.touches[0], e.touches[1]);
+      if (!vInitialDistance) vInitialDistance = newDist;
+      const nextScale = vStartScale * (newDist / vInitialDistance);
+      vScale = Math.min(Math.max(1, nextScale), 4);
+      if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; }
+      else { vX = vStartTX; vY = vStartTY; }
+      applyViewerTransform();
+      markViewerBusy();
+      return;
+    }
+
+    if (!vIsDragging || e.touches.length !== 1) return;
+
+    const nowX = e.touches[0].clientX;
+    const nowY = e.touches[0].clientY;
+    const moveX = nowX - vStartX;
+    const moveY = nowY - vStartY;
+    if (Math.abs(moveX) > 4 || Math.abs(moveY) > 4) vTouchMoved = true;
+
+    if (vScale > 1.02) {
+      e.preventDefault();
+      vX = vStartTX + moveX;
+      vY = vStartTY + moveY;
+      applyViewerTransform();
+      markViewerBusy();
+      return;
+    }
+
+    vSwipeDX = moveX; vSwipeDY = moveY;
+    vLastX = nowX; vLastY = nowY;
+    if (Math.abs(vSwipeDX) > Math.abs(vSwipeDY)) {
+      if (Math.abs(vSwipeDX) > 12) vSwipeLocked = true;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  viewer.addEventListener('touchend', (e) => {
+    if (isViewerCloseTarget(e)) return;
+    if (!viewer.classList.contains('is-open')) return;
+
+    if (vIsZooming && e.touches.length < 2) {
+      e.preventDefault();
+      vIsZooming = false; vInitialDistance = 0; vStartScale = vScale;
+      if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; applyViewerTransform(); }
+      return;
+    }
+    if (!vIsDragging) return;
+
+    if (vScale > 1.02) {
+      vIsDragging = false; vTouchMoved = false; vSwipeLocked = false;
+      vSwipeDX = 0; vSwipeDY = 0;
+      return;
+    }
+
+    const horizontal = Math.abs(vSwipeDX);
+    const vertical = Math.abs(vSwipeDY);
+    const now = performance.now();
+
+    if (vSwipeLocked && !vBusy && now - vLastSwipeTime > V_SWIPE_COOLDOWN &&
+        horizontal > V_SWIPE_THRESHOLD && vertical < V_SWIPE_VERTICAL_LIMIT) {
+      e.preventDefault();
+      vLastSwipeTime = now;
+      const direction = vSwipeDX > 0 ? -1 : 1;
+      requestAnimationFrame(() => { direction < 0 ? goPrevViewerImage() : goNextViewerImage(); });
+      vLastTap = 0;
+    } else if (horizontal < 12 && vertical < 12 && !vTouchMoved) {
+      const tapNow = Date.now();
+      if (tapNow - vLastTap < 300) {
+        e.preventDefault();
+        toggleViewerZoom();
+        vLastTap = 0;
+      } else {
+        vLastTap = tapNow;
+      }
+    }
+
+    vIsDragging = false; vTouchMoved = false; vSwipeLocked = false;
+    vSwipeDX = 0; vSwipeDY = 0;
+  }, { passive: false });
+
+  viewer.addEventListener('touchcancel', () => {
+    vIsDragging = false; vIsZooming = false; vInitialDistance = 0;
+    vStartScale = vScale; vStartTX = vX; vStartTY = vY;
+    vTouchMoved = false; vSwipeLocked = false; vSwipeDX = 0; vSwipeDY = 0;
+  }, { passive: false });
+
+  // Mouse wheel / trackpad zoom (desktop). Note: this is an addition beyond dungzak.art's
+  // current engine, which does not yet implement wheel zoom in its own lightbox — see note.
+  viewer.addEventListener('wheel', (e) => {
+    if (!viewer.classList.contains('is-open')) return;
+    e.preventDefault();
+    const delta = -e.deltaY * 0.0015;
+    vScale = Math.min(Math.max(1, vScale + delta * vScale), 4);
+    if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; }
+    applyViewerTransform();
+  }, { passive: false });
+
+  document.addEventListener('keydown', (e) => {
+    if (!viewer.classList.contains('is-open')) return;
+    if (e.key === 'ArrowRight') { goNextViewerImage(); return; }
+    if (e.key === 'ArrowLeft') { goPrevViewerImage(); return; }
+    if (e.key === 'Escape') { closeViewer(); return; }
+  });
 
   function resetHome() {
     closeViewer();
