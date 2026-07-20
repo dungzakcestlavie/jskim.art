@@ -1752,7 +1752,8 @@
     return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
   function field(obj, base) {
-    const v = obj[base + '_' + lang];
+    const suffix = lang === 'ko' ? 'kr' : 'en';
+    const v = obj[base + '_' + suffix];
     return v === undefined ? '' : v;
   }
 
