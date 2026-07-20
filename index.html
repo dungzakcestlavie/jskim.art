@@ -463,17 +463,11 @@
   .role { margin: 22px 0 0; font-size: 12px; letter-spacing: .28em; color: var(--gold-bright); text-transform: uppercase; opacity: .85; }
   html[data-lang="ko"] .role { letter-spacing: .18em; }
   html[data-lang="en"] .role { font-family: var(--font-utility); letter-spacing: .24em; }
-  .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 22px 0; }
-  .stage-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,.5); opacity: .9; margin-top: 26px; }
+  .divider { width: 40px; height: 1px; background: var(--gold-base); opacity: .55; margin: 26px 0; }
+  .stage-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 6px 2px rgba(224,194,122,.5); opacity: .9; margin: 28px 0 6px; }
   .status { font-size: clamp(15px,2.4vw,18px); opacity: .9; }
   .desc { margin-top: 12px; font-size: 13px; color: var(--text-dim); }
   html[data-lang="en"] .status, html[data-lang="en"] .desc { font-family: var(--font-en-display); font-style: italic; }
-  .home-enter { margin-top: 30px; }
-  .home-enter button {
-    background: none; border: 1px solid var(--gold-base); color: var(--gold-bright); border-radius: 999px;
-    padding: 10px 26px; font: inherit; font-size: 13px; letter-spacing: .06em; cursor: pointer; transition: background .2s ease;
-  }
-  .home-enter button:hover { background: rgba(224,194,122,.1); }
 
   #panel-works.is-active { display: block; }
   #panel-works {
@@ -1142,11 +1136,6 @@
       <p class="role">Artist</p>
       <div class="divider"></div>
       <div class="stage-dot"></div>
-      <div class="home-enter" id="home-enter" hidden>
-        <button type="button" data-target="works">
-          <span data-i18n="ko">작품 보기 →</span><span data-i18n="en">View ARTWORKS →</span>
-        </button>
-      </div>
     </div>
   </section>
 
@@ -1794,10 +1783,6 @@
     }
     worksLoaded = true;
     worksLoading = false;
-
-    if (allWorks.length) {
-      $('#home-enter').hidden = false;
-    }
 
     buildSeriesOptions();
     applyFilters();
