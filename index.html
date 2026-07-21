@@ -901,7 +901,9 @@
     max-width: 92vw; max-height: 78vh; max-height: 78dvh; object-fit: contain;
     transform: translate3d(0,0,0) scale(1); transform-origin: center center;
     will-change: transform; user-select: none; -webkit-user-drag: none;
+    opacity: 1; transition: opacity 180ms ease;
   }
+  #viewer img.is-loading { opacity: 0; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; min-height: 1em; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; z-index: 2; }
   #viewer .v-arrow {
@@ -2284,7 +2286,6 @@
     vScale = 1; vX = 0; vY = 0;
     vIsDragging = false; vIsZooming = false; vInitialDistance = 0;
     vStartScale = 1; vStartTX = 0; vStartTY = 0; vTouchMoved = false;
-    viewerImg.style.transition = 'none';
     applyViewerTransform();
   }
 
@@ -2329,6 +2330,25 @@
     const standardUrl = work.image ? withCacheBust(work.image) : '';
     viewerImg.alt = buildAltText(work);
 
+    // Guards against a race between the two loads below: if the (usually
+    // larger) zoom asset happens to finish loading before the standard one,
+    // it must not then get overwritten by the standard image finishing late.
+    let hiResApplied = false;
+
+    function revealViewerImage(src) {
+      viewerImg.src = src;
+      viewerImg.classList.add('is-loading');
+      // Two rAFs: let the browser paint the opacity:0 state first, then
+      // transition back to visible. Fades the new artwork in instead of
+      // having it pop into view at whatever size it happens to be —
+      // this is what keeps a resolution/crop mismatch between the
+      // standard and zoom assets (or a plain load-timing hiccup) from
+      // reading as the artwork suddenly jumping bigger.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => viewerImg.classList.remove('is-loading'));
+      });
+    }
+
     // Don't assign viewerImg.src directly here. Doing so clears the
     // currently-visible artwork immediately, and while the new file is still
     // downloading the <img> has no intrinsic size and collapses to nothing —
@@ -2340,12 +2360,12 @@
     // next one can be shown at its correct size right away.
     const preloadStandard = new Image();
     preloadStandard.onload = () => {
-      if (thisToken !== viewerLoadToken) return;
-      viewerImg.src = standardUrl;
+      if (thisToken !== viewerLoadToken || hiResApplied) return;
+      revealViewerImage(standardUrl);
     };
     preloadStandard.onerror = () => {
-      if (thisToken !== viewerLoadToken) return;
-      viewerImg.src = standardUrl;
+      if (thisToken !== viewerLoadToken || hiResApplied) return;
+      revealViewerImage(standardUrl);
     };
     if (standardUrl) {
       preloadStandard.src = standardUrl;
@@ -2357,7 +2377,8 @@
       const zoomImg = new Image();
       zoomImg.onload = () => {
         if (thisToken !== viewerLoadToken) return;
-        viewerImg.src = withCacheBust(work.zoom);
+        hiResApplied = true;
+        revealViewerImage(withCacheBust(work.zoom));
       };
       zoomImg.src = withCacheBust(work.zoom);
     }
@@ -2584,16 +2605,16 @@
   viewer.addEventListener('wheel', (e) => {
     if (!viewer.classList.contains('is-open')) return;
 
-    // Trackpad two-finger left/right movement (e.g. on a laptop) fires wheel
-    // events too, and often carries a small residual deltaY alongside the
-    // dominant deltaX. Previously any deltaY — including that residual —
-    // was read as a zoom command, so simply moving left/right on a trackpad
-    // could suddenly enlarge the artwork. Only treat this as zoom when it's
-    // a genuine pinch gesture (ctrlKey, set by the browser for trackpad
-    // pinch/ctrl+wheel) or when the vertical component is clearly dominant.
-    const isPinchZoom = e.ctrlKey;
-    const isHorizontalDominant = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-    if (!isPinchZoom && isHorizontalDominant) return;
+    // Trackpad two-finger scrolling/panning (in any direction — including
+    // simply moving left/right to reach the prev/next arrows) never sets
+    // ctrlKey. The only wheel interaction browsers report with ctrlKey:true
+    // is a genuine pinch-to-zoom gesture on a trackpad, or Ctrl+wheel on a
+    // mouse. Comparing deltaX/deltaY to guess "was this a zoom?" still let
+    // some ordinary left/right trackpad movement through as zoom, because
+    // trackpads don't report perfectly clean horizontal-only deltas. So this
+    // now requires ctrlKey strictly — no direction-guessing — which means a
+    // laptop trackpad can never trigger this by accident anymore.
+    if (!e.ctrlKey) return;
 
     e.preventDefault();
     const delta = -e.deltaY * 0.0015;
