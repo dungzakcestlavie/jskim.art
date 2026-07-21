@@ -892,11 +892,8 @@
 
   html.viewer-open .bg-layer { display: none; }
 
-  #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; touch-action: none; }
+  #viewer { position: fixed; inset: 0; background: rgb(6,12,26); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; touch-action: none; }
   #viewer.is-open { display: flex; }
-  @media (max-width: 899px) {
-    #viewer { background: rgb(6,12,26); }
-  }
   #viewer-stage { position: relative; width: 100%; height: 78vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
   #viewer-stage.is-zoomed { cursor: grab; }
   #viewer-stage.is-zoomed.is-dragging { cursor: grabbing; }
