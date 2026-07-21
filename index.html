@@ -2587,21 +2587,15 @@
     vTouchMoved = false; vSwipeLocked = false; vSwipeDX = 0; vSwipeDY = 0;
   }, { passive: false });
 
-  // Mouse wheel / trackpad zoom (desktop).
+  // Mouse wheel / trackpad zoom (desktop) — same formula as dungzak.art's
+  // #lf-lightbox wheel handler, so scrolling zooms in/out freely just like
+  // there. The only guard kept is: ignore wheel input while a drag or pinch
+  // is actively in progress, since a laptop clickpad's physical click
+  // mechanism can emit stray wheel ticks while the finger is moving to pan
+  // a zoomed image, which would otherwise fight with the drag.
   viewer.addEventListener('wheel', (e) => {
     if (!viewer.classList.contains('is-open')) return;
-    // Plain two-finger trackpad scrolling — up/down, left/right, with no
-    // mouse button held at all — still arrives as a 'wheel' event with a
-    // deltaY, and was still being read as "zoom out" even after the
-    // previous drag-specific guard, because nothing was being dragged in
-    // this case. A user simply scrolling up and down over a zoomed image
-    // (e.g. reaching to grab the arrow buttons, or just moving around) kept
-    // shrinking the zoom until it snapped back to the full view. The only
-    // wheel interaction browsers report with ctrlKey:true is a genuine
-    // trackpad pinch gesture or literal Ctrl+wheel — requiring that here
-    // means ordinary scrolling, in any direction, can never change the zoom
-    // level again.
-    if (!e.ctrlKey) return;
+    if (vMouseDragging || vIsDragging || vIsZooming) return;
     e.preventDefault();
     const delta = -e.deltaY * 0.0015;
     vScale = Math.min(Math.max(1, vScale + delta * vScale), 4);
