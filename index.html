@@ -2410,6 +2410,10 @@
   viewer.addEventListener('click', (e) => { if (e.target === viewer || e.target === viewerStage) closeViewer(); });
   viewer.addEventListener('dblclick', (e) => {
     if (!viewer.classList.contains('is-open')) return;
+    // Ignore a dblclick that's really the tail end of a drag-pan gesture
+    // (release, re-grip, drag again) rather than an intentional
+    // double-click to toggle zoom.
+    if (Date.now() - vLastMouseDragEnd < 400) return;
     e.preventDefault();
     toggleViewerZoom();
   });
@@ -2599,10 +2603,14 @@
 
   // Mouse drag-to-pan when zoomed (desktop). Cursor becomes a hand via the
   // .is-zoomed/.is-dragging classes toggled on #viewer-stage.
+  let vMouseDragMoved = false;
+  let vLastMouseDragEnd = 0;
+
   viewer.addEventListener('mousedown', (e) => {
     if (!viewer.classList.contains('is-open') || vScale <= 1.02 || e.button !== 0) return;
     e.preventDefault();
     vMouseDragging = true;
+    vMouseDragMoved = false;
     vMouseLastX = e.clientX;
     vMouseLastY = e.clientY;
     viewerStage.classList.add('is-dragging');
@@ -2614,10 +2622,21 @@
     vY += e.clientY - vMouseLastY;
     vMouseLastX = e.clientX;
     vMouseLastY = e.clientY;
+    vMouseDragMoved = true;
     applyViewerTransform();
   });
 
   document.addEventListener('mouseup', () => {
+    // Panning a zoomed-in image with the mouse is a click-drag-release
+    // gesture, and moving it further than one drag reaches means
+    // releasing, moving the cursor back, and clicking-and-dragging again.
+    // Two of those releases/re-grips landing close together in time and
+    // position is exactly what a browser reads as a "double-click" — which
+    // fired our zoom-toggle and reset the zoom back to 1 out of nowhere in
+    // the middle of panning. Recording that a real drag (actual movement,
+    // not just a stationary click) just ended lets the dblclick handler
+    // below recognize and ignore that case.
+    if (vMouseDragging && vMouseDragMoved) vLastMouseDragEnd = Date.now();
     vMouseDragging = false;
     viewerStage.classList.remove('is-dragging');
   });
