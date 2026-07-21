@@ -2327,60 +2327,47 @@
     resetViewerTransform();
     updateViewerCaption(work);
 
-    const standardUrl = work.image ? withCacheBust(work.image) : '';
+    // Mirrors dungzak.art's lightbox exactly: pick ONE source per slide
+    // (the zoom/full-res asset if there is one, otherwise the standard
+    // image) and show only that. jskim.art used to show the standard image
+    // first and then silently swap in the zoom asset a moment later —
+    // whichever of the two finished loading second could resize the
+    // artwork again, which is what was reading as a sudden jump. Assigning
+    // a single source once removes that swap (and the race behind it)
+    // entirely, the same way dungzak.art's proven viewer does.
+    const finalSrc = work.zoom || work.image || '';
+    const finalUrl = finalSrc ? withCacheBust(finalSrc) : '';
     viewerImg.alt = buildAltText(work);
-
-    // Guards against a race between the two loads below: if the (usually
-    // larger) zoom asset happens to finish loading before the standard one,
-    // it must not then get overwritten by the standard image finishing late.
-    let hiResApplied = false;
 
     function revealViewerImage(src) {
       viewerImg.src = src;
       viewerImg.classList.add('is-loading');
       // Two rAFs: let the browser paint the opacity:0 state first, then
-      // transition back to visible. Fades the new artwork in instead of
-      // having it pop into view at whatever size it happens to be —
-      // this is what keeps a resolution/crop mismatch between the
-      // standard and zoom assets (or a plain load-timing hiccup) from
-      // reading as the artwork suddenly jumping bigger.
+      // transition back to visible. Fades the artwork in instead of having
+      // it pop into view at whatever size it happens to be.
       requestAnimationFrame(() => {
         requestAnimationFrame(() => viewerImg.classList.remove('is-loading'));
       });
     }
 
-    // Don't assign viewerImg.src directly here. Doing so clears the
-    // currently-visible artwork immediately, and while the new file is still
-    // downloading the <img> has no intrinsic size and collapses to nothing —
-    // then, the instant it finishes loading, it "pops" back up to full size
-    // inside the frame. On a laptop, paging quickly through artworks made
-    // that pop read as the artwork suddenly enlarging. Preloading off-screen
-    // and only swapping the visible src once the image is fully ready keeps
-    // the previous artwork on screen (no empty/collapsed frame) until the
-    // next one can be shown at its correct size right away.
-    const preloadStandard = new Image();
-    preloadStandard.onload = () => {
-      if (thisToken !== viewerLoadToken || hiResApplied) return;
-      revealViewerImage(standardUrl);
+    // Preloading off-screen first (instead of assigning viewerImg.src
+    // directly) avoids the previously-visible artwork collapsing to nothing
+    // while the new file downloads and then "popping" back to full size the
+    // instant it's ready — the previous artwork simply stays on screen
+    // until the next one is fully ready to show at its correct size.
+    const preload = new Image();
+    preload.onload = () => {
+      if (thisToken !== viewerLoadToken) return;
+      revealViewerImage(finalUrl);
     };
-    preloadStandard.onerror = () => {
-      if (thisToken !== viewerLoadToken || hiResApplied) return;
-      revealViewerImage(standardUrl);
+    preload.onerror = () => {
+      if (thisToken !== viewerLoadToken) return;
+      revealViewerImage(finalUrl);
     };
-    if (standardUrl) {
-      preloadStandard.src = standardUrl;
+    if (finalUrl) {
+      preload.src = finalUrl;
     } else {
       viewerImg.src = '';
-    }
-
-    if (work.zoom && work.zoom !== work.image) {
-      const zoomImg = new Image();
-      zoomImg.onload = () => {
-        if (thisToken !== viewerLoadToken) return;
-        hiResApplied = true;
-        revealViewerImage(withCacheBust(work.zoom));
-      };
-      zoomImg.src = withCacheBust(work.zoom);
     }
 
     preloadNeighborViewerImages();
