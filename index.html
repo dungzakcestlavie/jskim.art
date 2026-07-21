@@ -2407,7 +2407,17 @@
     setViewerSlide(index);
   }
   viewer.querySelector('.v-close').addEventListener('click', closeViewer);
-  viewer.addEventListener('click', (e) => { if (e.target === viewer || e.target === viewerStage) closeViewer(); });
+  viewer.addEventListener('click', (e) => {
+    if (e.target !== viewer && e.target !== viewerStage) return;
+    // Dragging a zoomed-in image up/down (or sideways) can move it far
+    // enough that the stage's plain background is exposed right where the
+    // cursor happens to release — and since releasing there fires a click
+    // targeting the background, that used to close the entire viewer
+    // outright ("전체 화면이 꺼진다"), even though the user only meant to pan
+    // the image. Skipping this close if a real drag just ended fixes it.
+    if (Date.now() - vLastMouseDragEnd < 400) return;
+    closeViewer();
+  });
   viewer.addEventListener('dblclick', (e) => {
     if (!viewer.classList.contains('is-open')) return;
     // Ignore a dblclick that's really the tail end of a drag-pan gesture
