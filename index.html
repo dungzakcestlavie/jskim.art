@@ -901,9 +901,7 @@
     max-width: 92vw; max-height: 78vh; max-height: 78dvh; object-fit: contain;
     transform: translate3d(0,0,0) scale(1); transform-origin: center center;
     will-change: transform; user-select: none; -webkit-user-drag: none;
-    opacity: 1; transition: opacity 180ms ease;
   }
-  #viewer img.is-loading { opacity: 0; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; min-height: 1em; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; z-index: 2; }
   #viewer .v-arrow {
@@ -1497,6 +1495,18 @@
 
   const html = document.documentElement;
   const UI_STATE_KEY = 'jskimUiStateV1';
+
+  // Stop the browser's own trackpad-pinch / Ctrl+wheel page zoom across the
+  // whole site, not just inside the artwork viewer. A laptop trackpad pinch
+  // gesture is delivered to the browser as a 'wheel' event with
+  // ctrlKey:true; if nothing calls preventDefault() on it, the browser zooms
+  // the ENTIRE page natively while the user is simply moving around — which
+  // looks exactly like "the screen suddenly gets bigger," and none of the
+  // artwork-viewer-specific fixes above could ever have caught this, since
+  // it can happen with the viewer closed too.
+  document.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) e.preventDefault();
+  }, { passive: false });
 
   function loadUiState() {
     try {
@@ -2327,48 +2337,24 @@
     resetViewerTransform();
     updateViewerCaption(work);
 
-    // Mirrors dungzak.art's lightbox exactly: pick ONE source per slide
-    // (the zoom/full-res asset if there is one, otherwise the standard
-    // image) and show only that. jskim.art used to show the standard image
-    // first and then silently swap in the zoom asset a moment later —
-    // whichever of the two finished loading second could resize the
-    // artwork again, which is what was reading as a sudden jump. Assigning
-    // a single source once removes that swap (and the race behind it)
-    // entirely, the same way dungzak.art's proven viewer does.
-    const finalSrc = work.zoom || work.image || '';
-    const finalUrl = finalSrc ? withCacheBust(finalSrc) : '';
+    // Mirrors dungzak.art's setLightboxSlideContent exactly: one source per
+    // slide (zoom asset if present, else standard), assigned directly — no
+    // separate off-screen preload gate, no opacity fade layered on top.
+    // onload is only used to re-apply the scale/position reset via rAF once
+    // the image's real dimensions are known, same as dungzak.art does.
+    const src = work.zoom || work.image || '';
     viewerImg.alt = buildAltText(work);
 
-    function revealViewerImage(src) {
-      viewerImg.src = src;
-      viewerImg.classList.add('is-loading');
-      // Two rAFs: let the browser paint the opacity:0 state first, then
-      // transition back to visible. Fades the artwork in instead of having
-      // it pop into view at whatever size it happens to be.
+    viewerImg.onload = () => {
+      if (thisToken !== viewerLoadToken) return;
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => viewerImg.classList.remove('is-loading'));
+        if (thisToken !== viewerLoadToken) return;
+        vScale = 1; vX = 0; vY = 0;
+        applyViewerTransform();
       });
-    }
+    };
 
-    // Preloading off-screen first (instead of assigning viewerImg.src
-    // directly) avoids the previously-visible artwork collapsing to nothing
-    // while the new file downloads and then "popping" back to full size the
-    // instant it's ready — the previous artwork simply stays on screen
-    // until the next one is fully ready to show at its correct size.
-    const preload = new Image();
-    preload.onload = () => {
-      if (thisToken !== viewerLoadToken) return;
-      revealViewerImage(finalUrl);
-    };
-    preload.onerror = () => {
-      if (thisToken !== viewerLoadToken) return;
-      revealViewerImage(finalUrl);
-    };
-    if (finalUrl) {
-      preload.src = finalUrl;
-    } else {
-      viewerImg.src = '';
-    }
+    viewerImg.src = src ? withCacheBust(src) : '';
 
     preloadNeighborViewerImages();
   }
@@ -2589,25 +2575,16 @@
 
   // Mouse wheel / trackpad zoom (desktop). Note: this is an addition beyond dungzak.art's
   // current engine, which does not yet implement wheel zoom in its own lightbox — see note.
+  // Kept identical to dungzak.art's #lf-lightbox wheel handler (same formula,
+  // same markViewerBusy() call) rather than a jskim-only variant.
   viewer.addEventListener('wheel', (e) => {
     if (!viewer.classList.contains('is-open')) return;
-
-    // Trackpad two-finger scrolling/panning (in any direction — including
-    // simply moving left/right to reach the prev/next arrows) never sets
-    // ctrlKey. The only wheel interaction browsers report with ctrlKey:true
-    // is a genuine pinch-to-zoom gesture on a trackpad, or Ctrl+wheel on a
-    // mouse. Comparing deltaX/deltaY to guess "was this a zoom?" still let
-    // some ordinary left/right trackpad movement through as zoom, because
-    // trackpads don't report perfectly clean horizontal-only deltas. So this
-    // now requires ctrlKey strictly — no direction-guessing — which means a
-    // laptop trackpad can never trigger this by accident anymore.
-    if (!e.ctrlKey) return;
-
     e.preventDefault();
     const delta = -e.deltaY * 0.0015;
     vScale = Math.min(Math.max(1, vScale + delta * vScale), 4);
     if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; }
     applyViewerTransform();
+    markViewerBusy();
   }, { passive: false });
 
   // Mouse drag-to-pan when zoomed (desktop). Cursor becomes a hand via the
