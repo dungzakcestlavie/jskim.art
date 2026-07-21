@@ -894,11 +894,11 @@
 
   #viewer { position: fixed; inset: 0; background: rgb(6,12,26); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; touch-action: none; }
   #viewer.is-open { display: flex; }
-  #viewer-stage { position: relative; width: 100%; height: 78vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  #viewer-stage { position: relative; width: 100%; height: 78vh; height: 78dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
   #viewer-stage.is-zoomed { cursor: grab; }
   #viewer-stage.is-zoomed.is-dragging { cursor: grabbing; }
   #viewer img {
-    max-width: 92vw; max-height: 78vh; object-fit: contain;
+    max-width: 92vw; max-height: 78vh; max-height: 78dvh; object-fit: contain;
     transform: translate3d(0,0,0) scale(1); transform-origin: center center;
     will-change: transform; user-select: none; -webkit-user-drag: none;
   }
@@ -2560,6 +2560,18 @@
   // current engine, which does not yet implement wheel zoom in its own lightbox — see note.
   viewer.addEventListener('wheel', (e) => {
     if (!viewer.classList.contains('is-open')) return;
+
+    // Trackpad two-finger left/right movement (e.g. on a laptop) fires wheel
+    // events too, and often carries a small residual deltaY alongside the
+    // dominant deltaX. Previously any deltaY — including that residual —
+    // was read as a zoom command, so simply moving left/right on a trackpad
+    // could suddenly enlarge the artwork. Only treat this as zoom when it's
+    // a genuine pinch gesture (ctrlKey, set by the browser for trackpad
+    // pinch/ctrl+wheel) or when the vertical component is clearly dominant.
+    const isPinchZoom = e.ctrlKey;
+    const isHorizontalDominant = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    if (!isPinchZoom && isHorizontalDominant) return;
+
     e.preventDefault();
     const delta = -e.deltaY * 0.0015;
     vScale = Math.min(Math.max(1, vScale + delta * vScale), 4);
