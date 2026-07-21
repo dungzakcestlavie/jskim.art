@@ -2593,6 +2593,14 @@
   // same markViewerBusy() call) rather than a jskim-only variant.
   viewer.addEventListener('wheel', (e) => {
     if (!viewer.classList.contains('is-open')) return;
+    // A laptop clickpad's physical click-and-drag mechanism can emit small
+    // stray wheel/scroll signals while the finger is moving across it to
+    // pan a zoomed-in image. Since this handler used to run unconditionally,
+    // those stray signals gradually shrank vScale during a drag until it
+    // snapped back to the full, unzoomed view — even though the user never
+    // intended to zoom out. Ignoring wheel input while an actual drag or
+    // pinch is in progress removes that interference entirely.
+    if (vMouseDragging || vIsDragging || vIsZooming) return;
     e.preventDefault();
     const delta = -e.deltaY * 0.0015;
     vScale = Math.min(Math.max(1, vScale + delta * vScale), 4);
