@@ -902,11 +902,6 @@
     transform: translate3d(0,0,0) scale(1); transform-origin: center center;
     will-change: transform; user-select: none; -webkit-user-drag: none;
   }
-  #viewer .v-layer {
-    position: absolute; inset: 0; margin: auto;
-    opacity: 0;
-  }
-  #viewer .v-layer.is-front { opacity: 1; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; min-height: 1em; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; z-index: 2; }
   #viewer .v-arrow {
@@ -1206,8 +1201,7 @@
   <button class="v-close" aria-label="close">&times;</button>
   <button class="v-arrow v-prev" aria-label="previous work">&#8249;</button>
   <div id="viewer-stage">
-    <img id="viewer-img" class="v-layer" alt="">
-    <img id="viewer-img-b" class="v-layer" alt="">
+    <img id="viewer-img" alt="">
   </div>
   <button class="v-arrow v-next" aria-label="next work">&#8250;</button>
   <div class="v-meta" id="viewer-meta"></div>
@@ -2246,15 +2240,7 @@
 
   const viewer = $('#viewer');
   const viewerStage = $('#viewer-stage');
-  const viewerImgA = $('#viewer-img');
-  const viewerImgB = $('#viewer-img-b');
-  // The viewer always has exactly one "front" layer (fully visible, the one
-  // pinch/pan/wheel-zoom act on) and one "back" layer (fully transparent,
-  // used to preload+prepare the next artwork). Navigating swaps which
-  // element is which; nothing is ever removed from the DOM or reloaded.
-  let activeViewerImg = viewerImgA;
-  let idleViewerImg = viewerImgB;
-  viewerImgA.classList.add('is-front');
+  const viewerImg = $('#viewer-img');
   const viewerMeta = $('#viewer-meta');
   const viewerPrevBtn = viewer.querySelector('.v-prev');
   const viewerNextBtn = viewer.querySelector('.v-next');
@@ -2292,8 +2278,8 @@
   function clampViewerImageToFrame() {
     if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; return; }
     const frame = viewerStage.getBoundingClientRect();
-    const baseW = activeViewerImg.offsetWidth || frame.width;
-    const baseH = activeViewerImg.offsetHeight || frame.height;
+    const baseW = viewerImg.offsetWidth || frame.width;
+    const baseH = viewerImg.offsetHeight || frame.height;
     const maxX = Math.max(0, (baseW * vScale - frame.width) / 2);
     const maxY = Math.max(0, (baseH * vScale - frame.height) / 2);
     vX = clampViewerValue(vX, -maxX, maxX);
@@ -2302,7 +2288,7 @@
 
   function applyViewerTransform() {
     clampViewerImageToFrame();
-    activeViewerImg.style.transform = `translate3d(${vX}px, ${vY}px, 0) scale(${vScale})`;
+    viewerImg.style.transform = `translate3d(${vX}px, ${vY}px, 0) scale(${vScale})`;
     viewerStage.classList.toggle('is-zoomed', vScale > 1.02);
   }
 
@@ -2348,50 +2334,36 @@
     viewerLoadToken += 1;
     const thisToken = viewerLoadToken;
 
+    // Matches dungzak.art's setLightboxSlideContent exactly: one source per
+    // slide (zoom asset if present, else standard), assigned directly to
+    // the single #viewer-img element — no separate layers, no crossfade.
+    // The one deliberate change from dungzak.art is that the caption text
+    // updates at the same moment the image itself becomes visible (inside
+    // onload), not immediately on click — updating it earlier let the
+    // caption's length change shift the whole centered layout a beat
+    // before the image changed, which read as its own flash on top of the
+    // image swap.
     const src = work.zoom || work.image || '';
     const url = src ? withCacheBust(src) : '';
     const alt = buildAltText(work);
 
-    // Crossfade transition: prepare the CURRENTLY HIDDEN layer with the new
-    // artwork while the currently visible layer keeps showing the previous
-    // one, completely untouched. Only once the new image has actually
-    // finished loading (real pixels, real dimensions — no half-downloaded
-    // or blank state) do the two layers swap which one is "front". The
-    // caption text is updated at that exact same moment (not immediately on
-    // click) — updating it earlier let the caption's length change shift
-    // the stage's on-screen position (via the flex-centered layout) a beat
-    // before the image itself changed, which read as a flash/jolt of its
-    // own on top of the image swap.
-    const incoming = idleViewerImg;
-    const outgoing = activeViewerImg;
-
-    incoming.style.transform = 'translate3d(0,0,0) scale(1)';
-    incoming.alt = alt;
+    viewerImg.style.transform = 'translate3d(0,0,0) scale(1)';
+    viewerImg.alt = alt;
 
     function reveal() {
       if (thisToken !== viewerLoadToken) return;
       updateViewerCaption(work);
-      incoming.classList.add('is-front');
-      outgoing.classList.remove('is-front');
-      activeViewerImg = incoming;
-      idleViewerImg = outgoing;
       vScale = 1; vX = 0; vY = 0;
       applyViewerTransform();
     }
 
     if (!url) {
-      incoming.removeAttribute('src');
-      incoming.dataset.loadedUrl = '';
-      reveal();
-    } else if (incoming.dataset.loadedUrl === url && incoming.complete) {
-      // Already loaded (e.g. this exact layer showed this exact artwork
-      // before) — safe to reveal immediately, no flash possible since the
-      // pixels are already decoded.
+      viewerImg.removeAttribute('src');
       reveal();
     } else {
-      incoming.onload = () => { incoming.dataset.loadedUrl = url; reveal(); };
-      incoming.onerror = () => { incoming.dataset.loadedUrl = url; reveal(); };
-      incoming.src = url;
+      viewerImg.onload = () => reveal();
+      viewerImg.onerror = () => reveal();
+      viewerImg.src = url;
     }
 
     preloadNeighborViewerImages();
@@ -2470,8 +2442,7 @@
     document.body.classList.remove('viewer-open');
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    viewerImgA.removeAttribute('src');
-    viewerImgB.removeAttribute('src');
+    viewerImg.removeAttribute('src');
     viewerLoadToken += 1;
     resetViewerTransform();
     vItems = [];
