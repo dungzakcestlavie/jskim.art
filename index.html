@@ -902,6 +902,11 @@
     transform: translate3d(0,0,0) scale(1); transform-origin: center center;
     will-change: transform; user-select: none; -webkit-user-drag: none;
   }
+  #viewer .v-layer {
+    position: absolute; inset: 0; margin: auto;
+    opacity: 0; z-index: 0; transition: opacity .22s ease;
+  }
+  #viewer .v-layer.is-front { opacity: 1; z-index: 1; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; min-height: 1em; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; z-index: 2; }
   #viewer .v-arrow {
@@ -1201,7 +1206,8 @@
   <button class="v-close" aria-label="close">&times;</button>
   <button class="v-arrow v-prev" aria-label="previous work">&#8249;</button>
   <div id="viewer-stage">
-    <img id="viewer-img" src="" alt="">
+    <img id="viewer-img" class="v-layer" alt="">
+    <img id="viewer-img-b" class="v-layer" alt="">
   </div>
   <button class="v-arrow v-next" aria-label="next work">&#8250;</button>
   <div class="v-meta" id="viewer-meta"></div>
@@ -2240,7 +2246,15 @@
 
   const viewer = $('#viewer');
   const viewerStage = $('#viewer-stage');
-  const viewerImg = $('#viewer-img');
+  const viewerImgA = $('#viewer-img');
+  const viewerImgB = $('#viewer-img-b');
+  // The viewer always has exactly one "front" layer (fully visible, the one
+  // pinch/pan/wheel-zoom act on) and one "back" layer (fully transparent,
+  // used to preload+prepare the next artwork). Navigating swaps which
+  // element is which; nothing is ever removed from the DOM or reloaded.
+  let activeViewerImg = viewerImgA;
+  let idleViewerImg = viewerImgB;
+  viewerImgA.classList.add('is-front');
   const viewerMeta = $('#viewer-meta');
   const viewerPrevBtn = viewer.querySelector('.v-prev');
   const viewerNextBtn = viewer.querySelector('.v-next');
@@ -2278,8 +2292,8 @@
   function clampViewerImageToFrame() {
     if (vScale <= 1.02) { vScale = 1; vX = 0; vY = 0; return; }
     const frame = viewerStage.getBoundingClientRect();
-    const baseW = viewerImg.offsetWidth || frame.width;
-    const baseH = viewerImg.offsetHeight || frame.height;
+    const baseW = activeViewerImg.offsetWidth || frame.width;
+    const baseH = activeViewerImg.offsetHeight || frame.height;
     const maxX = Math.max(0, (baseW * vScale - frame.width) / 2);
     const maxY = Math.max(0, (baseH * vScale - frame.height) / 2);
     vX = clampViewerValue(vX, -maxX, maxX);
@@ -2288,7 +2302,7 @@
 
   function applyViewerTransform() {
     clampViewerImageToFrame();
-    viewerImg.style.transform = `translate3d(${vX}px, ${vY}px, 0) scale(${vScale})`;
+    activeViewerImg.style.transform = `translate3d(${vX}px, ${vY}px, 0) scale(${vScale})`;
     viewerStage.classList.toggle('is-zoomed', vScale > 1.02);
   }
 
@@ -2334,27 +2348,51 @@
     viewerLoadToken += 1;
     const thisToken = viewerLoadToken;
 
-    resetViewerTransform();
     updateViewerCaption(work);
 
-    // Mirrors dungzak.art's setLightboxSlideContent exactly: one source per
-    // slide (zoom asset if present, else standard), assigned directly — no
-    // separate off-screen preload gate, no opacity fade layered on top.
-    // onload is only used to re-apply the scale/position reset via rAF once
-    // the image's real dimensions are known, same as dungzak.art does.
     const src = work.zoom || work.image || '';
-    viewerImg.alt = buildAltText(work);
+    const url = src ? withCacheBust(src) : '';
+    const alt = buildAltText(work);
 
-    viewerImg.onload = () => {
+    // Crossfade transition: prepare the CURRENTLY HIDDEN layer with the new
+    // artwork while the currently visible layer keeps showing the previous
+    // one, completely untouched. Only once the new image has actually
+    // finished loading (real pixels, real dimensions — no half-downloaded
+    // or blank state) do the two layers swap which one is "front". This is
+    // what makes the flash-then-pop-to-full-size behavior structurally
+    // impossible: there is never a moment where the visible layer has no
+    // image, and the size only ever changes as part of a smooth opacity
+    // cross-dissolve, never as an abrupt swap.
+    const incoming = idleViewerImg;
+    const outgoing = activeViewerImg;
+
+    incoming.style.transform = 'translate3d(0,0,0) scale(1)';
+    incoming.alt = alt;
+
+    function reveal() {
       if (thisToken !== viewerLoadToken) return;
-      requestAnimationFrame(() => {
-        if (thisToken !== viewerLoadToken) return;
-        vScale = 1; vX = 0; vY = 0;
-        applyViewerTransform();
-      });
-    };
+      incoming.classList.add('is-front');
+      outgoing.classList.remove('is-front');
+      activeViewerImg = incoming;
+      idleViewerImg = outgoing;
+      vScale = 1; vX = 0; vY = 0;
+      applyViewerTransform();
+    }
 
-    viewerImg.src = src ? withCacheBust(src) : '';
+    if (!url) {
+      incoming.removeAttribute('src');
+      incoming.dataset.loadedUrl = '';
+      reveal();
+    } else if (incoming.dataset.loadedUrl === url && incoming.complete) {
+      // Already loaded (e.g. this exact layer showed this exact artwork
+      // before) — safe to reveal immediately, no flash possible since the
+      // pixels are already decoded.
+      reveal();
+    } else {
+      incoming.onload = () => { incoming.dataset.loadedUrl = url; reveal(); };
+      incoming.onerror = () => { incoming.dataset.loadedUrl = url; reveal(); };
+      incoming.src = url;
+    }
 
     preloadNeighborViewerImages();
   }
@@ -2432,7 +2470,8 @@
     document.body.classList.remove('viewer-open');
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    viewerImg.src = '';
+    viewerImgA.removeAttribute('src');
+    viewerImgB.removeAttribute('src');
     viewerLoadToken += 1;
     resetViewerTransform();
     vItems = [];
