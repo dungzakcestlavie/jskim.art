@@ -888,29 +888,7 @@
     .card .meta .s { font-size: 10.4px; }
   }
 
-  /* ---- Empty state ---- */
-  .empty-state {
-    width: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    min-height: clamp(280px, 40vh, 560px);
-    min-height: clamp(280px, 40dvh, 560px);
-    padding: 40px 20px; color: var(--text-dim); box-sizing: border-box;
-    animation: empty-fade .2s ease;
-  }
-  @keyframes empty-fade { from { opacity: 0; } to { opacity: 1; } }
-  .empty-state-icon { width: 39.6px; height: 39.6px; color: var(--gold-base); opacity: .7; margin-bottom: 12px; }
-  .empty-state-title { margin: 0 0 6px; font-size: 15px; font-weight: 500; color: var(--text-main); line-height: 1.4; }
-  .empty-state-sub { margin: 0; font-size: 12.35px; color: var(--text-dim); max-width: 320px; line-height: 1.5; }
-  html[data-lang="en"] .empty-state-title { font-size: 17.2px; }
-  html[data-lang="en"] .empty-state-sub { font-size: 13.9px; }
-
-  .load-more-wrap { text-align: center; margin-top: 28px; }
-  .load-more-wrap button {
-    background: none; border: 1px solid var(--card-border); color: var(--text-dim); border-radius: 999px;
-    padding: 9px 22px; font: inherit; font-size: 13px; cursor: pointer;
-  }
-  .load-more-wrap button:hover { color: var(--gold-bright); border-color: var(--gold-base); }
-  .load-more-wrap[hidden] { display: none; }
+  #scroll-sentinel { width: 100%; height: 1px; }
 
   #viewer { position: fixed; inset: 0; background: rgba(6,12,26,.96); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; touch-action: none; }
   #viewer.is-open { display: flex; }
@@ -1188,24 +1166,7 @@
       </div>
     </div>
     <div class="grid" id="grid"></div>
-    <div class="empty-state" id="empty-msg" hidden>
-      <svg class="empty-state-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="8" y="9" width="32" height="30" rx="3"/>
-        <circle cx="18.5" cy="19" r="3"/>
-        <path d="M40 30l-8.5-8.5-7 7-5-5-11.5 11.5"/>
-      </svg>
-      <p class="empty-state-title">
-        <span data-i18n="ko">검색 결과가 없습니다</span><span data-i18n="en">No works found</span>
-      </p>
-      <p class="empty-state-sub">
-        <span data-i18n="ko">다른 검색어나 섹션을 선택해 주세요.</span><span data-i18n="en">Try another keyword or select a different section.</span>
-      </p>
-    </div>
-    <div class="load-more-wrap" id="load-more-wrap" hidden>
-      <button type="button" id="load-more-btn">
-        <span data-i18n="ko">더 보기</span><span data-i18n="en">Load More</span>
-      </button>
-    </div>
+    <div id="scroll-sentinel" aria-hidden="true"></div>
   </section>
 </main>
 
@@ -1825,11 +1786,6 @@
       input.focus();
     });
 
-    $('#load-more-btn').addEventListener('click', () => {
-      visibleCount += LOAD_STEP;
-      renderGrid();
-    });
-
     $('#search').value = searchQuery;
     updateSearchPlaceholder();
     updateSearchClearVisibility();
@@ -2191,19 +2147,29 @@
     else imgs.forEach(loadLazyImage);
   }
 
+  let sentinelObserver = null;
+  function ensureSentinelObserver() {
+    if (sentinelObserver || !('IntersectionObserver' in window)) return sentinelObserver;
+    sentinelObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        if (visibleCount >= filtered.length) return;
+        visibleCount += LOAD_STEP;
+        renderGrid();
+      });
+    }, { root: null, rootMargin: '600px 0px', threshold: 0 });
+    return sentinelObserver;
+  }
+
   function renderGrid() {
     const grid = $('#grid');
-    const empty = $('#empty-msg');
-    const loadMoreWrap = $('#load-more-wrap');
-
+    const sentinel = $('#scroll-sentinel');
 
     if (!filtered.length) {
       grid.innerHTML = '';
-      empty.hidden = false;
-      loadMoreWrap.hidden = true;
+      sentinel.hidden = true;
       return;
     }
-    empty.hidden = true;
 
     const visible = filtered.slice(0, visibleCount);
     const html = visible.map((w, i) => buildCardHTML(w, i)).join('');
@@ -2212,7 +2178,16 @@
     grid.replaceChildren(template.content);
     observeLazyImages(grid);
 
-    loadMoreWrap.hidden = visible.length >= filtered.length;
+    const hasMore = visible.length < filtered.length;
+    sentinel.hidden = !hasMore;
+    if (hasMore) {
+      const observer = ensureSentinelObserver();
+      if (observer) observer.observe(sentinel);
+      // Fallback for browsers without IntersectionObserver: load everything.
+      else { visibleCount = filtered.length; renderGrid(); }
+    } else if (sentinelObserver) {
+      sentinelObserver.unobserve(sentinel);
+    }
   }
 
   function injectArtworkStructuredData() {
