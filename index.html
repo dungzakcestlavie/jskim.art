@@ -2328,7 +2328,30 @@
 
     const standardUrl = work.image ? withCacheBust(work.image) : '';
     viewerImg.alt = buildAltText(work);
-    viewerImg.src = standardUrl;
+
+    // Don't assign viewerImg.src directly here. Doing so clears the
+    // currently-visible artwork immediately, and while the new file is still
+    // downloading the <img> has no intrinsic size and collapses to nothing —
+    // then, the instant it finishes loading, it "pops" back up to full size
+    // inside the frame. On a laptop, paging quickly through artworks made
+    // that pop read as the artwork suddenly enlarging. Preloading off-screen
+    // and only swapping the visible src once the image is fully ready keeps
+    // the previous artwork on screen (no empty/collapsed frame) until the
+    // next one can be shown at its correct size right away.
+    const preloadStandard = new Image();
+    preloadStandard.onload = () => {
+      if (thisToken !== viewerLoadToken) return;
+      viewerImg.src = standardUrl;
+    };
+    preloadStandard.onerror = () => {
+      if (thisToken !== viewerLoadToken) return;
+      viewerImg.src = standardUrl;
+    };
+    if (standardUrl) {
+      preloadStandard.src = standardUrl;
+    } else {
+      viewerImg.src = '';
+    }
 
     if (work.zoom && work.zoom !== work.image) {
       const zoomImg = new Image();
