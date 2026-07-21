@@ -904,9 +904,9 @@
   }
   #viewer .v-layer {
     position: absolute; inset: 0; margin: auto;
-    opacity: 0; z-index: 0;
+    opacity: 0;
   }
-  #viewer .v-layer.is-front { opacity: 1; z-index: 1; }
+  #viewer .v-layer.is-front { opacity: 1; }
   #viewer .v-meta { color: var(--text-dim); font-size: 13px; margin-top: 14px; text-align: center; min-height: 1em; }
   #viewer .v-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; line-height: 1; z-index: 2; }
   #viewer .v-arrow {
@@ -2348,8 +2348,6 @@
     viewerLoadToken += 1;
     const thisToken = viewerLoadToken;
 
-    updateViewerCaption(work);
-
     const src = work.zoom || work.image || '';
     const url = src ? withCacheBust(src) : '';
     const alt = buildAltText(work);
@@ -2358,11 +2356,12 @@
     // artwork while the currently visible layer keeps showing the previous
     // one, completely untouched. Only once the new image has actually
     // finished loading (real pixels, real dimensions — no half-downloaded
-    // or blank state) do the two layers swap which one is "front". This is
-    // what makes the flash-then-pop-to-full-size behavior structurally
-    // impossible: there is never a moment where the visible layer has no
-    // image, and the size only ever changes as part of a smooth opacity
-    // cross-dissolve, never as an abrupt swap.
+    // or blank state) do the two layers swap which one is "front". The
+    // caption text is updated at that exact same moment (not immediately on
+    // click) — updating it earlier let the caption's length change shift
+    // the stage's on-screen position (via the flex-centered layout) a beat
+    // before the image itself changed, which read as a flash/jolt of its
+    // own on top of the image swap.
     const incoming = idleViewerImg;
     const outgoing = activeViewerImg;
 
@@ -2371,6 +2370,7 @@
 
     function reveal() {
       if (thisToken !== viewerLoadToken) return;
+      updateViewerCaption(work);
       incoming.classList.add('is-front');
       outgoing.classList.remove('is-front');
       activeViewerImg = incoming;
