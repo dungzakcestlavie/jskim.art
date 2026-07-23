@@ -961,13 +961,31 @@
 
   #viewer { position: fixed; inset: 0; background: rgb(6,12,26); display: none; align-items: center; justify-content: center; z-index: 50; flex-direction: column; touch-action: none; }
   #viewer.is-open { display: flex; }
-  #viewer-stage { position: relative; width: 100%; height: 78vh; height: 78dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  #viewer-stage {
+    position: relative;
+    width: 100%;
+    height: min(88vh, 1400px);
+    height: min(88dvh, 1400px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
   #viewer-stage.is-zoomed { cursor: grab; }
   #viewer-stage.is-zoomed.is-dragging { cursor: grabbing; }
   #viewer img {
-    max-width: 92vw; max-height: 78vh; max-height: 78dvh; object-fit: contain;
-    transform: translate3d(0,0,0) scale(1); transform-origin: center center;
-    will-change: transform; user-select: none; -webkit-user-drag: none;
+    width: auto;
+    height: auto;
+    max-width: min(94vw, 1800px);
+    max-height: min(88vh, 1400px);
+    max-height: min(88dvh, 1400px);
+    object-fit: contain;
+
+    transform: translate3d(0,0,0) scale(1);
+    transform-origin: center center;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-drag: none;
   }
   /* Zoom / Lightbox caption fully hidden on every device.
      Standard artwork-card captions remain unchanged. */
@@ -1012,6 +1030,26 @@
       color: var(--gold-bright);
       opacity: 1;
       outline: none;
+    }
+  }
+
+  /* Mobile and tablet only: reduce the visible X while preserving a
+     44×44px touch target. Desktop/notebook styling above remains intact. */
+  @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+    #viewer .v-close {
+      top: calc(env(safe-area-inset-top, 0px) + 18px);
+      right: 18px;
+
+      width: 44px;
+      height: 44px;
+
+      font-size: 19px;
+      line-height: 1;
+      opacity: .55;
+    }
+
+    #viewer .v-close:active {
+      opacity: .85;
     }
   }
   #viewer .v-arrow {
