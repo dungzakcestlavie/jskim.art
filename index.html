@@ -1720,14 +1720,14 @@
 
   let allWorks = [];
   let sections = [];
-  let filtered = [];
+  let filteredWorks = [];
   let worksLoaded = false;
   const INITIAL_VISIBLE = 24;
   const LOAD_STEP = 24;
   const INITIAL_EAGER_COUNT = 6;
   let visibleCount = INITIAL_VISIBLE;
 
-  let sectionFilter = savedState.section || 'all';
+  let selectedSection = savedState.section || 'all';
   let searchQuery = savedState.query || '';
   // Which group (e.g. 'indramang') the Series panel is currently drilled
   // into, showing that group's movements instead of the top-level list.
@@ -1772,6 +1772,16 @@
     }
     worksLoaded = true;
     worksLoading = false;
+
+    // A stale saved filter must never silently fall back to showing all works.
+    // Reset only when the saved key truly no longer exists.
+    if (
+      selectedSection !== 'all' &&
+      !sections.some(s => String(s.key) === String(selectedSection))
+    ) {
+      selectedSection = 'all';
+      saveUiState({ section: 'all' });
+    }
 
     buildSeriesOptions();
     applyFilters();
@@ -1862,8 +1872,8 @@
   // (not just the top-level list) so the trigger button always shows the
   // right label even when a movement nested under a group is selected.
   function currentSectionMeta() {
-    if (sectionFilter === 'all') return { key: 'all', kr: '전체 섹션', en: 'All Sections' };
-    const sec = findSection(sectionFilter);
+    if (selectedSection === 'all') return { key: 'all', kr: '전체 섹션', en: 'All Sections' };
+    const sec = findSection(selectedSection);
     if (sec) return { key: sec.key, kr: sec.title_kr || sec.title_en || '', en: sec.title_en || sec.title_kr || '' };
     return { key: 'all', kr: '전체 섹션', en: 'All Sections' };
   }
@@ -1879,7 +1889,7 @@
   }
 
   // Single source of truth for "is this option the active one" — every
-  // aria-selected value in the panel is derived from sectionFilter through
+  // aria-selected value in the panel is derived from selectedSection through
   // this one function, never set independently anywhere else.
   // MOBILE TOUCH-STATE FIX 2026-07-19: the auto-focus calls below exist
   // purely for keyboard users (so arrow-key navigation lands somewhere
@@ -1900,7 +1910,7 @@
   }
 
   function isSectionActive(key) {
-    return key === sectionFilter;
+    return key === selectedSection;
   }
 
   // Explicitly wipes every aria-selected flag current in the DOM before a
@@ -1943,7 +1953,7 @@
       backBtn.addEventListener('click', () => {
         // Returning to the top level always drops every child-level
         // selection state first; the top level then re-derives its own
-        // active row purely from sectionFilter (single source of truth).
+        // active row purely from selectedSection (single source of truth).
         seriesPanelGroup = null;
         buildSeriesOptions();
         const first = seriesPanel.querySelector('.series-select-option');
@@ -1981,7 +1991,7 @@
         // A group also shows the check mark when the currently-applied
         // filter is one of its movements, so you can see at a glance that
         // something inside 인드라망 is selected without opening it. This is
-        // still derived from the single sectionFilter value — never a
+        // still derived from the single selectedSection value — never a
         // second independent flag.
         const isChildActive = item.isGroup && childSeriesData(item.key).some(c => isSectionActive(c.key));
         btn.setAttribute('aria-selected', String(isSectionActive(item.key) || isChildActive));
@@ -2019,7 +2029,7 @@
   }
 
   function selectSeries(key) {
-    sectionFilter = key;
+    selectedSection = key;
     saveUiState({ section: key });
     visibleCount = INITIAL_VISIBLE;
     buildSeriesOptions();
@@ -2030,7 +2040,7 @@
   function openSeriesPanel() {
     // Reopen directly inside the current selection's group (if any) so a
     // checked movement is visible immediately, without an extra click.
-    const sec = findSection(sectionFilter);
+    const sec = findSection(selectedSection);
     seriesPanelGroup = (sec && sec.parentKey) ? sec.parentKey : null;
     buildSeriesOptions();
 
@@ -2078,24 +2088,76 @@
     if (input && clearBtn) clearBtn.hidden = !input.value;
   }
 
+  function getWorkSectionKey(work) {
+    if (!work) return '';
+    if (work.section_key !== undefined && work.section_key !== null) {
+      return String(work.section_key);
+    }
+
+    // Compatibility only: keep works.json untouched even if an older data
+    // set still identifies a section numerically.
+    if (work.section_id !== undefined && work.section_id !== null) {
+      const numericId = String(work.section_id);
+      const section = sections.find(s =>
+        String(s.section_id ?? s.id ?? s.order ?? '') === numericId
+      );
+      return section ? String(section.key) : numericId;
+    }
+
+    return '';
+  }
+
+  function isWorkInSelectedSection(work) {
+    if (selectedSection === 'all') return true;
+
+    const workSectionKey = getWorkSectionKey(work);
+    const activeSection = sections.find(s => String(s.key) === String(selectedSection));
+
+    if (workSectionKey === String(selectedSection)) return true;
+
+    // Parent sections such as 인드라망 may contain movement child keys.
+    return !!(
+      activeSection &&
+      Array.isArray(activeSection.childKeys) &&
+      activeSection.childKeys.map(String).includes(workSectionKey)
+    );
+  }
+
   function applyFilters() {
-    const activeSection = sections.find(s => s.key === sectionFilter);
-    filtered = allWorks.filter(w => {
-      const matchesSection = sectionFilter === 'all'
-        || w.section_key === sectionFilter
-        || (activeSection && Array.isArray(activeSection.childKeys) && activeSection.childKeys.includes(w.section_key));
-      const title = (field(w, 'title') || '').toLowerCase();
-      const material = (field(w, 'material') || '').toLowerCase();
-      const sectionMeta = sections.find(s => s.key === w.section_key || (Array.isArray(s.childKeys) && s.childKeys.includes(w.section_key)));
-      const sectionName = sectionMeta ? (lang === 'ko' ? sectionMeta.title_kr : sectionMeta.title_en) || '' : '';
-      const matchesSearch = !searchQuery
-        || title.includes(searchQuery)
-        || material.includes(searchQuery)
-        || String(w.year || '').includes(searchQuery)
-        || sectionName.toLowerCase().includes(searchQuery)
-        || String(w.id||'').toLowerCase().includes(searchQuery);
-      return matchesSection && matchesSearch;
+    // Single source of truth:
+    // allWorks -> selected section -> search -> grid/lightbox.
+    const sectionWorks = selectedSection === 'all'
+      ? allWorks.slice()
+      : allWorks.filter(isWorkInSelectedSection);
+
+    filteredWorks = sectionWorks.filter(work => {
+      if (!searchQuery) return true;
+
+      const titleKr = String(work.title_kr || '').toLowerCase();
+      const titleEn = String(work.title_en || '').toLowerCase();
+      const materialKr = String(work.material_kr || '').toLowerCase();
+      const materialEn = String(work.material_en || '').toLowerCase();
+      const year = String(work.year || '').toLowerCase();
+      const id = String(work.id || '').toLowerCase();
+      const workSectionKey = getWorkSectionKey(work);
+
+      const sectionMeta = sections.find(s =>
+        String(s.key) === workSectionKey ||
+        (Array.isArray(s.childKeys) && s.childKeys.map(String).includes(workSectionKey))
+      );
+      const sectionKr = String(sectionMeta?.title_kr || '').toLowerCase();
+      const sectionEn = String(sectionMeta?.title_en || '').toLowerCase();
+
+      return titleKr.includes(searchQuery)
+        || titleEn.includes(searchQuery)
+        || materialKr.includes(searchQuery)
+        || materialEn.includes(searchQuery)
+        || year.includes(searchQuery)
+        || id.includes(searchQuery)
+        || sectionKr.includes(searchQuery)
+        || sectionEn.includes(searchQuery);
     });
+
     renderGrid();
   }
 
@@ -2106,6 +2168,10 @@
     try {
       const title = field(work, 'title');
       const material = field(work, 'material');
+      const isYeosuWork = getWorkSectionKey(work) === 'yeosu';
+      const secondaryMeta = isYeosuWork
+        ? ''
+        : [material, work.year].filter(Boolean).join(' · ');
       const rawImage = work.image || '';
       const imageUrl = rawImage ? withCacheBust(rawImage) : '';
       const priority = index < INITIAL_EAGER_COUNT;
@@ -2114,7 +2180,8 @@
       const altText = buildAltText(work);
       return (
         '<article class="card" data-index="' + index + '" data-work=\'' + escapeHTML(JSON.stringify({
-          id: work.id, title_kr: work.title_kr, title_en: work.title_en,
+          id: work.id, section_key: work.section_key, section_id: work.section_id,
+          title_kr: work.title_kr, title_en: work.title_en,
           material_kr: work.material_kr, material_en: work.material_en,
           size_kr: work.size_kr, size_en: work.size_en, year: work.year,
           image: work.image, zoom: work.zoom
@@ -2125,7 +2192,7 @@
           '</div>' +
           '<div class="meta">' +
             '<div class="t">' + escapeHTML(title || '\u00A0') + '</div>' +
-            '<div class="s">' + escapeHTML(material) + (work.year ? ' · ' + escapeHTML(work.year) : '') + '</div>' +
+            (secondaryMeta ? '<div class="s">' + escapeHTML(secondaryMeta) + '</div>' : '') +
           '</div>' +
         '</article>'
       );
@@ -2167,7 +2234,7 @@
     sentinelObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
-        if (visibleCount >= filtered.length) return;
+        if (visibleCount >= filteredWorks.length) return;
         visibleCount += LOAD_STEP;
         renderGrid();
       });
@@ -2179,26 +2246,26 @@
     const grid = $('#grid');
     const sentinel = $('#scroll-sentinel');
 
-    if (!filtered.length) {
+    if (!filteredWorks.length) {
       grid.innerHTML = '';
       sentinel.hidden = true;
       return;
     }
 
-    const visible = filtered.slice(0, visibleCount);
+    const visible = filteredWorks.slice(0, visibleCount);
     const html = visible.map((w, i) => buildCardHTML(w, i)).join('');
     const template = document.createElement('template');
     template.innerHTML = html;
     grid.replaceChildren(template.content);
     observeLazyImages(grid);
 
-    const hasMore = visible.length < filtered.length;
+    const hasMore = visible.length < filteredWorks.length;
     sentinel.hidden = !hasMore;
     if (hasMore) {
       const observer = ensureSentinelObserver();
       if (observer) observer.observe(sentinel);
       // Fallback for browsers without IntersectionObserver: load everything.
-      else { visibleCount = filtered.length; renderGrid(); }
+      else { visibleCount = filteredWorks.length; renderGrid(); }
     } else if (sentinelObserver) {
       sentinelObserver.unobserve(sentinel);
     }
@@ -2247,7 +2314,7 @@
   let viewerLoadToken = 0;
 
   // ---- Viewer engine state (ported from dungzak.art works viewer) ----
-  let vItems = [];       // currently navigable work list (full filtered set, not just rendered DOM)
+  let vItems = [];       // currently navigable work list (full filteredWorks set, not just rendered DOM)
   let vIndex = 0;
   let vScale = 1, vX = 0, vY = 0;
   let vStartX = 0, vStartY = 0, vLastX = 0, vLastY = 0;
@@ -2318,9 +2385,15 @@
   }
 
   function updateViewerCaption(work) {
-    // Sections with all-empty fields (e.g. Section I 시인 윤동주와 미술가 김연식,
-    // matching dungzak.art's "A Origins" no-caption mode) render no caption at all.
     const title = field(work, 'title');
+
+    // 여수, 섬 위에 섬 — 365 Islands: title-only caption.
+    if (getWorkSectionKey(work) === 'yeosu') {
+      viewerMeta.textContent = title || '';
+      return;
+    }
+
+    // Existing caption policy for every other section remains unchanged.
     const material = field(work, 'material');
     const size = field(work, 'size');
     viewerMeta.textContent = [title, material, size, work.year].filter(Boolean).join(' · ');
@@ -2389,9 +2462,9 @@
     const card = e.target.closest('.card');
     if (!card) return;
     try {
-      // Navigable set = full filtered list (not just the currently rendered/paged cards),
+      // Navigable set = full filteredWorks list (not just the currently rendered/paged cards),
       // mirroring dungzak.art's section-scoped lightbox behavior.
-      vItems = filtered;
+      vItems = filteredWorks;
       const clickedIndex = Number(card.dataset.index);
       openViewer(Number.isFinite(clickedIndex) ? clickedIndex : 0);
     } catch (e) {}
@@ -2666,7 +2739,7 @@
     closeDrawer();
     if (typeof closeSeriesPanel === 'function') closeSeriesPanel();
 
-    sectionFilter = 'all';
+    selectedSection = 'all';
     seriesPanelGroup = null;
     searchQuery = '';
     visibleCount = INITIAL_VISIBLE;
