@@ -875,17 +875,84 @@
   .thumb-wrap { width: 100%; aspect-ratio: 4/5; background: #08152c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
   .thumb-wrap img { width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .35s ease; }
   .thumb-wrap img.is-loaded { opacity: 1; }
-  .card .meta { padding: 10px 12px 14px; }
-  .card .meta .t { font-size: 13px; }
-  .card .meta .s { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-  /* English-only: work title/material/size/year captions were one shared
-     size for KR and EN. Korean keeps 13px/11px exactly as before. */
-  html[data-lang="en"] .card .meta .t { font-size: 14px; }
-  html[data-lang="en"] .card .meta .s { font-size: 11.9px; }
+  /* Standard artwork-card caption only.
+     Viewer/lightbox caption (#viewer .v-meta) remains unchanged. */
+  .card .meta {
+    width: 100%;
+    min-height: 58px;
+    height: auto;
+    margin: 0;
+    padding: 12px 10px 14px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+  }
+
+  .card .meta .t {
+    display: block;
+    width: 100%;
+    margin: 0;
+
+    font-size: clamp(16px, 1.35vw, 19px);
+    line-height: 1.4;
+    font-weight: 400;
+    text-align: center;
+
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+
+  .card .meta .s {
+    width: 100%;
+    margin: 4px 0 0;
+    color: var(--text-dim);
+    font-size: clamp(11px, .9vw, 12px);
+    line-height: 1.4;
+    text-align: center;
+
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+
+  html[data-lang="en"] .card .meta .t {
+    font-size: clamp(17px, 1.45vw, 20px);
+    line-height: 1.3;
+    font-weight: 400;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  html[data-lang="en"] .card .meta .s {
+    font-size: clamp(11.5px, .95vw, 12.5px);
+    word-break: normal;
+  }
+
   @media (max-width: 899px) {
-    .card .meta { padding: 7px 8px 12px; }
-    .card .meta .t { font-size: 12.2px; line-height: 1.16; }
-    .card .meta .s { font-size: 10.4px; }
+    .card .meta {
+      min-height: 58px;
+      padding: 12px 10px 14px;
+    }
+
+    .card .meta .t {
+      font-size: clamp(16px, 4vw, 19px);
+      line-height: 1.4;
+    }
+
+    html[data-lang="en"] .card .meta .t {
+      font-size: clamp(17px, 4.2vw, 20px);
+      line-height: 1.3;
+    }
   }
 
   #scroll-sentinel { width: 100%; height: 1px; }
