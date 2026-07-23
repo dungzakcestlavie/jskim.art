@@ -2107,13 +2107,55 @@
     return '';
   }
 
+  // “전체 섹션”은 모든 작품을 한 화면에 합치는 의미가 아니다.
+  // Works 첫 진입 상태를 뜻하며, sections.json에서 가장 먼저 정렬되는
+  // 활성 최상위 섹션의 작품만 보여준다. 현재 첫 섹션은 yeosu이다.
+  // 이 계산은 화면 크기나 포인터 종류와 무관하므로 PC, iPhone,
+  // Android, iPad에서 완전히 동일하게 적용된다.
+  function getFirstDisplaySectionKey() {
+    const orderedTopLevelSections = sections
+      .filter(section => section && section.active !== false && !section.parentKey)
+      .slice()
+      .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0));
+
+    // 실제 작품이 존재하는 첫 번째 최상위 섹션을 우선한다.
+    for (const section of orderedTopLevelSections) {
+      const key = String(section.key ?? '');
+      if (!key) continue;
+
+      const childKeys = Array.isArray(section.childKeys)
+        ? section.childKeys.map(String)
+        : [];
+
+      const hasWorks = allWorks.some(work => {
+        const workKey = getWorkSectionKey(work);
+        return workKey === key || childKeys.includes(workKey);
+      });
+
+      if (hasWorks) return key;
+    }
+
+    // sections.json을 읽지 못한 예외 상황에서도 works.json의 첫 작품
+    // 섹션을 사용하여 전체 작품 노출을 방지한다.
+    return allWorks.length ? getWorkSectionKey(allWorks[0]) : '';
+  }
+
+  function getEffectiveSelectedSection() {
+    return selectedSection === 'all'
+      ? getFirstDisplaySectionKey()
+      : String(selectedSection);
+  }
+
   function isWorkInSelectedSection(work) {
-    if (selectedSection === 'all') return true;
+    const effectiveSection = getEffectiveSelectedSection();
+    if (!effectiveSection) return false;
 
     const workSectionKey = getWorkSectionKey(work);
-    const activeSection = sections.find(s => String(s.key) === String(selectedSection));
+    const activeSection = sections.find(
+      section => String(section.key) === effectiveSection
+    );
 
-    if (workSectionKey === String(selectedSection)) return true;
+    if (workSectionKey === effectiveSection) return true;
 
     // Parent sections such as 인드라망 may contain movement child keys.
     return !!(
@@ -2125,10 +2167,9 @@
 
   function applyFilters() {
     // Single source of truth:
-    // allWorks -> selected section -> search -> grid/lightbox.
-    const sectionWorks = selectedSection === 'all'
-      ? allWorks.slice()
-      : allWorks.filter(isWorkInSelectedSection);
+    // allWorks -> effective selected section -> search -> grid/lightbox.
+    // selectedSection === 'all'일 때도 첫 번째 섹션만 필터링한다.
+    const sectionWorks = allWorks.filter(isWorkInSelectedSection);
 
     filteredWorks = sectionWorks.filter(work => {
       if (!searchQuery) return true;
