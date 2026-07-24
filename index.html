@@ -1355,11 +1355,20 @@
      가드(preventDocumentPinch 등)가 별도로 처리하고 있어 이 블록
      규칙은 불필요했다 — 완전히 제거했다. */
 
+  /* 2026-07-24 추가: 위에서 none을 제거한 것과 별개로, 조상 체인 전체에
+     명시적으로 pan-y를 선언해 둔다 — 교집합 계산에서 auto(미지정)와
+     pan-y(명시)가 섞이는 것보다, 체인 전체가 명시적으로 pan-y로
+     일치하는 편이 더 안전하다(방어적 이중 조치). */
+  #bio-modal.artist-bio-modal {
+    touch-action: pan-y;
+  }
+
   #bio-modal .bio-card {
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
+    touch-action: pan-y;
   }
 
   #bio-modal .bio-header {
@@ -1379,7 +1388,11 @@
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    /* 2026-07-24 재수정: -webkit-overflow-scrolling:touch은 iOS 13 이전
+       구형 관성 스크롤을 위한 레거시 속성이다. 최신 iOS는 overflow:auto
+       요소에서 관성 스크롤을 기본 지원하며, 이 레거시 속성이 중첩된
+       flex + position:fixed 레이아웃과 만나면 스크롤이 아예 시작되지
+       않는 경우가 보고돼 있다 — 제거한다. */
     touch-action: pan-y;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -1456,6 +1469,7 @@
     overflow: visible;
     transform: none;
     transform-origin: 0 0;
+    touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -1463,12 +1477,14 @@
     will-change: transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    touch-action: none;
   }
 
   #bio-modal .bio-content {
     width: 100%;
     min-width: 0;
     overflow: visible;
+    touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
     /* 마지막 문장이 홈 인디케이터/화면 끝에 딱 붙어 "잘린 것처럼" 보이지
        않도록 여유 공간을 둔다 (스펙 §7). */
