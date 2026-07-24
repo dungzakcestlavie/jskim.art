@@ -1373,26 +1373,55 @@
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #bio-modal .bio-viewport::-webkit-scrollbar,
+  #bio-modal .bio-card::-webkit-scrollbar,
+  #bio-modal .bio-zoom-stage::-webkit-scrollbar,
+  #bio-modal .bio-content::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+  }
+
+  #bio-modal .bio-card,
+  #bio-modal .bio-viewport,
+  #bio-modal .bio-zoom-stage,
+  #bio-modal .bio-content {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   #bio-modal .bio-viewport[data-zoomed="true"] {
     overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
     touch-action: none;
   }
 
   #bio-modal .bio-zoom-stage {
     position: relative;
     width: 100%;
-    min-width: 0;
+    min-width: 100%;
     min-height: 100%;
+    overflow: visible;
     transform: translate3d(0, 0, 0) scale(1);
     transform-origin: 0 0;
     will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   #bio-modal .bio-content {
     width: 100%;
     min-width: 0;
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
   }
 
   #bio-modal .bio-close {
@@ -3300,6 +3329,7 @@
   let bioLastTapX = 0;
   let bioLastTapY = 0;
   let bioTouchMoved = false;
+  let bioSavedScrollTop = 0;
 
   function bioDistance(touches) {
     return Math.hypot(
@@ -3313,6 +3343,15 @@
       x: (touches[0].clientX + touches[1].clientX) / 2,
       y: (touches[0].clientY + touches[1].clientY) / 2
     };
+  }
+
+  function enterBioZoomMode() {
+    if (!bioViewport || bioScale > 1.001) return;
+    bioSavedScrollTop = bioViewport.scrollTop;
+    bioY -= bioSavedScrollTop;
+    bioViewport.scrollTop = 0;
+    bioViewport.scrollLeft = 0;
+    bioViewport.dataset.zoomed = 'true';
   }
 
   function clampBioPan() {
@@ -3342,7 +3381,8 @@
       `translate3d(${bioX}px, ${bioY}px, 0) scale(${bioScale})`;
   }
 
-  function resetBioZoom() {
+  function resetBioZoom(restoreScroll = false) {
+    const scrollTopToRestore = restoreScroll ? bioSavedScrollTop : 0;
     bioScale = 1;
     bioX = 0;
     bioY = 0;
@@ -3350,12 +3390,15 @@
     bioTouchMoved = false;
     if (bioViewport) {
       bioViewport.dataset.zoomed = 'false';
-      bioViewport.scrollTop = 0;
       bioViewport.scrollLeft = 0;
+      requestAnimationFrame(() => {
+        bioViewport.scrollTop = scrollTopToRestore;
+      });
     }
     if (bioZoomStage) {
       bioZoomStage.style.transform = 'translate3d(0, 0, 0) scale(1)';
     }
+    if (!restoreScroll) bioSavedScrollTop = 0;
   }
 
   function zoomBioAt(clientX, clientY, nextScale) {
@@ -3365,10 +3408,7 @@
     const pointY = clientY - rect.top;
     const oldScale = bioScale;
 
-    if (oldScale === 1 && bioViewport.scrollTop > 0) {
-      bioY = -bioViewport.scrollTop;
-      bioViewport.scrollTop = 0;
-    }
+    if (oldScale === 1) enterBioZoomMode();
 
     const contentX = (pointX - bioX) / oldScale;
     const contentY = (pointY - bioY) / oldScale;
@@ -3384,10 +3424,7 @@
 
       if (event.touches.length === 2) {
         event.preventDefault();
-        if (bioScale === 1 && bioViewport.scrollTop > 0) {
-          bioY = -bioViewport.scrollTop;
-          bioViewport.scrollTop = 0;
-        }
+        if (bioScale === 1) enterBioZoomMode();
         bioStartDistance = bioDistance(event.touches);
         bioStartScale = bioScale;
         const center = bioCenter(event.touches);
@@ -3447,7 +3484,7 @@
         if (now - bioLastTapTime <= 300 && nearLastTap) {
           event.preventDefault();
           if (bioScale > 1) {
-            resetBioZoom();
+            resetBioZoom(true);
           } else {
             zoomBioAt(touch.clientX, touch.clientY, BIO_DOUBLE_TAP_SCALE);
           }
@@ -3459,14 +3496,14 @@
         }
       }
 
-      if (bioScale <= 1.02) resetBioZoom();
+      if (bioScale <= 1.02) resetBioZoom(true);
       bioTouchMoved = false;
     }, { passive: false });
 
     bioZoomStage.addEventListener('touchcancel', () => {
       bioStartDistance = 0;
       bioTouchMoved = false;
-      if (bioScale <= 1.02) resetBioZoom();
+      if (bioScale <= 1.02) resetBioZoom(true);
     }, { passive: true });
 
     window.addEventListener('orientationchange', resetBioZoom, { passive: true });
