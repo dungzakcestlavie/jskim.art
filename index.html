@@ -1351,6 +1351,7 @@
   #bio-modal .bio-card {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -1403,18 +1404,31 @@
     touch-action: none;
   }
 
+  /* 2026-07-24 수정 (본문이 중간에서 잘리는 실제 원인):
+     .bio-zoom-stage에 항상(1배 상태에서도) transform/will-change/
+     backface-visibility가 걸려 있었다. iOS Safari는 -webkit-overflow-
+     scrolling:touch 컨테이너 안의 자식에게 transform(합성 레이어)이
+     상시 적용돼 있으면, 그 컨테이너의 스크롤 가능 높이를 실제 콘텐츠
+     길이보다 짧게(레이어가 처음 만들어진 시점 기준으로) 잘못 계산해
+     본문이 중간에서 끊기는 경우가 있다 — 확대 기능과 무관하게 "항상
+     켜져 있던 GPU 힌트"가 원인이었다. 이제 1배(휴지) 상태에서는
+     transform을 아예 걸지 않고, 확대 중(data-zoomed="true")일 때만
+     최소한으로 건다. */
   #bio-modal .bio-zoom-stage {
     position: relative;
     width: 100%;
     min-width: 100%;
     min-height: 100%;
     overflow: visible;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: none;
     transform-origin: 0 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #bio-modal .bio-viewport[data-zoomed="true"] .bio-zoom-stage {
     will-change: transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    -webkit-tap-highlight-color: transparent;
   }
 
   #bio-modal .bio-content {
@@ -1422,6 +1436,9 @@
     min-width: 0;
     overflow: visible;
     -webkit-tap-highlight-color: transparent;
+    /* 마지막 문장이 홈 인디케이터/화면 끝에 딱 붙어 "잘린 것처럼" 보이지
+       않도록 여유 공간을 둔다 (스펙 §7). */
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
   }
 
   #bio-modal .bio-close {
@@ -3396,7 +3413,11 @@
       });
     }
     if (bioZoomStage) {
-      bioZoomStage.style.transform = 'translate3d(0, 0, 0) scale(1)';
+      // 2026-07-24 수정: 'translate3d(0,0,0) scale(1)'도 값 자체는 무변형
+      // 이지만 WebKit에서는 여전히 별도 합성 레이어를 만든다 — 1배
+      // 휴지 상태에서는 transform을 아예 제거해 스크롤 높이 오계산을
+      // 막는다(위 CSS 주석 참고).
+      bioZoomStage.style.transform = 'none';
     }
     if (!restoreScroll) bioSavedScrollTop = 0;
   }
@@ -3510,6 +3531,19 @@
     window.addEventListener('resize', () => {
       if (bioScale > 1) applyBioTransform();
     }, { passive: true });
+
+    // 2026-07-24 추가 (스펙 §12): Artist Bio 본문에 연결된 ResizeObserver는
+    // 이 하나뿐이다. KR/EN 전환·연보 펼침으로 본문 길이가 바뀔 때, 확대
+    // 중이었다면 팬 범위(clampBioPan)를 새 크기에 맞게 다시 계산한다.
+    // 1배(휴지) 상태에서는 아무 것도 하지 않아 브라우저 기본 스크롤에
+    // 전혀 개입하지 않는다.
+    const bioContentEl = bioZoomRoot.querySelector('.bio-content');
+    if ('ResizeObserver' in window && bioContentEl) {
+      const bioResizeObserver = new ResizeObserver(() => {
+        if (bioScale > 1) applyBioTransform();
+      });
+      bioResizeObserver.observe(bioContentEl);
+    }
   }
 
 
