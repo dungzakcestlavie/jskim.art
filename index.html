@@ -2163,8 +2163,20 @@
   if (chronoToggle && chronoBody) {
     chronoToggle.addEventListener('click', () => {
       const isOpen = chronoToggle.getAttribute('aria-expanded') === 'true';
-      chronoToggle.setAttribute('aria-expanded', String(!isOpen));
-      chronoBody.hidden = isOpen;
+      const willOpen = !isOpen;
+      chronoToggle.setAttribute('aria-expanded', String(willOpen));
+      chronoBody.hidden = !willOpen;
+
+      // 2026-07-24 추가: "연보가 안 펼쳐진다"의 실제 정체는 대부분
+      // "펼쳐지긴 하는데 새로 나온 내용이 .bio-viewport 스크롤 영역
+      // 아래 화면 밖에 있어서 안 보이는 것"이다. 펼친 직후 새로 열린
+      // 블록을 .bio-viewport 내부 스크롤만으로(페이지 전체는 절대
+      // 움직이지 않고) 자연스럽게 보이는 위치까지 이동시킨다.
+      if (willOpen) {
+        requestAnimationFrame(() => {
+          chronoBody.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      }
     });
   }
 
