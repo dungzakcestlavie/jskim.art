@@ -2,7 +2,7 @@
 <html lang="ko" data-lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1830">
 <meta name="google" content="notranslate">
@@ -1294,6 +1294,86 @@
   .footer-copy a:hover { color: var(--gold-bright); }
   /* Intro sequence removed per request: the home screen (symbol, "Artist"
      label, divider) now appears immediately on load, with no fade-in delay. */
+
+  /* Mobile/touch page zoom lock */
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior-x: none;
+  }
+
+  main,
+  header,
+  section,
+  footer,
+  #panel-home,
+  #panel-works {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  button,
+  a,
+  [role="button"],
+  .menu-item,
+  .artwork-card,
+  .card {
+    touch-action: manipulation;
+  }
+
+  .artwork-lightbox,
+  .zoom-viewer {
+    touch-action: none;
+    overscroll-behavior: contain;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    html,
+    body {
+      touch-action: pan-x pan-y;
+    }
+
+    #bio-modal.artist-bio-modal {
+      touch-action: none;
+      overscroll-behavior: contain;
+    }
+
+    #bio-modal .bio-card {
+      overflow: hidden;
+    }
+
+    #bio-modal .bio-zoom-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: none;
+      transform: translate3d(0, 0, 0) scale(1);
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    #bio-modal .bio-close {
+      z-index: 5;
+    }
+  }
+
+  body.modal-open {
+    overflow: hidden;
+  }
+
 </style>
 </head>
 <body>
@@ -1484,7 +1564,7 @@
   <div class="footer-copy">&copy; 2026 <a href="https://jskim.art/">jskim.art</a></div>
 </footer>
 
-<div id="viewer" role="dialog" aria-modal="true" aria-hidden="true">
+<div id="viewer" class="artwork-lightbox zoom-viewer" data-allow-zoom="true" role="dialog" aria-modal="true" aria-hidden="true">
   <button class="v-close" aria-label="close">&times;</button>
   <button class="v-arrow v-prev" aria-label="previous work">&#8249;</button>
   <div id="viewer-stage">
@@ -1494,10 +1574,11 @@
   <div class="v-meta" id="viewer-meta"></div>
 </div>
 
-<div id="bio-modal" hidden>
+<div id="bio-modal" class="artist-bio-modal artist-bio-viewer" data-allow-zoom="true" hidden>
   <div class="bio-backdrop"></div>
   <div class="bio-card" role="dialog" aria-modal="true" aria-labelledby="bio-title">
     <button class="bio-close" aria-label="close">&times;</button>
+    <div class="bio-zoom-content">
     <div class="bio-lang">
       <button class="active" data-bio-lang="kr" aria-pressed="true">KR</button>
       <button data-bio-lang="en" aria-pressed="false">EN</button>
@@ -1761,6 +1842,7 @@
           </ul></div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -3107,6 +3189,170 @@
 
   window.addEventListener('scroll', requestHeaderCompactUpdate, { passive: true });
   compactHeaderMedia.addEventListener?.('change', requestHeaderCompactUpdate);
+
+
+  /* Mobile/touch page zoom lock with scoped exceptions */
+  const zoomAllowedSelector =
+    '[data-allow-zoom="true"], .artist-bio-modal, .artist-bio-viewer, .artwork-lightbox, .zoom-viewer';
+
+  function isZoomAllowedTarget(target) {
+    return Boolean(target instanceof Element && target.closest(zoomAllowedSelector));
+  }
+
+  function preventPageGestureZoom(event) {
+    if (isZoomAllowedTarget(event.target)) return;
+    event.preventDefault();
+  }
+
+  function preventDocumentPinch(event) {
+    if (isZoomAllowedTarget(event.target)) return;
+    if (event.touches && event.touches.length > 1) event.preventDefault();
+  }
+
+  let pageLastTouchEnd = 0;
+  function preventPageDoubleTapZoom(event) {
+    if (isZoomAllowedTarget(event.target)) return;
+    const now = Date.now();
+    if (now - pageLastTouchEnd <= 300) event.preventDefault();
+    pageLastTouchEnd = now;
+  }
+
+  document.addEventListener('gesturestart', preventPageGestureZoom, { passive: false });
+  document.addEventListener('gesturechange', preventPageGestureZoom, { passive: false });
+  document.addEventListener('gestureend', preventPageGestureZoom, { passive: false });
+  document.addEventListener('touchmove', preventDocumentPinch, { passive: false });
+  document.addEventListener('touchend', preventPageDoubleTapZoom, { passive: false });
+
+  /* Artist Bio content-only pinch, pan and double-tap zoom */
+  const bioZoomRoot = document.getElementById('bio-modal');
+  const bioZoomContent = bioZoomRoot?.querySelector('.bio-zoom-content');
+  const BIO_MIN_SCALE = 1;
+  const BIO_MAX_SCALE = 3;
+
+  let bioScale = 1;
+  let bioX = 0;
+  let bioY = 0;
+  let bioStartScale = 1;
+  let bioStartDistance = 0;
+  let bioStartCenterX = 0;
+  let bioStartCenterY = 0;
+  let bioStartX = 0;
+  let bioStartY = 0;
+  let bioPanLastX = 0;
+  let bioPanLastY = 0;
+  let bioLastTap = 0;
+
+  function bioDistance(touches) {
+    return Math.hypot(
+      touches[0].clientX - touches[1].clientX,
+      touches[0].clientY - touches[1].clientY
+    );
+  }
+
+  function bioCenter(touches) {
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2
+    };
+  }
+
+  function clampBioPan() {
+    if (!bioZoomContent || bioScale <= 1) {
+      bioX = 0;
+      bioY = 0;
+      return;
+    }
+    const maxX = Math.max(0, bioZoomContent.clientWidth * (bioScale - 1) / 2);
+    const maxY = Math.max(0, bioZoomContent.clientHeight * (bioScale - 1) / 2);
+    bioX = Math.max(-maxX, Math.min(maxX, bioX));
+    bioY = Math.max(-maxY, Math.min(maxY, bioY));
+  }
+
+  function applyBioTransform() {
+    if (!bioZoomContent) return;
+    clampBioPan();
+    bioZoomContent.style.transform =
+      `translate3d(${bioX}px, ${bioY}px, 0) scale(${bioScale})`;
+  }
+
+  function resetBioZoom() {
+    bioScale = 1;
+    bioX = 0;
+    bioY = 0;
+    applyBioTransform();
+    if (bioZoomContent) bioZoomContent.scrollTop = 0;
+  }
+
+  if (bioZoomRoot && bioZoomContent) {
+    bioZoomContent.addEventListener('touchstart', (event) => {
+      if (event.touches.length === 2) {
+        event.preventDefault();
+        bioStartDistance = bioDistance(event.touches);
+        bioStartScale = bioScale;
+        const center = bioCenter(event.touches);
+        bioStartCenterX = center.x;
+        bioStartCenterY = center.y;
+        bioStartX = bioX;
+        bioStartY = bioY;
+      } else if (event.touches.length === 1 && bioScale > 1) {
+        event.preventDefault();
+        bioPanLastX = event.touches[0].clientX;
+        bioPanLastY = event.touches[0].clientY;
+      }
+    }, { passive: false });
+
+    bioZoomContent.addEventListener('touchmove', (event) => {
+      if (event.touches.length === 2 && bioStartDistance > 0) {
+        event.preventDefault();
+        const center = bioCenter(event.touches);
+        bioScale = Math.max(
+          BIO_MIN_SCALE,
+          Math.min(BIO_MAX_SCALE, bioStartScale * bioDistance(event.touches) / bioStartDistance)
+        );
+        bioX = bioStartX + center.x - bioStartCenterX;
+        bioY = bioStartY + center.y - bioStartCenterY;
+        applyBioTransform();
+      } else if (event.touches.length === 1 && bioScale > 1) {
+        event.preventDefault();
+        const touch = event.touches[0];
+        bioX += touch.clientX - bioPanLastX;
+        bioY += touch.clientY - bioPanLastY;
+        bioPanLastX = touch.clientX;
+        bioPanLastY = touch.clientY;
+        applyBioTransform();
+      }
+    }, { passive: false });
+
+    bioZoomContent.addEventListener('touchend', (event) => {
+      if (event.touches.length < 2) bioStartDistance = 0;
+
+      if (event.changedTouches.length === 1) {
+        const now = Date.now();
+        if (now - bioLastTap < 300) {
+          event.preventDefault();
+          bioScale = bioScale > 1 ? 1 : 2;
+          bioX = 0;
+          bioY = 0;
+          applyBioTransform();
+          bioLastTap = 0;
+        } else {
+          bioLastTap = now;
+        }
+      }
+
+      if (bioScale <= 1.02) {
+        bioScale = 1;
+        bioX = 0;
+        bioY = 0;
+        applyBioTransform();
+      }
+    }, { passive: false });
+
+    bioZoomRoot.querySelector('.bio-close')?.addEventListener('click', resetBioZoom);
+    bioZoomRoot.querySelector('.bio-backdrop')?.addEventListener('click', resetBioZoom);
+    window.addEventListener('orientationchange', resetBioZoom, { passive: true });
+  }
+
 
   setLang(lang);
   showPanel(savedState.panel === 'works' ? 'works' : 'home');
