@@ -1174,23 +1174,11 @@
       height: min(88vh, 920px);
       max-height: 88vh;
       margin: 0;
-      padding: 0;
-    }
-
-    /* 2026-07-24 수정 (노트북 마우스 휠 스크롤 어려움 대응):
-       .bio-card는 이 구조에서 실제로 스크롤되는 요소가 아니다
-       (overflow:hidden인 flex 셸) — 진짜 스크롤 컨테이너는
-       .bio-viewport다. 예전에는 스크롤바 스타일을 .bio-card에
-       줬는데 적용될 수가 없었다(스크롤이 아예 안 일어나는 요소라서).
-       실제 스크롤바 표시 규칙은 아래 "노트북 스크롤바 표시" 블록
-       (범용 스크롤바 숨김 규칙보다 파일 뒤쪽에 위치)에서 처리한다 —
-       CSS 소스 순서상 숨김 규칙보다 뒤에 있어야 이긴다. */
-    #bio-modal .bio-viewport {
       padding: 36px 40px;
     }
 
     #bio-modal .bio-header {
-      padding: 36px 40px 0;
+      padding-right: 34px;
     }
 
     #bio-modal .bio-lang {
@@ -1359,49 +1347,41 @@
      명시적으로 pan-y를 선언해 둔다 — 교집합 계산에서 auto(미지정)와
      pan-y(명시)가 섞이는 것보다, 체인 전체가 명시적으로 pan-y로
      일치하는 편이 더 안전하다(방어적 이중 조치). */
+  /* 2026-07-24 재수정 (dungzak.art의 실제 작동하는 Artist Bio 구조를
+     그대로 따름): .bio-viewport/.bio-zoom-stage로 나누는 대신,
+     .bio-card 자신이 유일한 스크롤 컨테이너다. 확대/축소 기능은
+     Artist Bio 텍스트에는 원래 불필요했고, 이 여러 겹 구조 자체가
+     iOS/Android 터치 스크롤이 계속 막히던 근본 원인이었을 가능성이
+     커서 — 검증된 단순 구조로 통일한다. */
   #bio-modal.artist-bio-modal {
     touch-action: pan-y;
   }
 
   #bio-modal .bio-card {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
     overflow: hidden;
-    touch-action: pan-y;
-  }
-
-  #bio-modal .bio-header {
-    position: relative;
-    flex: 0 0 auto;
-    min-width: 0;
-    padding-right: 34px;
-    z-index: 4;
-  }
-
-  #bio-modal .bio-viewport {
-    position: relative;
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    /* 2026-07-24 재수정: -webkit-overflow-scrolling:touch은 iOS 13 이전
-       구형 관성 스크롤을 위한 레거시 속성이다. 최신 iOS는 overflow:auto
-       요소에서 관성 스크롤을 기본 지원하며, 이 레거시 속성이 중첩된
-       flex + position:fixed 레이아웃과 만나면 스크롤이 아예 시작되지
-       않는 경우가 보고돼 있다 — 제거한다. */
     touch-action: pan-y;
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-tap-highlight-color: transparent;
   }
 
-  #bio-modal .bio-viewport::-webkit-scrollbar,
+  #bio-modal .bio-header {
+    position: relative;
+    min-width: 0;
+    padding-right: 34px;
+    z-index: 4;
+  }
+
+  #bio-modal .bio-content {
+    width: 100%;
+    min-width: 0;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   #bio-modal .bio-card::-webkit-scrollbar,
-  #bio-modal .bio-zoom-stage::-webkit-scrollbar,
   #bio-modal .bio-content::-webkit-scrollbar {
     display: none;
     width: 0;
@@ -1410,8 +1390,6 @@
   }
 
   #bio-modal .bio-card,
-  #bio-modal .bio-viewport,
-  #bio-modal .bio-zoom-stage,
   #bio-modal .bio-content {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -1419,81 +1397,40 @@
 
   /* 2026-07-24 추가 (노트북 마우스 휠 스크롤 어려움 대응):
      터치 기기는 스크롤바를 계속 숨기지만, 마우스/트랙패드가 있는
-     노트북·데스크톱에서는 실제 스크롤 컨테이너(.bio-viewport)에
-     가늘고 눈에 띄는 스크롤바를 보여준다 — 휠로 어디까지 왔는지,
-     더 내릴 내용이 있는지 시각적으로 바로 알 수 있게 한다. 위의
-     범용 숨김 규칙보다 소스 순서상 뒤에 있어 여기서 다시 켠다. */
+     노트북·데스크톱에서는 실제 스크롤 컨테이너(.bio-card)에 가늘고
+     눈에 띄는 스크롤바를 보여준다 — 휠로 어디까지 왔는지, 더 내릴
+     내용이 있는지 시각적으로 바로 알 수 있게 한다. 위의 범용 숨김
+     규칙보다 소스 순서상 뒤에 있어 여기서 다시 켠다. */
   @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
-    #bio-modal .bio-viewport {
+    #bio-modal .bio-card {
       scrollbar-width: thin;
       scrollbar-color: rgba(214, 177, 96, .75) transparent;
     }
 
-    #bio-modal .bio-viewport::-webkit-scrollbar {
+    #bio-modal .bio-card::-webkit-scrollbar {
       display: block;
       width: 7px;
     }
 
-    #bio-modal .bio-viewport::-webkit-scrollbar-track {
+    #bio-modal .bio-card::-webkit-scrollbar-track {
       background: transparent;
     }
 
-    #bio-modal .bio-viewport::-webkit-scrollbar-thumb {
+    #bio-modal .bio-card::-webkit-scrollbar-thumb {
       background: rgba(214, 177, 96, .75);
       border-radius: 999px;
     }
   }
 
-  #bio-modal .bio-viewport[data-zoomed="true"] {
-    overflow: hidden;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: auto;
-    touch-action: none;
-  }
-
-  /* 2026-07-24 수정 (본문이 중간에서 잘리는 실제 원인):
-     .bio-zoom-stage에 항상(1배 상태에서도) transform/will-change/
-     backface-visibility가 걸려 있었다. iOS Safari는 -webkit-overflow-
-     scrolling:touch 컨테이너 안의 자식에게 transform(합성 레이어)이
-     상시 적용돼 있으면, 그 컨테이너의 스크롤 가능 높이를 실제 콘텐츠
-     길이보다 짧게(레이어가 처음 만들어진 시점 기준으로) 잘못 계산해
-     본문이 중간에서 끊기는 경우가 있다 — 확대 기능과 무관하게 "항상
-     켜져 있던 GPU 힌트"가 원인이었다. 이제 1배(휴지) 상태에서는
-     transform을 아예 걸지 않고, 확대 중(data-zoomed="true")일 때만
-     최소한으로 건다. */
-  #bio-modal .bio-zoom-stage {
-    position: relative;
-    width: 100%;
-    min-width: 100%;
-    min-height: 100%;
-    overflow: visible;
-    transform: none;
-    transform-origin: 0 0;
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  #bio-modal .bio-viewport[data-zoomed="true"] .bio-zoom-stage {
-    will-change: transform;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    touch-action: none;
-  }
-
-  #bio-modal .bio-content {
-    width: 100%;
-    min-width: 0;
-    overflow: visible;
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-    /* 마지막 문장이 홈 인디케이터/화면 끝에 딱 붙어 "잘린 것처럼" 보이지
-       않도록 여유 공간을 둔다 (스펙 §7). */
-    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
-  }
-
   #bio-modal .bio-close {
     z-index: 20;
     touch-action: manipulation;
+  }
+
+  #bio-modal .bio-content {
+    /* 마지막 문장이 홈 인디케이터/화면 끝에 딱 붙어 "잘린 것처럼" 보이지
+       않도록 여유 공간을 둔다 (스펙 §7). */
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
   }
 
   @media (max-width: 1024px) {
@@ -1729,9 +1666,7 @@
       <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
       <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
     </div>
-    <div class="bio-viewport" data-zoomed="false">
-      <div class="bio-zoom-stage">
-        <div class="bio-content">
+    <div class="bio-content">
     <p class="bio-tagline ko">정산(靜山) 김연식은 회화와 사찰음식, 음악, 수행을 하나의 언어로 바라보는 한국의 현대미술가이다.</p>
     <p class="bio-tagline en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist who sees painting, temple cuisine, music, and spiritual practice as a single artistic language.</p>
     <div class="bio-body">
@@ -1991,8 +1926,6 @@
       </div>
         </div>
       </div>
-    </div>
-    </div>
   </div>
 </div>
 
@@ -2189,6 +2122,8 @@
   function openBioModal() {
     resetBioZoom();
     $('#bio-modal').hidden = false;
+    const card = $('#bio-modal .bio-card');
+    if (card) card.scrollTop = 0;
     const toggle = $('#chrono-toggle');
     const body = $('#chrono-body');
     if (toggle && body) {
