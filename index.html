@@ -1450,6 +1450,53 @@
     }
   }
 
+  /* 2026-07-24 추가 — 모바일·태블릿 전용 Artist Bio 가독성 개선
+     (노트북·데스크톱 제외: 데스크톱은 이미 위 min-width:1025px +
+     hover:hover + pointer:fine 블록에서 22px/20px로 충분히 큼).
+     적용 범위는 "진짜 데스크톱이 아닌 모든 기기" — max-width:1024px
+     이거나 터치 포인터인 경우. 시뮬레이션 기준:
+       - iPhone(~390px 폭): 카드 여백(24px 마진 + 좌우 패딩 60px) 제외
+         실제 텍스트 컬럼 ≈ 306px. 17px 국문 기준 약 14~15자/줄 —
+         작은 화면에서 통상적인 읽기 폭.
+       - iPad(~768~834px 폭): 컬럼이 넓어 글자를 키워도 줄 길이 여유가
+         충분해 가독성이 오히려 더 좋아짐.
+     기존 14px(국문 본문)·16.6px(영문 본문)·15.5/16.5px(태그라인)는
+     모바일 화면 대비 다소 작아 장문 읽기에 눈이 피로했던 값이다. */
+  @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+    #bio-modal .bio-tagline {
+      font-size: 18px !important;
+      line-height: 1.55 !important;
+    }
+    #bio-modal .bio-tagline.en {
+      font-size: 19px !important;
+      line-height: 1.55 !important;
+    }
+    #bio-modal .bio-body p {
+      font-size: 17px !important;
+      line-height: 1.9 !important;
+    }
+    #bio-modal .bio-body p.ko {
+      font-size: 17px !important;
+      line-height: 2 !important;
+    }
+    #bio-modal .bio-body p.en {
+      font-size: 18.5px !important;
+      line-height: 1.85 !important;
+    }
+
+    /* 작가 연보 목록도 본문과 같은 비율로 확대 (§ 이번 추가 요청) */
+    #bio-modal .chrono-toggle {
+      font-size: 15px !important;
+    }
+    #bio-modal .chrono-year h3 {
+      font-size: 16px !important;
+    }
+    #bio-modal .chrono-year li {
+      font-size: 16.5px !important;
+      line-height: 1.8 !important;
+    }
+  }
+
   body.modal-open {
     overflow: hidden;
   }
