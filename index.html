@@ -1295,7 +1295,8 @@
   /* Intro sequence removed per request: the home screen (symbol, "Artist"
      label, divider) now appears immediately on load, with no fade-in delay. */
 
-  /* Mobile/touch page zoom lock */
+  /* Mobile/touch page zoom lock — page viewport stays fixed while
+     Artist Bio and artwork viewer use independent custom transforms. */
   html,
   body {
     width: 100%;
@@ -1309,6 +1310,8 @@
     overscroll-behavior-x: none;
   }
 
+  body { touch-action: pan-y; }
+
   main,
   header,
   section,
@@ -1319,6 +1322,7 @@
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   button,
@@ -1330,43 +1334,86 @@
     touch-action: manipulation;
   }
 
+  #viewer,
+  #viewer-stage,
   .artwork-lightbox,
   .zoom-viewer {
     touch-action: none;
     overscroll-behavior: contain;
   }
 
-  @media (hover: none), (pointer: coarse) {
-    html,
-    body {
-      touch-action: pan-x pan-y;
-    }
+  /* Artist Bio: fixed shell/header, independently zoomable body only. */
+  #bio-modal.artist-bio-modal {
+    touch-action: none;
+    overscroll-behavior: contain;
+  }
 
-    #bio-modal.artist-bio-modal {
-      touch-action: none;
-      overscroll-behavior: contain;
-    }
+  #bio-modal .bio-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
+  #bio-modal .bio-header {
+    position: relative;
+    flex: 0 0 auto;
+    min-width: 0;
+    padding-right: 34px;
+    z-index: 4;
+  }
+
+  #bio-modal .bio-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  #bio-modal .bio-viewport[data-zoomed="true"] {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  #bio-modal .bio-zoom-stage {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    transform: translate3d(0, 0, 0) scale(1);
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
+  #bio-modal .bio-content {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #bio-modal .bio-close {
+    z-index: 20;
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 1024px) {
     #bio-modal .bio-card {
-      overflow: hidden;
-    }
-
-    #bio-modal .bio-zoom-content {
-      position: relative;
-      width: 100%;
-      height: 100%;
+      width: calc(100% - 24px);
+      max-width: calc(100% - 24px);
       min-width: 0;
-      overflow-x: hidden;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: none;
-      transform: translate3d(0, 0, 0) scale(1);
-      transform-origin: center center;
-      will-change: transform;
+      height: min(82dvh, 760px);
+      max-height: calc(100dvh - 32px);
+      margin: max(16px, env(safe-area-inset-top, 0px)) auto;
     }
 
-    #bio-modal .bio-close {
-      z-index: 5;
+    input,
+    textarea,
+    select {
+      font-size: 16px;
     }
   }
 
@@ -1578,13 +1625,17 @@
   <div class="bio-backdrop"></div>
   <div class="bio-card" role="dialog" aria-modal="true" aria-labelledby="bio-title">
     <button class="bio-close" aria-label="close">&times;</button>
-    <div class="bio-zoom-content">
-    <div class="bio-lang">
-      <button class="active" data-bio-lang="kr" aria-pressed="true">KR</button>
-      <button data-bio-lang="en" aria-pressed="false">EN</button>
+    <div class="bio-header">
+      <div class="bio-lang">
+        <button class="active" data-bio-lang="kr" aria-pressed="true">KR</button>
+        <button data-bio-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
+      <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
     </div>
-    <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
-    <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
+    <div class="bio-viewport" data-zoomed="false">
+      <div class="bio-zoom-stage">
+        <div class="bio-content">
     <p class="bio-tagline ko">정산(靜山) 김연식은 회화와 사찰음식, 음악, 수행을 하나의 언어로 바라보는 한국의 현대미술가이다.</p>
     <p class="bio-tagline en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist who sees painting, temple cuisine, music, and spiritual practice as a single artistic language.</p>
     <div class="bio-body">
@@ -1842,6 +1893,8 @@
           </ul></div>
         </div>
       </div>
+        </div>
+      </div>
     </div>
     </div>
   </div>
@@ -2038,6 +2091,7 @@
 
   $('#tab-bio').addEventListener('click', openBioModal);
   function openBioModal() {
+    resetBioZoom();
     $('#bio-modal').hidden = false;
     const toggle = $('#chrono-toggle');
     const body = $('#chrono-body');
@@ -2046,10 +2100,11 @@
       body.hidden = true;
     }
   }
-  $('#bio-modal .bio-close').addEventListener('click', () => { $('#bio-modal').hidden = true; });
-  $('#bio-modal .bio-backdrop').addEventListener('click', () => { $('#bio-modal').hidden = true; });
+  $('#bio-modal .bio-close').addEventListener('click', () => { resetBioZoom(); $('#bio-modal').hidden = true; });
+  $('#bio-modal .bio-backdrop').addEventListener('click', () => { resetBioZoom(); $('#bio-modal').hidden = true; });
   $$('.bio-lang button', $('#bio-modal')).forEach(btn => {
     btn.addEventListener('click', () => {
+      resetBioZoom();
       const target = btn.dataset.bioLang;
       $$('.bio-lang button', $('#bio-modal')).forEach(b => b.classList.toggle('active', b === btn));
       $$('#bio-modal .ko').forEach(el => el.style.display = target === 'kr' ? '' : 'none');
@@ -3191,43 +3246,44 @@
   compactHeaderMedia.addEventListener?.('change', requestHeaderCompactUpdate);
 
 
-  /* Mobile/touch page zoom lock with scoped exceptions */
-  const zoomAllowedSelector =
-    '[data-allow-zoom="true"], .artist-bio-modal, .artist-bio-viewer, .artwork-lightbox, .zoom-viewer';
+  /* Page viewport zoom lock. Native browser zoom is blocked everywhere;
+     the artwork viewer and Artist Bio implement their own transforms. */
+  const interactiveZoomSelector =
+    '.bio-zoom-stage, #viewer, #viewer-stage, .artwork-lightbox, .zoom-viewer';
 
-  function isZoomAllowedTarget(target) {
-    return Boolean(target instanceof Element && target.closest(zoomAllowedSelector));
-  }
-
-  function preventPageGestureZoom(event) {
-    if (isZoomAllowedTarget(event.target)) return;
+  function preventNativeGestureZoom(event) {
     event.preventDefault();
   }
 
   function preventDocumentPinch(event) {
-    if (isZoomAllowedTarget(event.target)) return;
-    if (event.touches && event.touches.length > 1) event.preventDefault();
+    if (event.touches && event.touches.length > 1) {
+      event.preventDefault();
+    }
   }
 
   let pageLastTouchEnd = 0;
   function preventPageDoubleTapZoom(event) {
-    if (isZoomAllowedTarget(event.target)) return;
+    const target = event.target;
+    if (target instanceof Element && target.closest(interactiveZoomSelector)) return;
+
     const now = Date.now();
     if (now - pageLastTouchEnd <= 300) event.preventDefault();
     pageLastTouchEnd = now;
   }
 
-  document.addEventListener('gesturestart', preventPageGestureZoom, { passive: false });
-  document.addEventListener('gesturechange', preventPageGestureZoom, { passive: false });
-  document.addEventListener('gestureend', preventPageGestureZoom, { passive: false });
+  document.addEventListener('gesturestart', preventNativeGestureZoom, { passive: false });
+  document.addEventListener('gesturechange', preventNativeGestureZoom, { passive: false });
+  document.addEventListener('gestureend', preventNativeGestureZoom, { passive: false });
   document.addEventListener('touchmove', preventDocumentPinch, { passive: false });
   document.addEventListener('touchend', preventPageDoubleTapZoom, { passive: false });
 
-  /* Artist Bio content-only pinch, pan and double-tap zoom */
+  /* Artist Bio body-only pinch, pan and double-tap zoom. */
   const bioZoomRoot = document.getElementById('bio-modal');
-  const bioZoomContent = bioZoomRoot?.querySelector('.bio-zoom-content');
+  const bioViewport = bioZoomRoot?.querySelector('.bio-viewport');
+  const bioZoomStage = bioZoomRoot?.querySelector('.bio-zoom-stage');
   const BIO_MIN_SCALE = 1;
   const BIO_MAX_SCALE = 3;
+  const BIO_DOUBLE_TAP_SCALE = 1.7;
 
   let bioScale = 1;
   let bioX = 0;
@@ -3240,7 +3296,10 @@
   let bioStartY = 0;
   let bioPanLastX = 0;
   let bioPanLastY = 0;
-  let bioLastTap = 0;
+  let bioLastTapTime = 0;
+  let bioLastTapX = 0;
+  let bioLastTapY = 0;
+  let bioTouchMoved = false;
 
   function bioDistance(touches) {
     return Math.hypot(
@@ -3257,21 +3316,29 @@
   }
 
   function clampBioPan() {
-    if (!bioZoomContent || bioScale <= 1) {
+    if (!bioViewport || !bioZoomStage || bioScale <= 1) {
       bioX = 0;
       bioY = 0;
       return;
     }
-    const maxX = Math.max(0, bioZoomContent.clientWidth * (bioScale - 1) / 2);
-    const maxY = Math.max(0, bioZoomContent.clientHeight * (bioScale - 1) / 2);
-    bioX = Math.max(-maxX, Math.min(maxX, bioX));
-    bioY = Math.max(-maxY, Math.min(maxY, bioY));
+
+    const viewportWidth = bioViewport.clientWidth;
+    const viewportHeight = bioViewport.clientHeight;
+    const scaledWidth = bioZoomStage.offsetWidth * bioScale;
+    const scaledHeight = bioZoomStage.offsetHeight * bioScale;
+    const minX = Math.min(0, viewportWidth - scaledWidth);
+    const minY = Math.min(0, viewportHeight - scaledHeight);
+
+    bioX = Math.max(minX, Math.min(0, bioX));
+    bioY = Math.max(minY, Math.min(0, bioY));
   }
 
   function applyBioTransform() {
-    if (!bioZoomContent) return;
+    if (!bioViewport || !bioZoomStage) return;
     clampBioPan();
-    bioZoomContent.style.transform =
+    const zoomed = bioScale > 1.001;
+    bioViewport.dataset.zoomed = zoomed ? 'true' : 'false';
+    bioZoomStage.style.transform =
       `translate3d(${bioX}px, ${bioY}px, 0) scale(${bioScale})`;
   }
 
@@ -3279,19 +3346,54 @@
     bioScale = 1;
     bioX = 0;
     bioY = 0;
-    applyBioTransform();
-    if (bioZoomContent) bioZoomContent.scrollTop = 0;
+    bioStartDistance = 0;
+    bioTouchMoved = false;
+    if (bioViewport) {
+      bioViewport.dataset.zoomed = 'false';
+      bioViewport.scrollTop = 0;
+      bioViewport.scrollLeft = 0;
+    }
+    if (bioZoomStage) {
+      bioZoomStage.style.transform = 'translate3d(0, 0, 0) scale(1)';
+    }
   }
 
-  if (bioZoomRoot && bioZoomContent) {
-    bioZoomContent.addEventListener('touchstart', (event) => {
+  function zoomBioAt(clientX, clientY, nextScale) {
+    if (!bioViewport || !bioZoomStage) return;
+    const rect = bioViewport.getBoundingClientRect();
+    const pointX = clientX - rect.left;
+    const pointY = clientY - rect.top;
+    const oldScale = bioScale;
+
+    if (oldScale === 1 && bioViewport.scrollTop > 0) {
+      bioY = -bioViewport.scrollTop;
+      bioViewport.scrollTop = 0;
+    }
+
+    const contentX = (pointX - bioX) / oldScale;
+    const contentY = (pointY - bioY) / oldScale;
+    bioScale = Math.max(BIO_MIN_SCALE, Math.min(BIO_MAX_SCALE, nextScale));
+    bioX = pointX - contentX * bioScale;
+    bioY = pointY - contentY * bioScale;
+    applyBioTransform();
+  }
+
+  if (bioZoomRoot && bioViewport && bioZoomStage) {
+    bioZoomStage.addEventListener('touchstart', (event) => {
+      bioTouchMoved = false;
+
       if (event.touches.length === 2) {
         event.preventDefault();
+        if (bioScale === 1 && bioViewport.scrollTop > 0) {
+          bioY = -bioViewport.scrollTop;
+          bioViewport.scrollTop = 0;
+        }
         bioStartDistance = bioDistance(event.touches);
         bioStartScale = bioScale;
         const center = bioCenter(event.touches);
-        bioStartCenterX = center.x;
-        bioStartCenterY = center.y;
+        const rect = bioViewport.getBoundingClientRect();
+        bioStartCenterX = center.x - rect.left;
+        bioStartCenterY = center.y - rect.top;
         bioStartX = bioX;
         bioStartY = bioY;
       } else if (event.touches.length === 1 && bioScale > 1) {
@@ -3301,19 +3403,27 @@
       }
     }, { passive: false });
 
-    bioZoomContent.addEventListener('touchmove', (event) => {
+    bioZoomStage.addEventListener('touchmove', (event) => {
       if (event.touches.length === 2 && bioStartDistance > 0) {
         event.preventDefault();
+        bioTouchMoved = true;
         const center = bioCenter(event.touches);
-        bioScale = Math.max(
+        const rect = bioViewport.getBoundingClientRect();
+        const centerX = center.x - rect.left;
+        const centerY = center.y - rect.top;
+        const nextScale = Math.max(
           BIO_MIN_SCALE,
-          Math.min(BIO_MAX_SCALE, bioStartScale * bioDistance(event.touches) / bioStartDistance)
+          Math.min(BIO_MAX_SCALE,
+            bioStartScale * bioDistance(event.touches) / bioStartDistance)
         );
-        bioX = bioStartX + center.x - bioStartCenterX;
-        bioY = bioStartY + center.y - bioStartCenterY;
+        const ratio = nextScale / bioStartScale;
+        bioScale = nextScale;
+        bioX = centerX - (bioStartCenterX - bioStartX) * ratio;
+        bioY = centerY - (bioStartCenterY - bioStartY) * ratio;
         applyBioTransform();
       } else if (event.touches.length === 1 && bioScale > 1) {
         event.preventDefault();
+        bioTouchMoved = true;
         const touch = event.touches[0];
         bioX += touch.clientX - bioPanLastX;
         bioY += touch.clientY - bioPanLastY;
@@ -3323,34 +3433,46 @@
       }
     }, { passive: false });
 
-    bioZoomContent.addEventListener('touchend', (event) => {
+    bioZoomStage.addEventListener('touchend', (event) => {
       if (event.touches.length < 2) bioStartDistance = 0;
 
-      if (event.changedTouches.length === 1) {
+      if (event.changedTouches.length === 1 && !bioTouchMoved) {
+        const touch = event.changedTouches[0];
         const now = Date.now();
-        if (now - bioLastTap < 300) {
+        const nearLastTap = Math.hypot(
+          touch.clientX - bioLastTapX,
+          touch.clientY - bioLastTapY
+        ) < 28;
+
+        if (now - bioLastTapTime <= 300 && nearLastTap) {
           event.preventDefault();
-          bioScale = bioScale > 1 ? 1 : 2;
-          bioX = 0;
-          bioY = 0;
-          applyBioTransform();
-          bioLastTap = 0;
+          if (bioScale > 1) {
+            resetBioZoom();
+          } else {
+            zoomBioAt(touch.clientX, touch.clientY, BIO_DOUBLE_TAP_SCALE);
+          }
+          bioLastTapTime = 0;
         } else {
-          bioLastTap = now;
+          bioLastTapTime = now;
+          bioLastTapX = touch.clientX;
+          bioLastTapY = touch.clientY;
         }
       }
 
-      if (bioScale <= 1.02) {
-        bioScale = 1;
-        bioX = 0;
-        bioY = 0;
-        applyBioTransform();
-      }
+      if (bioScale <= 1.02) resetBioZoom();
+      bioTouchMoved = false;
     }, { passive: false });
 
-    bioZoomRoot.querySelector('.bio-close')?.addEventListener('click', resetBioZoom);
-    bioZoomRoot.querySelector('.bio-backdrop')?.addEventListener('click', resetBioZoom);
+    bioZoomStage.addEventListener('touchcancel', () => {
+      bioStartDistance = 0;
+      bioTouchMoved = false;
+      if (bioScale <= 1.02) resetBioZoom();
+    }, { passive: true });
+
     window.addEventListener('orientationchange', resetBioZoom, { passive: true });
+    window.addEventListener('resize', () => {
+      if (bioScale > 1) applyBioTransform();
+    }, { passive: true });
   }
 
 
