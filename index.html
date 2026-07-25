@@ -1567,6 +1567,55 @@
     }
   }
 
+
+
+  /* ================================================================
+     JSKIM.ART — ARTIST BIO MOBILE/TABLET SCROLL FIX ONLY
+     Keeps the existing pinch/double-tap zoom, typography, dimensions,
+     colors and controls unchanged. The viewport is forced to become the
+     sole vertical flex scroll container at scale 1.
+     ================================================================ */
+  @media (hover: none) and (pointer: coarse) {
+    #bio-modal .bio-card {
+      min-height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    #bio-modal .bio-viewport {
+      flex: 1 1 0 !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      max-height: 100% !important;
+
+      overflow-x: hidden !important;
+      overflow-y: scroll !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-x: none !important;
+      overscroll-behavior-y: contain !important;
+      touch-action: pan-y !important;
+    }
+
+    #bio-modal .bio-zoom-stage,
+    #bio-modal .bio-content {
+      min-height: max-content !important;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="false"] {
+      overflow-y: scroll !important;
+      touch-action: pan-y !important;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="false"] .bio-zoom-stage {
+      transform: none;
+      touch-action: pan-y !important;
+    }
+
+    /* At zoom > 1 the existing one-finger custom pan remains active. */
+    #bio-modal .bio-viewport[data-zoomed="true"] {
+      overflow: hidden !important;
+      touch-action: none !important;
+    }
+  }
 </style>
 </head>
 <body>
