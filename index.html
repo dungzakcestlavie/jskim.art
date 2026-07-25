@@ -1690,6 +1690,151 @@
       touch-action: none !important;
     }
   }
+
+
+  /* ================================================================
+     JSKIM.ART — MOBILE/TABLET ARTIST BIO DOM SCROLL REBUILD — FINAL
+     Fixed control header + one independent native scroll container +
+     inner zoom layer. Touch devices only; desktop/notebook unchanged.
+     ================================================================ */
+  .bio-mobile-title { display: none; }
+
+  @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+    #bio-modal.artist-bio-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      touch-action: pan-y pinch-zoom !important;
+      z-index: 60 !important;
+    }
+
+    #bio-modal .bio-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+    }
+
+    #bio-modal .artist-bio-modal-shell {
+      position: fixed !important;
+      top: env(safe-area-inset-top, 0px) !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      max-width: none !important;
+      height: calc(100dvh - env(safe-area-inset-top, 0px)) !important;
+      max-height: none !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      transform: none !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .artist-bio-header {
+      position: relative !important;
+      flex: 0 0 auto !important;
+      width: 100% !important;
+      min-height: 0 !important;
+      padding: 18px 54px 12px 20px !important;
+      overflow: visible !important;
+      transform: none !important;
+      touch-action: manipulation !important;
+      z-index: 4 !important;
+      background: var(--card-bg) !important;
+    }
+
+    #bio-modal .artist-bio-header .bio-lang {
+      margin: 0 !important;
+    }
+
+    #bio-modal .artist-bio-header .bio-close {
+      position: absolute !important;
+      top: 14px !important;
+      right: 14px !important;
+      margin: 0 !important;
+      transform: none !important;
+    }
+
+    #bio-modal .bio-desktop-title {
+      display: none !important;
+    }
+
+    #bio-modal .bio-mobile-title {
+      display: block !important;
+    }
+
+    #bio-modal .artist-bio-scroll {
+      position: relative !important;
+      flex: 1 1 auto !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 30px calc(48px + env(safe-area-inset-bottom, 0px)) !important;
+      overflow-x: hidden !important;
+      overflow-y: scroll !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-x: none !important;
+      overscroll-behavior-y: contain !important;
+      touch-action: pan-y pinch-zoom !important;
+      transform: none !important;
+      scrollbar-width: none !important;
+      z-index: 1 !important;
+    }
+
+    #bio-modal .artist-bio-scroll::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    #bio-modal .artist-bio-zoom-layer {
+      position: relative !important;
+      display: block !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      min-height: max-content !important;
+      height: auto !important;
+      overflow: visible !important;
+      transform-origin: 0 0 !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .bio-content {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: auto !important;
+      min-height: max-content !important;
+      overflow: visible !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .artist-bio-scroll[data-zoomed="false"] {
+      overflow-y: scroll !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .artist-bio-scroll[data-zoomed="false"] .artist-bio-zoom-layer {
+      transform: none !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .artist-bio-scroll[data-zoomed="true"] {
+      overflow: hidden !important;
+      touch-action: none !important;
+    }
+
+    #bio-modal .artist-bio-scroll[data-zoomed="true"] .artist-bio-zoom-layer {
+      touch-action: none !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -1892,19 +2037,25 @@
 
 <div id="bio-modal" class="artist-bio-modal artist-bio-viewer" data-allow-zoom="true" hidden>
   <div class="bio-backdrop"></div>
-  <div class="bio-card" role="dialog" aria-modal="true" aria-labelledby="bio-title">
-    <button class="bio-close" aria-label="close">&times;</button>
-    <div class="bio-header">
+  <div class="bio-card artist-bio-modal-shell" role="dialog" aria-modal="true" aria-labelledby="bio-title">
+    <div class="bio-header artist-bio-header">
       <div class="bio-lang">
         <button class="active" data-bio-lang="kr" aria-pressed="true">KR</button>
         <button data-bio-lang="en" aria-pressed="false">EN</button>
       </div>
-      <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
-      <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
+      <button class="bio-close" aria-label="close">&times;</button>
+      <div class="bio-desktop-title">
+        <h2 class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
+        <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
+      </div>
     </div>
-    <div class="bio-viewport" data-zoomed="false">
-      <div class="bio-zoom-stage">
+    <div class="bio-viewport artist-bio-scroll" data-zoomed="false">
+      <div class="bio-zoom-stage artist-bio-zoom-layer">
         <div class="bio-content">
+          <div class="bio-mobile-title">
+            <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
+            <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
+          </div>
     <p class="bio-tagline ko">정산(靜山) 김연식은 회화와 사찰음식, 음악, 수행을 하나의 언어로 바라보는 한국의 현대미술가이다.</p>
     <p class="bio-tagline en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist who sees painting, temple cuisine, music, and spiritual practice as a single artistic language.</p>
     <div class="bio-body">
@@ -3813,14 +3964,8 @@
       new ResizeObserver(syncBioHeaderHeight).observe(header);
     }
 
-    /* One-finger vertical movement at scale 1 must remain native scrolling.
-       Only pinch or the already-zoomed custom pan is canceled by the zoom engine. */
-    viewport.addEventListener('touchmove', (event) => {
-      const zoomed = viewport.dataset.zoomed === 'true';
-      if (!zoomed && event.touches.length === 1) {
-        event.stopPropagation();
-      }
-    }, { passive: true, capture: true });
+    /* One-finger movement at scale 1 is intentionally left completely
+       untouched so the browser owns native vertical scrolling. */
   })();
 </script>
 
