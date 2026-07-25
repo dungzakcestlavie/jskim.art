@@ -1330,511 +1330,133 @@
     overscroll-behavior: contain;
   }
 
-  /* Artist Bio: fixed shell/header, independently zoomable body only.
-     2026-07-24 수정 (iPad/모바일 스크롤이 여전히 안 되던 진짜 원인):
-     여기 있던 touch-action:none이 문제였다. CSS touch-action은 "해당
-     요소 + 모든 조상의 값의 교집합"으로 실제 적용값이 계산되는데, 이
-     규칙은 자손이 아무리 pan-y로 재선언해도 조상 쪽의 none을 다시
-     열어주지 못한다(교집합은 한쪽이 none이면 그걸로 끝). #bio-modal은
-     .bio-viewport의 조상이라, 여기 있던 none이 .bio-viewport의 pan-y를
-     무력화시켜 1배 상태에서도 스크롤이 막혔다 — 지난번에 고친
-     .bio-zoom-stage의 transform 문제와는 별개의, 더 상위 레벨의 원인.
-     페이지 전체 핀치줌 차단은 이미 document 레벨의 2손가락 제스처
-     가드(preventDocumentPinch 등)가 별도로 처리하고 있어 이 블록
-     규칙은 불필요했다 — 완전히 제거했다. */
-
-  /* 2026-07-24 추가: 위에서 none을 제거한 것과 별개로, 조상 체인 전체에
-     명시적으로 pan-y를 선언해 둔다 — 교집합 계산에서 auto(미지정)와
-     pan-y(명시)가 섞이는 것보다, 체인 전체가 명시적으로 pan-y로
-     일치하는 편이 더 안전하다(방어적 이중 조치). */
-  /* 2026-07-24 재수정 (dungzak.art의 실제 작동하는 Artist Bio 구조를
-     그대로 따름): .bio-viewport/.bio-zoom-stage로 나누는 대신,
-     .bio-card 자신이 유일한 스크롤 컨테이너다. 확대/축소 기능은
-     Artist Bio 텍스트에는 원래 불필요했고, 이 여러 겹 구조 자체가
-     iOS/Android 터치 스크롤이 계속 막히던 근본 원인이었을 가능성이
-     커서 — 검증된 단순 구조로 통일한다. */
-  #bio-modal.artist-bio-modal {
-    touch-action: pan-y;
-  }
-
-  #bio-modal .bio-card {
-    overflow: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  #bio-modal .bio-header {
-    position: relative;
-    min-width: 0;
-    padding-right: 34px;
-    z-index: 4;
-  }
-
-  #bio-modal .bio-content {
-    width: 100%;
-    min-width: 0;
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  #bio-modal .bio-card::-webkit-scrollbar,
-  #bio-modal .bio-content::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
-    background: transparent;
-  }
-
-  #bio-modal .bio-card,
-  #bio-modal .bio-content {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  /* 2026-07-24 추가 (노트북 마우스 휠 스크롤 어려움 대응):
-     터치 기기는 스크롤바를 계속 숨기지만, 마우스/트랙패드가 있는
-     노트북·데스크톱에서는 실제 스크롤 컨테이너(.bio-card)에 가늘고
-     눈에 띄는 스크롤바를 보여준다 — 휠로 어디까지 왔는지, 더 내릴
-     내용이 있는지 시각적으로 바로 알 수 있게 한다. 위의 범용 숨김
-     규칙보다 소스 순서상 뒤에 있어 여기서 다시 켠다. */
-  @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
-    #bio-modal .bio-card {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(214, 177, 96, .75) transparent;
-    }
-
-    #bio-modal .bio-card::-webkit-scrollbar {
-      display: block;
-      width: 7px;
-    }
-
-    #bio-modal .bio-card::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    #bio-modal .bio-card::-webkit-scrollbar-thumb {
-      background: rgba(214, 177, 96, .75);
-      border-radius: 999px;
-    }
-  }
-
-  #bio-modal .bio-close {
-    z-index: 20;
-    touch-action: manipulation;
-  }
-
-  #bio-modal .bio-content {
-    /* 마지막 문장이 홈 인디케이터/화면 끝에 딱 붙어 "잘린 것처럼" 보이지
-       않도록 여유 공간을 둔다 (스펙 §7). */
-    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
-  }
-
-  @media (max-width: 1024px) {
-    #bio-modal .bio-card {
-      width: calc(100% - 24px);
-      max-width: calc(100% - 24px);
-      min-width: 0;
-      height: min(82dvh, 760px);
-      max-height: calc(100dvh - 32px);
-      margin: max(16px, env(safe-area-inset-top, 0px)) auto;
-    }
-
-    input,
-    textarea,
-    select {
-      font-size: 16px;
-    }
-  }
-
-  /* 2026-07-24 추가 — 모바일·태블릿 전용 Artist Bio 가독성 개선
-     (노트북·데스크톱 제외: 데스크톱은 이미 위 min-width:1025px +
-     hover:hover + pointer:fine 블록에서 22px/20px로 충분히 큼).
-     적용 범위는 "진짜 데스크톱이 아닌 모든 기기" — max-width:1024px
-     이거나 터치 포인터인 경우. 시뮬레이션 기준:
-       - iPhone(~390px 폭): 카드 여백(24px 마진 + 좌우 패딩 60px) 제외
-         실제 텍스트 컬럼 ≈ 306px. 17px 국문 기준 약 14~15자/줄 —
-         작은 화면에서 통상적인 읽기 폭.
-       - iPad(~768~834px 폭): 컬럼이 넓어 글자를 키워도 줄 길이 여유가
-         충분해 가독성이 오히려 더 좋아짐.
-     기존 14px(국문 본문)·16.6px(영문 본문)·15.5/16.5px(태그라인)는
-     모바일 화면 대비 다소 작아 장문 읽기에 눈이 피로했던 값이다. */
-  @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
-    #bio-modal .bio-tagline {
-      font-size: 18px !important;
-      line-height: 1.55 !important;
-    }
-    #bio-modal .bio-tagline.en {
-      font-size: 19px !important;
-      line-height: 1.55 !important;
-    }
-    #bio-modal .bio-body p {
-      font-size: 17px !important;
-      line-height: 1.9 !important;
-    }
-    #bio-modal .bio-body p.ko {
-      font-size: 17px !important;
-      line-height: 2 !important;
-    }
-    #bio-modal .bio-body p.en {
-      font-size: 18.5px !important;
-      line-height: 1.85 !important;
-    }
-
-    /* 작가 연보 목록도 본문과 같은 비율로 확대 (§ 이번 추가 요청) */
-    #bio-modal .chrono-toggle {
-      font-size: 15px !important;
-    }
-    #bio-modal .chrono-year h3 {
-      font-size: 16px !important;
-    }
-    #bio-modal .chrono-year li {
-      font-size: 16.5px !important;
-      line-height: 1.8 !important;
-    }
-  }
-
-  body.modal-open {
-    overflow: hidden;
-  }
-
-
   /* ================================================================
-     JSKIM.ART — TOUCH DEVICE ARTIST BIO BODY-ONLY ZOOM
-     Scope: Artist Bio on phones and touch tablets only.
-     Existing fonts, colors, spacing, modal dimensions, controls,
-     chronology, desktop/notebook layout and artwork viewer are unchanged.
+     Artist Bio — mobile/tablet scroll & zoom (rebuilt 2026-07-25)
+     ------------------------------------------------------------
+     이전에는 이 자리에 서로 다른 시점에 작성된 4~5개의 "최종 수정"
+     블록이 겹쳐 있었고(§ 감사 결과), 그중 상당수가 같은 선택자를
+     다른 값으로 재선언해 소스 순서에 의존하는 불안정한 상태였다.
+     전부 제거하고 아래 한 블록으로 통합한다.
+
+     실제 원인 (스펙 §5 그대로 확인됨): 기존 구조는 .bio-zoom-stage에
+     transform: scale(...)로 확대를 구현했는데, CSS transform은 화면에
+     "보이는" 크기만 키울 뿐 스크롤 컨테이너(.bio-viewport)의 실제
+     scrollHeight/scrollWidth는 전혀 늘리지 않는다 — 그래서 확대한
+     채로 끝까지 내리면 "실제로는 늘어나지 않은" 원래 크기까지만
+     스크롤되고 멈춘 것처럼 보였다.
+
+     해결: transform 대신 font-size를 실제로 키운다(스펙 §5 방법 C —
+     Artist Bio는 텍스트 중심이라 이 방식이 구조적으로 더 안전하다).
+     font-size가 커지면 브라우저가 계산하는 실제 레이아웃 높이 자체가
+     늘어나므로 scrollHeight가 항상 "보이는 크기"와 정확히 일치한다.
+     부수 효과: 폭은 컨테이너 100%로 고정된 채 글자만 커지므로 텍스트가
+     자연스럽게 줄바꿈되어 가로로 넘치지 않는다 — 가로 스크롤이 아예
+     필요 없어져 "가로 이동이 중간에 막힌다"는 증상 자체가 구조적으로
+     사라진다(가로로 넘칠 내용이 없으니 막힐 곳도 없다).
+
+     결과적으로 한 손가락 터치는 확대 여부와 무관하게 단 한 번도
+     가로채지 않는다(스펙 §6 금지 사항 전부 준수) — 브라우저의 기본
+     세로 스크롤이 항상 그대로 동작하고, 스크롤 가능 범위도 실제
+     레이아웃값이라 별도 clamp 계산이 필요 없다(스펙 §7이 요구하는
+     계산을 브라우저가 대신 해 준다). 두 손가락 핀치만 JS가 처리해
+     --bio-scale 값을 바꾼다. 데스크톱(.bio-card 자체가 스크롤
+     컨테이너인 위쪽 min-width:1025px 블록)은 전혀 건드리지 않는다.
      ================================================================ */
-  @media (hover: none) and (pointer: coarse) {
+  @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
     #bio-modal.artist-bio-modal {
-      touch-action: pan-y;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: pan-y pinch-zoom;
     }
 
+    #bio-modal .bio-backdrop {
+      position: fixed;
+      inset: 0;
+    }
+
+    /* 모달 껍데기: 헤더(고정)+뷰포트(스크롤) 세로 flex 1단.
+       스크롤 컨테이너는 오직 .bio-viewport 하나뿐이다. */
     #bio-modal .bio-card {
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      right: 0;
+      bottom: env(safe-area-inset-bottom, 0px);
+      left: 0;
+      width: 100%;
+      max-width: none;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      touch-action: pan-y;
+      touch-action: pan-y pinch-zoom;
     }
 
     #bio-modal .bio-header {
       flex: 0 0 auto;
+      position: relative;
+      width: 100%;
+      padding: 18px 54px 12px 20px;
+      background: var(--card-bg);
+      z-index: 4;
+      touch-action: manipulation;
     }
 
+    #bio-modal .bio-lang { margin: 0; }
+    #bio-modal .bio-close { position: absolute; top: 14px; right: 14px; margin: 0; }
+    #bio-modal .bio-desktop-title { display: none; }
+    #bio-modal .bio-mobile-title { display: block; }
+
+    /* 유일한 스크롤 컨테이너 — 실제 세로/가로 이동은 전부 여기서만
+       일어난다. 확대해도(font-size가 커져도) overflow:auto가 그
+       늘어난 실제 크기를 그대로 반영한다. */
     #bio-modal .bio-viewport {
-      position: relative;
       flex: 1 1 auto;
-      min-width: 0;
       min-height: 0;
       width: 100%;
       overflow-x: hidden;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
-      touch-action: pan-y;
+      touch-action: pan-y pinch-zoom;
       scrollbar-width: none;
       -ms-overflow-style: none;
-      -webkit-overflow-scrolling: touch;
       -webkit-tap-highlight-color: transparent;
     }
-
     #bio-modal .bio-viewport::-webkit-scrollbar {
       display: none;
       width: 0;
       height: 0;
     }
 
-    #bio-modal .bio-zoom-stage {
-      position: relative;
+    #bio-modal .bio-content {
       width: 100%;
       min-width: 0;
-      transform: none;
-      transform-origin: 0 0;
-      will-change: transform;
+      padding: 0 30px calc(48px + env(safe-area-inset-bottom, 0px));
       touch-action: pan-y pinch-zoom;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    #bio-modal .bio-viewport[data-zoomed="true"] {
-      overflow: hidden;
-      touch-action: none;
-    }
-
-    #bio-modal .bio-viewport[data-zoomed="true"] .bio-zoom-stage {
-      touch-action: none;
-    }
+    /* 확대 배율(--bio-scale, JS가 핀치 제스처로 갱신)을 폰트 크기에
+       곱한다. 배율 1일 때 값은 기존 모바일 타이포그래피 값과 완전히
+       동일하다(회귀 없음) — 여기서 숫자를 바꾼 게 아니라 곱셈만
+       추가한 것이다. */
+    #bio-modal .bio-tagline { font-size: calc(18px * var(--bio-scale, 1)); line-height: 1.55; }
+    #bio-modal .bio-tagline.en { font-size: calc(19px * var(--bio-scale, 1)); line-height: 1.55; }
+    #bio-modal .bio-body p { font-size: calc(17px * var(--bio-scale, 1)); line-height: 1.9; }
+    #bio-modal .bio-body p.ko { font-size: calc(17px * var(--bio-scale, 1)); line-height: 2; }
+    #bio-modal .bio-body p.en { font-size: calc(18.5px * var(--bio-scale, 1)); line-height: 1.85; }
+    #bio-modal .chrono-toggle { font-size: calc(15px * var(--bio-scale, 1)); }
+    #bio-modal .chrono-year h3 { font-size: calc(16px * var(--bio-scale, 1)); }
+    #bio-modal .chrono-year li { font-size: calc(16.5px * var(--bio-scale, 1)); line-height: 1.8; }
   }
 
-
-
-  /* ================================================================
-     JSKIM.ART — ARTIST BIO MOBILE/TABLET SCROLL FIX ONLY
-     Keeps the existing pinch/double-tap zoom, typography, dimensions,
-     colors and controls unchanged. The viewport is forced to become the
-     sole vertical flex scroll container at scale 1.
-     ================================================================ */
-  @media (hover: none) and (pointer: coarse) {
-    #bio-modal .bio-card {
-      min-height: 0 !important;
-      overflow: hidden !important;
-    }
-
-    #bio-modal .bio-viewport {
-      flex: 1 1 0 !important;
-      height: 0 !important;
-      min-height: 0 !important;
-      max-height: 100% !important;
-
-      overflow-x: hidden !important;
-      overflow-y: scroll !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-x: none !important;
-      overscroll-behavior-y: contain !important;
-      touch-action: pan-y !important;
-    }
-
-    #bio-modal .bio-zoom-stage,
-    #bio-modal .bio-content {
-      min-height: max-content !important;
-    }
-
-    #bio-modal .bio-viewport[data-zoomed="false"] {
-      overflow-y: scroll !important;
-      touch-action: pan-y !important;
-    }
-
-    #bio-modal .bio-viewport[data-zoomed="false"] .bio-zoom-stage {
-      transform: none;
-      touch-action: pan-y !important;
-    }
-
-    /* At zoom > 1 the existing one-finger custom pan remains active. */
-    #bio-modal .bio-viewport[data-zoomed="true"] {
-      overflow: hidden !important;
-      touch-action: none !important;
-    }
-  }
-
-
-  /* ================================================================
-     JSKIM.ART — ARTIST BIO MOBILE/TABLET INTERNAL SCROLL COMPLETE FIX
-     Scope: touch phones/tablets only. UI, typography, spacing, zoom,
-     chronology and notebook/desktop layout remain unchanged.
-     ================================================================ */
-  @media (hover: none) and (pointer: coarse) {
-    #bio-modal.artist-bio-modal {
-      position: fixed !important;
-      inset: 0 !important;
-      overflow: hidden !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .bio-card {
-      display: grid !important;
-      grid-template-rows: auto minmax(0, 1fr) !important;
-      min-height: 0 !important;
-      overflow: hidden !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .bio-header {
-      grid-row: 1 !important;
-      position: relative !important;
-      flex: none !important;
-      min-height: 0 !important;
-      overflow: visible !important;
-      touch-action: manipulation !important;
-    }
-
-    #bio-modal .bio-viewport {
-      grid-row: 2 !important;
-      position: relative !important;
-      display: block !important;
-      width: 100% !important;
-      height: auto !important;
-      min-height: 0 !important;
-      max-height: calc(100dvh - var(--bio-header-height, 120px) - 32px) !important;
-
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-x: none !important;
-      overscroll-behavior-y: contain !important;
-      touch-action: pan-y pinch-zoom !important;
-      scrollbar-width: none !important;
-    }
-
-    #bio-modal .bio-viewport[data-zoomed="false"] {
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .bio-viewport[data-zoomed="false"] .bio-zoom-stage,
-    #bio-modal .bio-viewport[data-zoomed="false"] .bio-content {
-      min-height: 0 !important;
-      height: auto !important;
-      overflow: visible !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    /* 확대 중에는 기존 사용자 정의 한 손가락 이동을 유지한다. */
-    #bio-modal .bio-viewport[data-zoomed="true"] {
-      overflow: hidden !important;
-      touch-action: none !important;
-    }
-
-    #bio-modal .bio-viewport[data-zoomed="true"] .bio-zoom-stage {
-      touch-action: none !important;
-    }
-  }
-
-
-  /* ================================================================
-     JSKIM.ART — MOBILE/TABLET ARTIST BIO DOM SCROLL REBUILD — FINAL
-     Fixed control header + one independent native scroll container +
-     inner zoom layer. Touch devices only; desktop/notebook unchanged.
-     ================================================================ */
-  .bio-mobile-title { display: none; }
-
-  @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
-    #bio-modal.artist-bio-modal {
-      position: fixed !important;
-      inset: 0 !important;
-      width: 100vw !important;
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      overflow: hidden !important;
-      touch-action: pan-y pinch-zoom !important;
-      z-index: 60 !important;
-    }
-
-    #bio-modal .bio-backdrop {
-      position: fixed !important;
-      inset: 0 !important;
-    }
-
-    #bio-modal .artist-bio-modal-shell {
-      position: fixed !important;
-      top: env(safe-area-inset-top, 0px) !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      max-width: none !important;
-      height: calc(100dvh - env(safe-area-inset-top, 0px)) !important;
-      max-height: none !important;
-      min-height: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      overflow: hidden !important;
-      transform: none !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .artist-bio-header {
-      position: relative !important;
-      flex: 0 0 auto !important;
-      width: 100% !important;
-      min-height: 0 !important;
-      padding: 18px 54px 12px 20px !important;
-      overflow: visible !important;
-      transform: none !important;
-      touch-action: manipulation !important;
-      z-index: 4 !important;
-      background: var(--card-bg) !important;
-    }
-
-    #bio-modal .artist-bio-header .bio-lang {
-      margin: 0 !important;
-    }
-
-    #bio-modal .artist-bio-header .bio-close {
-      position: absolute !important;
-      top: 14px !important;
-      right: 14px !important;
-      margin: 0 !important;
-      transform: none !important;
-    }
-
-    #bio-modal .bio-desktop-title {
-      display: none !important;
-    }
-
-    #bio-modal .bio-mobile-title {
-      display: block !important;
-    }
-
-    #bio-modal .artist-bio-scroll {
-      position: relative !important;
-      flex: 1 1 auto !important;
-      width: 100% !important;
-      height: auto !important;
-      min-height: 0 !important;
-      max-height: none !important;
-      margin: 0 !important;
-      padding: 0 30px calc(48px + env(safe-area-inset-bottom, 0px)) !important;
-      overflow-x: hidden !important;
-      overflow-y: scroll !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-x: none !important;
-      overscroll-behavior-y: contain !important;
-      touch-action: pan-y pinch-zoom !important;
-      transform: none !important;
-      scrollbar-width: none !important;
-      z-index: 1 !important;
-    }
-
-    #bio-modal .artist-bio-scroll::-webkit-scrollbar {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-    }
-
-    #bio-modal .artist-bio-zoom-layer {
-      position: relative !important;
-      display: block !important;
-      width: 100% !important;
-      min-width: 0 !important;
-      min-height: max-content !important;
-      height: auto !important;
-      overflow: visible !important;
-      transform-origin: 0 0 !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .bio-content {
-      width: 100% !important;
-      min-width: 0 !important;
-      height: auto !important;
-      min-height: max-content !important;
-      overflow: visible !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .artist-bio-scroll[data-zoomed="false"] {
-      overflow-y: scroll !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .artist-bio-scroll[data-zoomed="false"] .artist-bio-zoom-layer {
-      transform: none !important;
-      touch-action: pan-y pinch-zoom !important;
-    }
-
-    #bio-modal .artist-bio-scroll[data-zoomed="true"] {
-      overflow: hidden !important;
-      touch-action: none !important;
-    }
-
-    #bio-modal .artist-bio-scroll[data-zoomed="true"] .artist-bio-zoom-layer {
-      touch-action: none !important;
-    }
-  }
 </style>
 </head>
 <body>
@@ -2515,6 +2137,11 @@
     $('#bio-modal').hidden = false;
     const card = $('#bio-modal .bio-card');
     if (card) card.scrollTop = 0;
+    // 2026-07-25 추가: 모바일 실제 스크롤 컨테이너(.bio-viewport)도
+    // 함께 맨 위로 되돌린다 -- 데스크톱(.bio-card)과 모바일(.bio-viewport)
+    // 스크롤 컨테이너가 서로 다르므로 둘 다 리셋해야 한다.
+    const viewport = $('#bio-modal .bio-viewport');
+    if (viewport) viewport.scrollTop = 0;
     const toggle = $('#chrono-toggle');
     const body = $('#chrono-body');
     if (toggle && body) {
@@ -3711,30 +3338,27 @@
   document.addEventListener('touchmove', preventDocumentPinch, { passive: false });
   document.addEventListener('touchend', preventPageDoubleTapZoom, { passive: false });
 
-  /* Artist Bio body-only pinch, pan and double-tap zoom. */
+  /* Artist Bio — mobile pinch-to-zoom (rebuilt 2026-07-25, replaces the
+     previous translate3d/scale + manual pan-clamp implementation).
+     One-finger touch is NEVER intercepted here, at any zoom level — the
+     browser always owns native scrolling on .bio-viewport, which is what
+     makes "reach the very last line, even while zoomed" work (스펙 §1
+     완료 기준). Only two-finger pinch is handled, and it only ever
+     changes --bio-scale (a CSS custom property multiplying font-size —
+     see the CSS block above), never a transform. There is no pan
+     offset / clampBioPan math left to maintain: because zoom grows the
+     real layout size, scrollWidth/scrollHeight/scrollLeft/scrollTop are
+     always the browser's own real values (스펙 §7 요구사항을 브라우저가
+     대신 계산해 준다). */
   const bioZoomRoot = document.getElementById('bio-modal');
   const bioViewport = bioZoomRoot?.querySelector('.bio-viewport');
-  const bioZoomStage = bioZoomRoot?.querySelector('.bio-zoom-stage');
+  const bioContent = bioZoomRoot?.querySelector('.bio-content');
   const BIO_MIN_SCALE = 1;
   const BIO_MAX_SCALE = 3;
-  const BIO_DOUBLE_TAP_SCALE = 1.7;
 
   let bioScale = 1;
-  let bioX = 0;
-  let bioY = 0;
-  let bioStartScale = 1;
   let bioStartDistance = 0;
-  let bioStartCenterX = 0;
-  let bioStartCenterY = 0;
-  let bioStartX = 0;
-  let bioStartY = 0;
-  let bioPanLastX = 0;
-  let bioPanLastY = 0;
-  let bioLastTapTime = 0;
-  let bioLastTapX = 0;
-  let bioLastTapY = 0;
-  let bioTouchMoved = false;
-  let bioSavedScrollTop = 0;
+  let bioStartScale = 1;
 
   function bioDistance(touches) {
     return Math.hypot(
@@ -3743,197 +3367,45 @@
     );
   }
 
-  function bioCenter(touches) {
-    return {
-      x: (touches[0].clientX + touches[1].clientX) / 2,
-      y: (touches[0].clientY + touches[1].clientY) / 2
-    };
+  function setBioScale(next) {
+    bioScale = Math.max(BIO_MIN_SCALE, Math.min(BIO_MAX_SCALE, next));
+    if (bioContent) bioContent.style.setProperty('--bio-scale', String(bioScale));
   }
 
-  function enterBioZoomMode() {
-    if (!bioViewport || bioScale > 1.001) return;
-    bioSavedScrollTop = bioViewport.scrollTop;
-    bioY -= bioSavedScrollTop;
-    bioViewport.scrollTop = 0;
-    bioViewport.scrollLeft = 0;
-    bioViewport.dataset.zoomed = 'true';
-  }
-
-  function clampBioPan() {
-    if (!bioViewport || !bioZoomStage || bioScale <= 1) {
-      bioX = 0;
-      bioY = 0;
-      return;
-    }
-
-    const viewportWidth = bioViewport.clientWidth;
-    const viewportHeight = bioViewport.clientHeight;
-    const scaledWidth = bioZoomStage.offsetWidth * bioScale;
-    const scaledHeight = bioZoomStage.offsetHeight * bioScale;
-    const minX = Math.min(0, viewportWidth - scaledWidth);
-    const minY = Math.min(0, viewportHeight - scaledHeight);
-
-    bioX = Math.max(minX, Math.min(0, bioX));
-    bioY = Math.max(minY, Math.min(0, bioY));
-  }
-
-  function applyBioTransform() {
-    if (!bioViewport || !bioZoomStage) return;
-    clampBioPan();
-    const zoomed = bioScale > 1.001;
-    bioViewport.dataset.zoomed = zoomed ? 'true' : 'false';
-    bioZoomStage.style.transform =
-      `translate3d(${bioX}px, ${bioY}px, 0) scale(${bioScale})`;
-  }
-
-  function resetBioZoom(restoreScroll = false) {
-    const scrollTopToRestore = restoreScroll ? bioSavedScrollTop : 0;
-    bioScale = 1;
-    bioX = 0;
-    bioY = 0;
+  function resetBioZoom() {
     bioStartDistance = 0;
-    bioTouchMoved = false;
-    if (bioViewport) {
-      bioViewport.dataset.zoomed = 'false';
-      bioViewport.scrollLeft = 0;
-      requestAnimationFrame(() => {
-        bioViewport.scrollTop = scrollTopToRestore;
-      });
-    }
-    if (bioZoomStage) {
-      // 2026-07-24 수정: 'translate3d(0,0,0) scale(1)'도 값 자체는 무변형
-      // 이지만 WebKit에서는 여전히 별도 합성 레이어를 만든다 — 1배
-      // 휴지 상태에서는 transform을 아예 제거해 스크롤 높이 오계산을
-      // 막는다(위 CSS 주석 참고).
-      bioZoomStage.style.transform = 'none';
-    }
-    if (!restoreScroll) bioSavedScrollTop = 0;
+    setBioScale(1);
   }
 
-  function zoomBioAt(clientX, clientY, nextScale) {
-    if (!bioViewport || !bioZoomStage) return;
-    const rect = bioViewport.getBoundingClientRect();
-    const pointX = clientX - rect.left;
-    const pointY = clientY - rect.top;
-    const oldScale = bioScale;
-
-    if (oldScale === 1) enterBioZoomMode();
-
-    const contentX = (pointX - bioX) / oldScale;
-    const contentY = (pointY - bioY) / oldScale;
-    bioScale = Math.max(BIO_MIN_SCALE, Math.min(BIO_MAX_SCALE, nextScale));
-    bioX = pointX - contentX * bioScale;
-    bioY = pointY - contentY * bioScale;
-    applyBioTransform();
-  }
-
-  if (bioZoomRoot && bioViewport && bioZoomStage) {
-    bioZoomStage.addEventListener('touchstart', (event) => {
-      bioTouchMoved = false;
-
+  if (bioZoomRoot && bioViewport && bioContent) {
+    bioViewport.addEventListener('touchstart', (event) => {
+      // 두 손가락일 때만 개입한다 — 한 손가락(스크롤/팬)은 스펙 §6이
+      // 금지하는 대로 절대 preventDefault하지 않는다.
       if (event.touches.length === 2) {
         event.preventDefault();
-        if (bioScale === 1) enterBioZoomMode();
         bioStartDistance = bioDistance(event.touches);
         bioStartScale = bioScale;
-        const center = bioCenter(event.touches);
-        const rect = bioViewport.getBoundingClientRect();
-        bioStartCenterX = center.x - rect.left;
-        bioStartCenterY = center.y - rect.top;
-        bioStartX = bioX;
-        bioStartY = bioY;
-      } else if (event.touches.length === 1 && bioScale > 1) {
-        event.preventDefault();
-        bioPanLastX = event.touches[0].clientX;
-        bioPanLastY = event.touches[0].clientY;
       }
     }, { passive: false });
 
-    bioZoomStage.addEventListener('touchmove', (event) => {
+    bioViewport.addEventListener('touchmove', (event) => {
       if (event.touches.length === 2 && bioStartDistance > 0) {
         event.preventDefault();
-        bioTouchMoved = true;
-        const center = bioCenter(event.touches);
-        const rect = bioViewport.getBoundingClientRect();
-        const centerX = center.x - rect.left;
-        const centerY = center.y - rect.top;
-        const nextScale = Math.max(
-          BIO_MIN_SCALE,
-          Math.min(BIO_MAX_SCALE,
-            bioStartScale * bioDistance(event.touches) / bioStartDistance)
-        );
-        const ratio = nextScale / bioStartScale;
-        bioScale = nextScale;
-        bioX = centerX - (bioStartCenterX - bioStartX) * ratio;
-        bioY = centerY - (bioStartCenterY - bioStartY) * ratio;
-        applyBioTransform();
-      } else if (event.touches.length === 1 && bioScale > 1) {
-        event.preventDefault();
-        bioTouchMoved = true;
-        const touch = event.touches[0];
-        bioX += touch.clientX - bioPanLastX;
-        bioY += touch.clientY - bioPanLastY;
-        bioPanLastX = touch.clientX;
-        bioPanLastY = touch.clientY;
-        applyBioTransform();
+        setBioScale(bioStartScale * bioDistance(event.touches) / bioStartDistance);
       }
     }, { passive: false });
 
-    bioZoomStage.addEventListener('touchend', (event) => {
+    bioViewport.addEventListener('touchend', (event) => {
       if (event.touches.length < 2) bioStartDistance = 0;
+    }, { passive: true });
 
-      if (event.changedTouches.length === 1 && !bioTouchMoved) {
-        const touch = event.changedTouches[0];
-        const now = Date.now();
-        const nearLastTap = Math.hypot(
-          touch.clientX - bioLastTapX,
-          touch.clientY - bioLastTapY
-        ) < 28;
-
-        if (now - bioLastTapTime <= 300 && nearLastTap) {
-          event.preventDefault();
-          if (bioScale > 1) {
-            resetBioZoom(true);
-          } else {
-            zoomBioAt(touch.clientX, touch.clientY, BIO_DOUBLE_TAP_SCALE);
-          }
-          bioLastTapTime = 0;
-        } else {
-          bioLastTapTime = now;
-          bioLastTapX = touch.clientX;
-          bioLastTapY = touch.clientY;
-        }
-      }
-
-      if (bioScale <= 1.02) resetBioZoom(true);
-      bioTouchMoved = false;
-    }, { passive: false });
-
-    bioZoomStage.addEventListener('touchcancel', () => {
+    bioViewport.addEventListener('touchcancel', () => {
       bioStartDistance = 0;
-      bioTouchMoved = false;
-      if (bioScale <= 1.02) resetBioZoom(true);
     }, { passive: true });
 
+    // 회전 후 어중간한 배율에 갇히지 않도록 초기화 — 스펙 §7 테스트 7.
     window.addEventListener('orientationchange', resetBioZoom, { passive: true });
-    window.addEventListener('resize', () => {
-      if (bioScale > 1) applyBioTransform();
-    }, { passive: true });
-
-    // 2026-07-24 추가 (스펙 §12): Artist Bio 본문에 연결된 ResizeObserver는
-    // 이 하나뿐이다. KR/EN 전환·연보 펼침으로 본문 길이가 바뀔 때, 확대
-    // 중이었다면 팬 범위(clampBioPan)를 새 크기에 맞게 다시 계산한다.
-    // 1배(휴지) 상태에서는 아무 것도 하지 않아 브라우저 기본 스크롤에
-    // 전혀 개입하지 않는다.
-    const bioContentEl = bioZoomRoot.querySelector('.bio-content');
-    if ('ResizeObserver' in window && bioContentEl) {
-      const bioResizeObserver = new ResizeObserver(() => {
-        if (bioScale > 1) applyBioTransform();
-      });
-      bioResizeObserver.observe(bioContentEl);
-    }
   }
-
 
   setLang(lang);
   showPanel(savedState.panel === 'works' ? 'works' : 'home');
@@ -3941,32 +3413,6 @@
   updateHeaderHeightVar();
   updateHeaderCompact();
 })();
-
-
-  /* Artist Bio scroll-area height sync. The header remains fixed and only
-     .bio-viewport receives the remaining vertical space. */
-  (() => {
-    const modal = document.getElementById('bio-modal');
-    const card = modal?.querySelector('.bio-card');
-    const header = modal?.querySelector('.bio-header');
-    const viewport = modal?.querySelector('.bio-viewport');
-    if (!modal || !card || !header || !viewport) return;
-
-    const syncBioHeaderHeight = () => {
-      const headerHeight = Math.ceil(header.getBoundingClientRect().height);
-      card.style.setProperty('--bio-header-height', `${headerHeight}px`);
-    };
-
-    syncBioHeaderHeight();
-    window.addEventListener('resize', syncBioHeaderHeight, { passive: true });
-    window.addEventListener('orientationchange', syncBioHeaderHeight, { passive: true });
-    if ('ResizeObserver' in window) {
-      new ResizeObserver(syncBioHeaderHeight).observe(header);
-    }
-
-    /* One-finger movement at scale 1 is intentionally left completely
-       untouched so the browser owns native vertical scrolling. */
-  })();
 </script>
 
 </body>
