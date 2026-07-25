@@ -1616,6 +1616,80 @@
       touch-action: none !important;
     }
   }
+
+
+  /* ================================================================
+     JSKIM.ART — ARTIST BIO MOBILE/TABLET INTERNAL SCROLL COMPLETE FIX
+     Scope: touch phones/tablets only. UI, typography, spacing, zoom,
+     chronology and notebook/desktop layout remain unchanged.
+     ================================================================ */
+  @media (hover: none) and (pointer: coarse) {
+    #bio-modal.artist-bio-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      overflow: hidden !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .bio-card {
+      display: grid !important;
+      grid-template-rows: auto minmax(0, 1fr) !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .bio-header {
+      grid-row: 1 !important;
+      position: relative !important;
+      flex: none !important;
+      min-height: 0 !important;
+      overflow: visible !important;
+      touch-action: manipulation !important;
+    }
+
+    #bio-modal .bio-viewport {
+      grid-row: 2 !important;
+      position: relative !important;
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: calc(100dvh - var(--bio-header-height, 120px) - 32px) !important;
+
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-x: none !important;
+      overscroll-behavior-y: contain !important;
+      touch-action: pan-y pinch-zoom !important;
+      scrollbar-width: none !important;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="false"] {
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="false"] .bio-zoom-stage,
+    #bio-modal .bio-viewport[data-zoomed="false"] .bio-content {
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: visible !important;
+      touch-action: pan-y pinch-zoom !important;
+    }
+
+    /* 확대 중에는 기존 사용자 정의 한 손가락 이동을 유지한다. */
+    #bio-modal .bio-viewport[data-zoomed="true"] {
+      overflow: hidden !important;
+      touch-action: none !important;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="true"] .bio-zoom-stage {
+      touch-action: none !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -3716,6 +3790,38 @@
   updateHeaderHeightVar();
   updateHeaderCompact();
 })();
+
+
+  /* Artist Bio scroll-area height sync. The header remains fixed and only
+     .bio-viewport receives the remaining vertical space. */
+  (() => {
+    const modal = document.getElementById('bio-modal');
+    const card = modal?.querySelector('.bio-card');
+    const header = modal?.querySelector('.bio-header');
+    const viewport = modal?.querySelector('.bio-viewport');
+    if (!modal || !card || !header || !viewport) return;
+
+    const syncBioHeaderHeight = () => {
+      const headerHeight = Math.ceil(header.getBoundingClientRect().height);
+      card.style.setProperty('--bio-header-height', `${headerHeight}px`);
+    };
+
+    syncBioHeaderHeight();
+    window.addEventListener('resize', syncBioHeaderHeight, { passive: true });
+    window.addEventListener('orientationchange', syncBioHeaderHeight, { passive: true });
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(syncBioHeaderHeight).observe(header);
+    }
+
+    /* One-finger vertical movement at scale 1 must remain native scrolling.
+       Only pinch or the already-zoomed custom pan is canceled by the zoom engine. */
+    viewport.addEventListener('touchmove', (event) => {
+      const zoomed = viewport.dataset.zoomed === 'true';
+      if (!zoomed && event.touches.length === 1) {
+        event.stopPropagation();
+      }
+    }, { passive: true, capture: true });
+  })();
 </script>
 
 </body>
