@@ -1501,6 +1501,72 @@
     overflow: hidden;
   }
 
+
+  /* ================================================================
+     JSKIM.ART — TOUCH DEVICE ARTIST BIO BODY-ONLY ZOOM
+     Scope: Artist Bio on phones and touch tablets only.
+     Existing fonts, colors, spacing, modal dimensions, controls,
+     chronology, desktop/notebook layout and artwork viewer are unchanged.
+     ================================================================ */
+  @media (hover: none) and (pointer: coarse) {
+    #bio-modal.artist-bio-modal {
+      touch-action: pan-y;
+    }
+
+    #bio-modal .bio-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    #bio-modal .bio-header {
+      flex: 0 0 auto;
+    }
+
+    #bio-modal .bio-viewport {
+      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #bio-modal .bio-viewport::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    #bio-modal .bio-zoom-stage {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      transform: none;
+      transform-origin: 0 0;
+      will-change: transform;
+      touch-action: pan-y pinch-zoom;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="true"] {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #bio-modal .bio-viewport[data-zoomed="true"] .bio-zoom-stage {
+      touch-action: none;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -1713,7 +1779,9 @@
       <h2 id="bio-title" class="ko" style="font-family:var(--font-kr-display);">작가 소개</h2>
       <h2 class="en" style="display:none;font-family:var(--font-en-display);font-style:italic;">Artist Bio</h2>
     </div>
-    <div class="bio-content">
+    <div class="bio-viewport" data-zoomed="false">
+      <div class="bio-zoom-stage">
+        <div class="bio-content">
     <p class="bio-tagline ko">정산(靜山) 김연식은 회화와 사찰음식, 음악, 수행을 하나의 언어로 바라보는 한국의 현대미술가이다.</p>
     <p class="bio-tagline en" style="display:none;">JUNGSAN KIM YUN SIK is a Korean contemporary artist who sees painting, temple cuisine, music, and spiritual practice as a single artistic language.</p>
     <div class="bio-body">
@@ -1973,6 +2041,8 @@
       </div>
         </div>
       </div>
+      </div>
+    </div>
   </div>
 </div>
 
