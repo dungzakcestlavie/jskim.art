@@ -1122,7 +1122,12 @@
   .bio-tagline.en { font-family: var(--font-en-display); font-style: italic; letter-spacing: .01em; font-weight: 500; font-size: 16.5px; }
 
   .bio-body p {
-    margin: 0 0 18px; font-size: 14px; line-height: 1.85; color: var(--text-dim);
+    margin: 0 0 18px; font-size: 14px; line-height: 1.85;
+    /* 2026-07-25 미세조정: 본문 텍스트만 --text-dim(다른 여러 요소가
+       공유하는 변수)이 아니라 이 값을 직접 지정한다 -- 공유 변수를
+       바꾸면 footer/contact-row/desc 등 무관한 요소까지 함께 밝아져
+       버리므로, Artist Bio 본문에만 적용되도록 분리했다. */
+    color: #E0DBCC;
   }
   .bio-body p:last-child { margin-bottom: 0; }
   /* KR: slightly more air between lines and paragraphs, plus a touch of
