@@ -3431,7 +3431,13 @@
   }
 
   setLang(lang);
-  showPanel(savedState.panel === 'works' ? 'works' : 'home');
+  // 2026-08-23 수정: 루트(/) 진입은 항상 INTRO(home)에서 시작해야 한다 —
+  // "마지막으로 보고 있던 화면(작품 목록)"을 localStorage에서 복원해 바로
+  // 갤러리로 건너뛰는 것이 재접속 시 인트로가 안 뜨는 원인이었다. panel
+  // 자체는 여전히 saveUiState({panel:target})로 저장되지만(다른 기능에
+  // 영향 없음), 새로 불러온 페이지의 초기 화면 결정에는 더 이상 쓰지
+  // 않는다 — "작품" 버튼을 눌렀을 때만 showPanel('works')로 이동한다.
+  showPanel('home');
   loadWorks();
   updateHeaderHeightVar();
   updateHeaderCompact();
