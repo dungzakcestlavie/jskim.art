@@ -5780,33 +5780,5 @@
   "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/standard/A4-0042.jpg",
   "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/zoom/A4-0042.jpg",
   "status": "available"
-},
-{
-  "id": "A4-0043",
-  "section_key": "indramang-movement-4",
-  "title_kr": "",
-  "title_en": "",
-  "material_kr": "",
-  "material_en": "",
-  "size_kr": "",
-  "size_en": "",
-  "year": "",
-  "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/standard/A4-0043.jpg",
-  "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/zoom/A4-0043.jpg",
-  "status": "available"
-},
-{
-  "id": "A4-0044",
-  "section_key": "indramang-movement-4",
-  "title_kr": "",
-  "title_en": "",
-  "material_kr": "",
-  "material_en": "",
-  "size_kr": "",
-  "size_en": "",
-  "year": "",
-  "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/standard/A4-0044.jpg",
-  "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/zoom/A4-0044.jpg",
-  "status": "available"
-}  
+}
 ]
