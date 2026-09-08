@@ -1525,34 +1525,52 @@
   }
 
   /* Photo archive only: independent of Works and all other info panels. */
-  #info-modal.is-exhibition .bio-card { background: #f8f6f0; color: #172b43; border-color: #d8d2c5; }
-  #info-modal.is-exhibition #info-title { color: #172b43; }
-  #info-modal.is-exhibition #info-modal-close { color: #172b43; }
-  #info-modal.is-exhibition:not(.is-viewer) #exhibition-gallery { display: block; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #c5bcaa transparent; }
-  #info-modal.is-exhibition .views-tabs { display: flex; gap: 24px; border-bottom: 1px solid #d8d2c5; margin-bottom: 26px; flex-wrap: wrap; }
-  #info-modal.is-exhibition .views-tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 0 12px; color: #172b43; font: inherit; cursor: pointer; }
-  #info-modal.is-exhibition .views-tabs button[aria-pressed="true"] { border-bottom-color: #aa884c; }
+  #info-modal.is-exhibition .bio-card { background: #102e3b; color: #eee9db; border-color: #426268; }
+  #info-modal.is-exhibition #info-title { color: #eee9db; }
+  #info-modal.is-exhibition #info-modal-close { color: #eee9db; }
+  #info-modal.is-exhibition:not(.is-viewer) #exhibition-gallery { display: block; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #527879 transparent; }
+  #info-modal.is-exhibition .views-tabs { display: flex; gap: 24px; border-bottom: 1px solid #426268; margin-bottom: 26px; flex-wrap: wrap; }
+  #info-modal.is-exhibition .views-tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 0 12px; color: #eee9db; font: inherit; cursor: pointer; }
+  #info-modal.is-exhibition .views-tabs button[aria-pressed="true"] { border-bottom-color: #d1b67c; }
   #info-modal.is-exhibition .views-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 28px; }
-  #info-modal.is-exhibition .views-card { min-width: 0; border: 1px solid #ded9cf; background: #fffefa; align-self: start; }
+  #info-modal.is-exhibition .views-card { min-width: 0; border: 1px solid #35565e; background: #163b43; align-self: start; }
   #info-modal.is-exhibition .views-cover { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
   #info-modal.is-exhibition .views-card-body { padding: 22px; overflow-wrap: anywhere; }
-  #info-modal.is-exhibition .views-label { color: #8c713f; font-size: 12px; margin: 0 0 10px; }
+  #info-modal.is-exhibition .views-label { color: #d8c28e; font-size: 12px; margin: 0 0 10px; }
   #info-modal.is-exhibition .views-card h3 { font-size: 22px; line-height: 1.4; margin: 0 0 12px; }
   #info-modal.is-exhibition .views-meta, #info-modal.is-exhibition .views-description { font-size: 14px; line-height: 1.7; margin: 0 0 14px; }
-  #info-modal.is-exhibition .views-open, #info-modal.is-exhibition .views-back { background: transparent; color: #172b43; border: 0; border-bottom: 1px solid #aa884c; padding: 6px 0; font: inherit; cursor: pointer; align-self: flex-start; }
+  #info-modal.is-exhibition .views-open, #info-modal.is-exhibition .views-back { background: transparent; color: #eee9db; border: 0; border-bottom: 1px solid #d1b67c; padding: 6px 0; font: inherit; cursor: pointer; align-self: flex-start; }
   #info-modal.is-exhibition .views-back { flex: 0 0 auto; }
-  #info-modal.is-exhibition .exhibition-controls { color: #172b43; }
-  #info-modal.is-exhibition .exhibition-controls button { color: #172b43; border-color: #d8d2c5; }
+  #info-modal.is-exhibition .exhibition-controls { color: #eee9db; }
+  #info-modal.is-exhibition .exhibition-controls button { color: #eee9db; border-color: #426268; }
   @media(max-width: 600px) { #info-modal.is-exhibition .views-grid { grid-template-columns: 1fr; gap: 22px; } }
 
   #info-modal.is-exhibition .exhibition-stage { overflow: hidden; touch-action: none; user-select: none; }
   #info-modal.is-exhibition .exhibition-stage img { pointer-events: none; transform-origin: center; }
   #info-modal.is-exhibition .views-zoom { display: flex; justify-content: center; gap: 12px; flex: 0 0 auto; }
-  #info-modal.is-exhibition .views-zoom button { min-width: 40px; min-height: 32px; background: transparent; border: 1px solid #d8d2c5; color: #172b43; border-radius: 4px; font: inherit; cursor: pointer; }
+  #info-modal.is-exhibition .views-zoom button { min-width: 40px; min-height: 32px; background: transparent; border: 1px solid #426268; color: #eee9db; border-radius: 4px; font: inherit; cursor: pointer; }
 
   html.archive-scroll-locked { overflow: hidden !important; scrollbar-gutter: stable; }
   html.archive-scroll-locked body { overflow: hidden !important; }
   #info-modal.is-exhibition #exhibition-gallery { overscroll-behavior: contain; }
+
+  /* Archive palette: midnight blue, deep jade, ivory and champagne. */
+  #info-modal.is-exhibition .bio-card {
+    background: linear-gradient(135deg, #102738 0%, #123840 58%, #19463f 100%);
+    color: #eee9db;
+  }
+  #info-modal.is-exhibition .views-card { background: linear-gradient(145deg, #173442, #1a403f); }
+  #info-modal.is-exhibition .views-card h3 { color: #eee9db; }
+  #info-modal.is-exhibition .views-meta,
+  #info-modal.is-exhibition .views-description { color: #bdd0cb; }
+  #info-modal.is-exhibition .views-tabs button { color: #bdd0cb; }
+  #info-modal.is-exhibition .views-tabs button[aria-pressed="true"] { color: #e4ce9d; border-bottom-color: #d1b67c; }
+  #info-modal.is-exhibition .views-open,
+  #info-modal.is-exhibition .views-back { color: #e4ce9d; }
+  #info-modal.is-exhibition .views-zoom button:hover,
+  #info-modal.is-exhibition .exhibition-controls button:not(:disabled):hover { background: #284f50; border-color: #d1b67c; }
+  #info-modal.is-exhibition button:focus-visible,
+  #info-modal.is-exhibition .exhibition-stage:focus-visible { outline-color: #e4ce9d; }
 </style>
 </head>
 <body>
