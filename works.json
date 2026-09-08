@@ -11744,5 +11744,61 @@
   "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/standard/colorspace-0099.jpg",
   "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/zoom/colorspace-0099.jpg",
   "status": "available"
+},
+{
+  "id": "js001",
+  "section_key": "exhibition",
+  "title_kr": "",
+  "title_en": "",
+  "material_kr": "",
+  "material_en": "",
+  "size_kr": "",
+  "size_en": "",
+  "year": "",
+  "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js001.jpg",
+  "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js001.jpg",
+  "status": "available"
+},
+{
+  "id": "js002",
+  "section_key": "exhibition",
+  "title_kr": "",
+  "title_en": "",
+  "material_kr": "",
+  "material_en": "",
+  "size_kr": "",
+  "size_en": "",
+  "year": "",
+  "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js002.jpg",
+  "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js002.jpg",
+  "status": "available"
+},
+{
+  "id": "js003",
+  "section_key": "exhibition",
+  "title_kr": "",
+  "title_en": "",
+  "material_kr": "",
+  "material_en": "",
+  "size_kr": "",
+  "size_en": "",
+  "year": "",
+  "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js003.jpg",
+  "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js003.jpg",
+  "status": "available"
+},
+{
+  "id": "js004",
+  "section_key": "exhibition",
+  "title_kr": "",
+  "title_en": "",
+  "material_kr": "",
+  "material_en": "",
+  "size_kr": "",
+  "size_en": "",
+  "year": "",
+  "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js004.jpg",
+  "zoom": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/js004.jpg",
+  "status": "available"
 }
 ]
