@@ -1148,10 +1148,48 @@
   .bio-body p.en { padding: 0 16px; font-size: 16.6px; }
   #info-body { font-size: 14px; line-height: 1.8; }
   #exhibition-gallery[hidden] { display: none; }
-  #exhibition-gallery { display: grid; gap: 18px; min-width: 0; }
-  #exhibition-gallery a { display: block; min-width: 0; }
-  #exhibition-gallery img { display: block; width: 100%; height: auto; }
-  #exhibition-gallery a:focus-visible { outline: 2px solid var(--gold-base); outline-offset: 4px; }
+  #info-modal.is-exhibition .bio-card {
+    box-sizing: border-box; width: min(900px, 84vw); max-width: none;
+    height: 82vh; height: 82dvh; max-height: 82vh; max-height: 82dvh;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    margin: 0; padding: 28px 30px 30px; border-radius: 8px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  #info-modal.is-exhibition #info-title {
+    flex: 0 0 auto; font-size: 24px; line-height: 1.35;
+    margin: 0 38px 24px 0; overflow-wrap: anywhere;
+  }
+  #info-modal.is-exhibition #info-modal-close { top: 20px; right: 20px; }
+  #info-modal.is-exhibition #exhibition-gallery {
+    display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; gap: 16px;
+  }
+  #info-modal.is-exhibition .exhibition-stage {
+    flex: 1; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center;
+  }
+  #info-modal.is-exhibition .exhibition-stage img {
+    display: block; width: 100%; height: 100%; max-width: 100%; max-height: 64vh;
+    object-fit: contain;
+  }
+  #info-modal.is-exhibition .exhibition-controls {
+    flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 20px;
+    color: var(--text-dim); font-size: 13px;
+  }
+  #info-modal.is-exhibition .exhibition-controls button {
+    width: 44px; height: 36px; border: 1px solid var(--card-border); border-radius: 4px;
+    background: transparent; color: var(--text-main); font: inherit; cursor: pointer;
+  }
+  #info-modal.is-exhibition .exhibition-controls button:disabled { opacity: .3; cursor: default; }
+  #info-modal.is-exhibition .exhibition-controls button:focus-visible,
+  #info-modal.is-exhibition .exhibition-stage:focus-visible { outline: 2px solid var(--gold-base); outline-offset: 3px; }
+  @media (min-width: 601px) and (max-width: 1024px) {
+    #info-modal.is-exhibition .bio-card { width: min(820px, 90vw); }
+  }
+  @media (max-width: 600px) {
+    #info-modal.is-exhibition .bio-card { width: calc(100vw - 24px); height: 88vh; height: 88dvh; max-height: 88vh; max-height: 88dvh; padding: 18px; }
+    #info-modal.is-exhibition #info-title { font-size: 20px; margin-bottom: 20px; }
+    #info-modal.is-exhibition #info-modal-close { top: 18px; right: 18px; }
+    #info-modal.is-exhibition .exhibition-stage img { max-height: 70vh; }
+  }
 
   /* Chronology disclosure — reuses existing bio-modal tokens (card-border,
      gold-bright, text-dim, font-utility) only; no new colors or fonts. */
@@ -1485,6 +1523,27 @@
       transition-duration: .13s !important; /* 2026-07-25: 모바일 터치 피드백 속도 */
     }
   }
+
+  /* Photo archive only: independent of Works and all other info panels. */
+  #info-modal.is-exhibition .bio-card { background: #f8f6f0; color: #172b43; border-color: #d8d2c5; }
+  #info-modal.is-exhibition #info-title { color: #172b43; }
+  #info-modal.is-exhibition #info-modal-close { color: #172b43; }
+  #info-modal.is-exhibition:not(.is-viewer) #exhibition-gallery { display: block; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #c5bcaa transparent; }
+  #info-modal.is-exhibition .views-tabs { display: flex; gap: 24px; border-bottom: 1px solid #d8d2c5; margin-bottom: 26px; flex-wrap: wrap; }
+  #info-modal.is-exhibition .views-tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 0 12px; color: #172b43; font: inherit; cursor: pointer; }
+  #info-modal.is-exhibition .views-tabs button[aria-pressed="true"] { border-bottom-color: #aa884c; }
+  #info-modal.is-exhibition .views-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 28px; }
+  #info-modal.is-exhibition .views-card { min-width: 0; border: 1px solid #ded9cf; background: #fffefa; align-self: start; }
+  #info-modal.is-exhibition .views-cover { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+  #info-modal.is-exhibition .views-card-body { padding: 22px; overflow-wrap: anywhere; }
+  #info-modal.is-exhibition .views-label { color: #8c713f; font-size: 12px; margin: 0 0 10px; }
+  #info-modal.is-exhibition .views-card h3 { font-size: 22px; line-height: 1.4; margin: 0 0 12px; }
+  #info-modal.is-exhibition .views-meta, #info-modal.is-exhibition .views-description { font-size: 14px; line-height: 1.7; margin: 0 0 14px; }
+  #info-modal.is-exhibition .views-open, #info-modal.is-exhibition .views-back { background: transparent; color: #172b43; border: 0; border-bottom: 1px solid #aa884c; padding: 6px 0; font: inherit; cursor: pointer; align-self: flex-start; }
+  #info-modal.is-exhibition .views-back { flex: 0 0 auto; }
+  #info-modal.is-exhibition .exhibition-controls { color: #172b43; }
+  #info-modal.is-exhibition .exhibition-controls button { color: #172b43; border-color: #d8d2c5; }
+  @media(max-width: 600px) { #info-modal.is-exhibition .views-grid { grid-template-columns: 1fr; gap: 22px; } }
 </style>
 </head>
 <body>
@@ -1545,7 +1604,7 @@
           <circle cx="8.5" cy="9.5" r="1.5"/>
           <path d="M21 15l-5-5-4 4-3-3-5 5"/>
         </svg>
-        <span data-i18n="ko">전시 모습</span><span data-i18n="en">Exhibition Views</span>
+        <span data-i18n="ko">전시, 작업 모습</span><span data-i18n="en">Exhibition &amp; Work Process</span>
       </button>
       <button type="button" class="drawer-btn" data-info-target="news">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -2129,61 +2188,140 @@
       en: { title: 'Writings', body: 'This page is being prepared. It will feature JUNGSAN KIM YUN SIK\'s poetry, prose, and artist notes.' }
     },
     exhibition: {
-      ko: { title: '전시 모습', body: '전시 모습 페이지를 준비하고 있습니다. 전시장, 설치 사진, 오프닝, 관람객, 전시 기록이 이곳에 소개될 예정입니다.' },
-      en: { title: 'Exhibition Views', body: 'This page is being prepared. It will feature exhibition views, installation photos, openings, visitors, and exhibition records.' }
+      ko: { title: '전시, 작업 모습', body: '전시 모습 페이지를 준비하고 있습니다. 전시장, 설치 사진, 오프닝, 관람객, 전시 기록이 이곳에 소개될 예정입니다.' },
+      en: { title: 'Exhibition & Work Process', body: 'This page is being prepared. It will feature exhibition views, installation photos, openings, visitors, and exhibition records.' }
     },
     news: {
       ko: { title: '뉴스', body: '뉴스 페이지를 준비하고 있습니다. 전시 소식, 작품 발표, 언론 기사, 인터뷰, 공지사항이 이곳에 소개될 예정입니다.' },
       en: { title: 'News', body: 'This page is being prepared. It will feature exhibition news, new work announcements, press coverage, interviews, and notices.' }
     }
   };
+  const VIEWS_IMAGE_BASE = 'https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/exhibition/';
+  let viewRecords = null;
+  let viewCategory = 'exhibition';
+  let currentViewRecord = null;
+  function viewText(record, key) { return String(record[key + (lang === 'ko' ? '_kr' : '_en')] || ''); }
+  function viewImage(name) { return new URL(name, VIEWS_IMAGE_BASE).href; }
+  function viewElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text) element.textContent = text;
+    return element;
+  }
+  function showViewCards() {
+    currentViewRecord = null;
+    $('#info-modal').classList.remove('is-viewer');
+    $('#info-title').textContent = INFO_CONTENT.exhibition[lang].title;
+    const gallery = $('#exhibition-gallery'); gallery.replaceChildren();
+    const tabs = viewElement('div', 'views-tabs');
+    tabs.setAttribute('role', 'group');
+    tabs.setAttribute('aria-label', lang === 'ko' ? '기록 분류' : 'Archive categories');
+    const labels = lang === 'ko' ? ['전시 모습', '작업 모습'] : ['Exhibition Views', 'Work Process'];
+    ['exhibition', 'process'].forEach((category, index) => {
+      const button = viewElement('button', '', labels[index]); button.type = 'button';
+      button.setAttribute('aria-pressed', String(viewCategory === category));
+      button.addEventListener('click', () => { viewCategory = category; showViewCards(); $('#exhibition-gallery .views-tabs').children[index].focus(); });
+      tabs.appendChild(button);
+    });
+    const grid = viewElement('div', 'views-grid');
+    const records = (viewRecords || []).filter(record => record.active !== false && record.category === viewCategory).slice().sort((a,b) => Number(a.order || 0) - Number(b.order || 0));
+    records.forEach(record => {
+      const card = viewElement('article', 'views-card');
+      const title = viewText(record, 'title');
+      if (record.cover) {
+        const cover = viewElement('img', 'views-cover'); cover.src = viewImage(record.cover); cover.alt = title; cover.loading = 'lazy'; card.appendChild(cover);
+      }
+      const body = viewElement('div', 'views-card-body');
+      body.appendChild(viewElement('p', 'views-label', labels[viewCategory === 'exhibition' ? 0 : 1]));
+      if (title) body.appendChild(viewElement('h3', '', title));
+      const meta = [record.date, viewText(record, 'location')].filter(Boolean).join(' · ');
+      if (meta) body.appendChild(viewElement('p', 'views-meta', meta));
+      const description = viewText(record, 'description');
+      if (description) body.appendChild(viewElement('p', 'views-description', description));
+      const button = viewElement('button', 'views-open', lang === 'ko' ? '기록 보기' : 'View Archive'); button.type = 'button';
+      button.addEventListener('click', () => {
+        currentViewRecord = record; exhibitionIndex = 0;
+        exhibitionPhotos = record.images.map(name => ({ image: viewImage(name), zoom: viewImage(name), title_kr: record.title_kr || '', title_en: record.title_en || '' }));
+        showExhibitionPhoto(); $('#exhibition-gallery .views-back').focus();
+      });
+      body.appendChild(button); card.appendChild(body); grid.appendChild(card);
+    });
+    if (!records.length) grid.appendChild(viewElement('p', '', lang === 'ko' ? '등록된 기록이 없습니다.' : 'No records yet.'));
+    gallery.append(tabs, grid);
+  }
   let exhibitionRequest = 0;
-  async function renderExhibitionGallery() {
-    const request = ++exhibitionRequest;
+  let exhibitionPhotos = [];
+  let exhibitionIndex = 0;
+  function showExhibitionPhoto() {
     const gallery = $('#exhibition-gallery');
     gallery.replaceChildren();
+    $('#info-modal').classList.add('is-viewer');
+    if (currentViewRecord) $('#info-title').textContent = viewText(currentViewRecord, 'title') || INFO_CONTENT.exhibition[lang].title;
+    if (!exhibitionPhotos.length) {
+      gallery.textContent = lang === 'ko' ? '등록된 사진이 없습니다.' : 'No photographs yet.';
+      return;
+    }
+    exhibitionIndex = Math.min(exhibitionIndex, exhibitionPhotos.length - 1);
+    const work = exhibitionPhotos[exhibitionIndex];
+    const link = document.createElement('a');
+    link.className = 'exhibition-stage';
+    link.href = work.zoom || work.image;
+    link.target = '_blank'; link.rel = 'noopener';
+    const label = field(work, 'title') || (lang === 'ko' ? '전시 기록 사진 ' : 'Exhibition photograph ') + (exhibitionIndex + 1);
+    link.setAttribute('aria-label', label + (lang === 'ko' ? ' — 원본 새 탭에서 열기' : ' — open original in new tab'));
+    const img = document.createElement('img');
+    img.src = work.image; img.alt = label; img.decoding = 'async';
+    link.appendChild(img);
+    const controls = document.createElement('div'); controls.className = 'exhibition-controls';
+    const prev = document.createElement('button'); prev.type = 'button'; prev.textContent = '←';
+    prev.setAttribute('aria-label', lang === 'ko' ? '이전 사진' : 'Previous photograph');
+    prev.disabled = exhibitionIndex === 0;
+    const counter = document.createElement('span'); counter.setAttribute('aria-live', 'polite');
+    counter.textContent = (exhibitionIndex + 1) + ' / ' + exhibitionPhotos.length;
+    const next = document.createElement('button'); next.type = 'button'; next.textContent = '→';
+    next.setAttribute('aria-label', lang === 'ko' ? '다음 사진' : 'Next photograph');
+    next.disabled = exhibitionIndex === exhibitionPhotos.length - 1;
+    function move(delta) {
+      exhibitionIndex += delta; showExhibitionPhoto();
+      const buttons = gallery.querySelectorAll('.exhibition-controls button');
+      const preferred = delta > 0 ? buttons[1] : buttons[0];
+      (preferred.disabled ? buttons[delta > 0 ? 0 : 1] : preferred).focus();
+    }
+    prev.addEventListener('click', () => move(-1));
+    next.addEventListener('click', () => move(1));
+    const back = viewElement('button', 'views-back', lang === 'ko' ? '← 기록 목록' : '← Back to archives'); back.type = 'button';
+    back.addEventListener('click', () => { showViewCards(); $('#exhibition-gallery .views-open')?.focus(); });
+    controls.append(prev, counter, next); gallery.append(back, link, controls);
+  }
+  async function renderExhibitionGallery() {
+    if (currentViewRecord) { showExhibitionPhoto(); return; }
+    const request = ++exhibitionRequest;
+    const gallery = $('#exhibition-gallery'); gallery.replaceChildren();
+    $('#info-modal').classList.remove('is-viewer');
+    gallery.textContent = lang === 'ko' ? '기록을 불러오는 중입니다.' : 'Loading archives…';
     try {
-      const responses = await Promise.all([
-        fetch('works.json', { cache: 'no-store' }),
-        fetch('sections.json', { cache: 'no-store' })
-      ]);
-      if (responses.some(response => !response.ok)) throw new Error('Exhibition data unavailable');
-      const [worksData, sectionData] = await Promise.all(responses.map(response => response.json()));
-      if (!Array.isArray(worksData) || !Array.isArray(sectionData)) throw new Error('Invalid exhibition data');
+      const response = await fetch('views.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Archive data unavailable');
+      const records = await response.json();
+      if (!Array.isArray(records) || records.some(record => !record || !Array.isArray(record.images))) throw new Error('Invalid archive data');
       if (request !== exhibitionRequest || currentInfoKey !== 'exhibition') return;
-      const section = sectionData.find(item => item.key === 'exhibition' && item.active !== false);
-      if (!section) return;
-      $('#info-title').textContent = section[lang === 'ko' ? 'title_kr' : 'title_en'] || section.title_kr;
-      const photos = worksData.filter(work => work.section_key === 'exhibition');
-      photos.forEach((work, index) => {
-        const link = document.createElement('a');
-        link.href = work.zoom || work.image;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        const label = field(work, 'title') || (lang === 'ko' ? '전시 기록 사진 ' : 'Exhibition photograph ') + (index + 1);
-        link.setAttribute('aria-label', label + (lang === 'ko' ? ' — 원본 새 탭에서 열기' : ' — open original in new tab'));
-        const img = document.createElement('img');
-        img.src = work.image;
-        img.alt = label;
-        img.loading = index === 0 ? 'eager' : 'lazy';
-        img.decoding = 'async';
-        link.appendChild(img);
-        gallery.appendChild(link);
-      });
+      viewRecords = records; showViewCards();
     } catch (error) {
       if (request !== exhibitionRequest || currentInfoKey !== 'exhibition') return;
-      gallery.textContent = lang === 'ko' ? '사진을 불러오지 못했습니다. 잠시 후 전시 모습을 다시 열어 주세요.' : 'Unable to load photographs. Please reopen Exhibition Views to retry.';
+      gallery.textContent = lang === 'ko' ? '기록을 불러오지 못했습니다. 닫은 후 다시 열어 주세요.' : 'Unable to load archives. Please close and reopen.';
     }
   }
   let currentInfoKey = null;
   function openInfoModal(key) {
     const data = INFO_CONTENT[key];
     if (!data) return;
+    if (key === 'exhibition' && currentInfoKey !== key) { exhibitionIndex = 0; viewCategory = 'exhibition'; currentViewRecord = null; }
     currentInfoKey = key;
     const d = data[lang] || data.ko;
     $('#info-title').textContent = d.title;
     $('#info-body').textContent = d.body;
     const isExhibition = key === 'exhibition';
+    $('#info-modal').classList.toggle('is-exhibition', isExhibition);
     $('#info-body').hidden = isExhibition;
     $('#exhibition-gallery').hidden = !isExhibition;
     if (isExhibition) renderExhibitionGallery();
