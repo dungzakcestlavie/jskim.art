@@ -1147,6 +1147,11 @@
      padding — no layout, width, or popup size change. */
   .bio-body p.en { padding: 0 16px; font-size: 16.6px; }
   #info-body { font-size: 14px; line-height: 1.8; }
+  #exhibition-gallery[hidden] { display: none; }
+  #exhibition-gallery { display: grid; gap: 18px; min-width: 0; }
+  #exhibition-gallery a { display: block; min-width: 0; }
+  #exhibition-gallery img { display: block; width: 100%; height: auto; }
+  #exhibition-gallery a:focus-visible { outline: 2px solid var(--gold-base); outline-offset: 4px; }
 
   /* Chronology disclosure — reuses existing bio-modal tokens (card-border,
      gold-bright, text-dim, font-utility) only; no new colors or fonts. */
@@ -1972,6 +1977,7 @@
     <button class="bio-close" id="info-modal-close" aria-label="close">&times;</button>
     <h2 id="info-title" style="font-family:var(--font-kr-display);"></h2>
     <p id="info-body" style="color:var(--text-dim);"></p>
+    <div id="exhibition-gallery" hidden></div>
   </div>
 </div>
 
@@ -2131,6 +2137,44 @@
       en: { title: 'News', body: 'This page is being prepared. It will feature exhibition news, new work announcements, press coverage, interviews, and notices.' }
     }
   };
+  let exhibitionRequest = 0;
+  async function renderExhibitionGallery() {
+    const request = ++exhibitionRequest;
+    const gallery = $('#exhibition-gallery');
+    gallery.replaceChildren();
+    try {
+      const responses = await Promise.all([
+        fetch('works.json', { cache: 'no-store' }),
+        fetch('sections.json', { cache: 'no-store' })
+      ]);
+      if (responses.some(response => !response.ok)) throw new Error('Exhibition data unavailable');
+      const [worksData, sectionData] = await Promise.all(responses.map(response => response.json()));
+      if (!Array.isArray(worksData) || !Array.isArray(sectionData)) throw new Error('Invalid exhibition data');
+      if (request !== exhibitionRequest || currentInfoKey !== 'exhibition') return;
+      const section = sectionData.find(item => item.key === 'exhibition' && item.active !== false);
+      if (!section) return;
+      $('#info-title').textContent = section[lang === 'ko' ? 'title_kr' : 'title_en'] || section.title_kr;
+      const photos = worksData.filter(work => work.section_key === 'exhibition');
+      photos.forEach((work, index) => {
+        const link = document.createElement('a');
+        link.href = work.zoom || work.image;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        const label = field(work, 'title') || (lang === 'ko' ? '전시 기록 사진 ' : 'Exhibition photograph ') + (index + 1);
+        link.setAttribute('aria-label', label + (lang === 'ko' ? ' — 원본 새 탭에서 열기' : ' — open original in new tab'));
+        const img = document.createElement('img');
+        img.src = work.image;
+        img.alt = label;
+        img.loading = index === 0 ? 'eager' : 'lazy';
+        img.decoding = 'async';
+        link.appendChild(img);
+        gallery.appendChild(link);
+      });
+    } catch (error) {
+      if (request !== exhibitionRequest || currentInfoKey !== 'exhibition') return;
+      gallery.textContent = lang === 'ko' ? '사진을 불러오지 못했습니다. 잠시 후 전시 모습을 다시 열어 주세요.' : 'Unable to load photographs. Please reopen Exhibition Views to retry.';
+    }
+  }
   let currentInfoKey = null;
   function openInfoModal(key) {
     const data = INFO_CONTENT[key];
@@ -2139,11 +2183,16 @@
     const d = data[lang] || data.ko;
     $('#info-title').textContent = d.title;
     $('#info-body').textContent = d.body;
+    const isExhibition = key === 'exhibition';
+    $('#info-body').hidden = isExhibition;
+    $('#exhibition-gallery').hidden = !isExhibition;
+    if (isExhibition) renderExhibitionGallery();
     $('#info-modal').hidden = false;
   }
   function closeInfoModal() {
     $('#info-modal').hidden = true;
     currentInfoKey = null;
+    exhibitionRequest++;
   }
   $('#info-modal-close').addEventListener('click', closeInfoModal);
   $('#info-modal .bio-backdrop').addEventListener('click', closeInfoModal);
@@ -2273,8 +2322,8 @@
         fetch('works.json?v=' + ASSET_VERSION),
         fetch('sections.json?v=' + ASSET_VERSION)
       ]);
-      allWorks = await worksRes.json();
-      sections = await sectionsRes.json();
+      allWorks = (await worksRes.json()).filter(work => work.section_key !== 'exhibition');
+      sections = (await sectionsRes.json()).filter(section => section.key !== 'exhibition');
     } catch (e) {
       allWorks = []; sections = [];
     }
