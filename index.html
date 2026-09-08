@@ -1549,6 +1549,10 @@
   #info-modal.is-exhibition .exhibition-stage img { pointer-events: none; transform-origin: center; }
   #info-modal.is-exhibition .views-zoom { display: flex; justify-content: center; gap: 12px; flex: 0 0 auto; }
   #info-modal.is-exhibition .views-zoom button { min-width: 40px; min-height: 32px; background: transparent; border: 1px solid #d8d2c5; color: #172b43; border-radius: 4px; font: inherit; cursor: pointer; }
+
+  html.archive-scroll-locked { overflow: hidden !important; scrollbar-gutter: stable; }
+  html.archive-scroll-locked body { overflow: hidden !important; }
+  #info-modal.is-exhibition #exhibition-gallery { overscroll-behavior: contain; }
 </style>
 </head>
 <body>
@@ -2215,6 +2219,7 @@
   }
   function showViewCards() {
     currentViewRecord = null;
+    archiveWheelZoom = null;
     $('#info-modal').classList.remove('is-viewer');
     $('#info-title').textContent = INFO_CONTENT.exhibition[lang].title;
     const gallery = $('#exhibition-gallery'); gallery.replaceChildren();
@@ -2254,6 +2259,7 @@
     if (!records.length) grid.appendChild(viewElement('p', '', lang === 'ko' ? '등록된 기록이 없습니다.' : 'No records yet.'));
     gallery.append(tabs, grid);
   }
+  let archiveWheelZoom = null;
   let exhibitionRequest = 0;
   let exhibitionPhotos = [];
   let exhibitionIndex = 0;
@@ -2323,7 +2329,10 @@
     stage.addEventListener('pointerup', event => end(event,false));
     stage.addEventListener('pointercancel', event => end(event,true));
     stage.addEventListener('lostpointercapture', event => end(event,true));
-    stage.addEventListener('wheel', event => { event.preventDefault(); zoom(scale*Math.exp(-event.deltaY*0.002)); }, {passive:false});
+    function wheelZoom(event) {
+      const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1);
+      zoom(scale * Math.exp(-Math.max(-200, Math.min(200, delta)) * 0.002));
+    }
     stage.addEventListener('keydown', event => {
       if (['ArrowLeft','ArrowRight','+','=','-','0'].includes(event.key)) event.preventDefault();
       if(event.key==='ArrowLeft')changePhoto(-1);
@@ -2333,7 +2342,7 @@
       if(event.key==='0')reset();
     });
     img.draggable=false; paint();
-    return { zoomIn:()=>zoom(scale*1.3), zoomOut:()=>zoom(scale/1.3), reset };
+    return { zoomIn:()=>zoom(scale*1.3), zoomOut:()=>zoom(scale/1.3), reset, wheelZoom };
   }
   function showExhibitionPhoto() {
     const gallery = $('#exhibition-gallery');
@@ -2376,6 +2385,7 @@
     const back = viewElement('button', 'views-back', lang === 'ko' ? '← 기록 목록' : '← Back to archives'); back.type = 'button';
     back.addEventListener('click', () => { showViewCards(); $('#exhibition-gallery .views-open')?.focus(); });
     const gestures = enableArchiveGestures(link, img, move);
+    archiveWheelZoom = gestures.wheelZoom;
     const toolbar = viewElement('div', 'views-zoom');
     [['−', lang === 'ko' ? '축소' : 'Zoom out', gestures.zoomOut],
      ['1:1', lang === 'ko' ? '확대 초기화' : 'Reset zoom', gestures.reset],
@@ -2412,6 +2422,7 @@
     $('#info-title').textContent = d.title;
     $('#info-body').textContent = d.body;
     const isExhibition = key === 'exhibition';
+    document.documentElement.classList.toggle('archive-scroll-locked', isExhibition);
     $('#info-modal').classList.toggle('is-exhibition', isExhibition);
     $('#info-body').hidden = isExhibition;
     $('#exhibition-gallery').hidden = !isExhibition;
@@ -2420,9 +2431,21 @@
   }
   function closeInfoModal() {
     $('#info-modal').hidden = true;
+    document.documentElement.classList.remove('archive-scroll-locked');
+    archiveWheelZoom = null;
     currentInfoKey = null;
     exhibitionRequest++;
   }
+  $('#info-modal').addEventListener('wheel', event => {
+    if (currentInfoKey !== 'exhibition' || $('#info-modal').hidden) return;
+    if ($('#info-modal').classList.contains('is-viewer')) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (archiveWheelZoom) archiveWheelZoom(event);
+    } else if (!event.target.closest('#exhibition-gallery')) {
+      event.preventDefault();
+    }
+  }, { passive: false, capture: true });
   $('#info-modal-close').addEventListener('click', closeInfoModal);
   $('#info-modal .bio-backdrop').addEventListener('click', closeInfoModal);
   $$('.drawer-btn').forEach(btn => {
