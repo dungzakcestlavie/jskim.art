@@ -1,0 +1,22 @@
+[
+  {
+    "id": "process-001",
+    "category": "process",
+    "title_kr": "작업 모습",
+    "title_en": "Work Process",
+    "date": "",
+    "location_kr": "",
+    "location_en": "",
+    "description_kr": "",
+    "description_en": "",
+    "cover": "js001.jpg",
+    "images": [
+      "js001.jpg",
+      "js002.jpg",
+      "js003.jpg",
+      "js004.jpg"
+    ],
+    "order": 1,
+    "active": true
+  }
+]
