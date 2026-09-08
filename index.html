@@ -1544,6 +1544,11 @@
   #info-modal.is-exhibition .exhibition-controls { color: #172b43; }
   #info-modal.is-exhibition .exhibition-controls button { color: #172b43; border-color: #d8d2c5; }
   @media(max-width: 600px) { #info-modal.is-exhibition .views-grid { grid-template-columns: 1fr; gap: 22px; } }
+
+  #info-modal.is-exhibition .exhibition-stage { overflow: hidden; touch-action: none; user-select: none; }
+  #info-modal.is-exhibition .exhibition-stage img { pointer-events: none; transform-origin: center; }
+  #info-modal.is-exhibition .views-zoom { display: flex; justify-content: center; gap: 12px; flex: 0 0 auto; }
+  #info-modal.is-exhibition .views-zoom button { min-width: 40px; min-height: 32px; background: transparent; border: 1px solid #d8d2c5; color: #172b43; border-radius: 4px; font: inherit; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -2252,6 +2257,84 @@
   let exhibitionRequest = 0;
   let exhibitionPhotos = [];
   let exhibitionIndex = 0;
+  function enableArchiveGestures(stage, img, changePhoto) {
+    let scale = 1, x = 0, y = 0, base = null, swipe = null, lastTap = null;
+    const points = new Map();
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const distance = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+    function paint() {
+      const maxX = stage.clientWidth * (scale - 1) / 2;
+      const maxY = stage.clientHeight * (scale - 1) / 2;
+      x = clamp(x, -maxX, maxX); y = clamp(y, -maxY, maxY);
+      img.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')';
+      stage.style.cursor = scale > 1 ? 'grab' : 'default';
+    }
+    function zoom(next) { scale = clamp(next, 1, 6); if (scale === 1) x = y = 0; paint(); }
+    function reset() { zoom(1); }
+    function rebase() {
+      const values = [...points.values()];
+      if (values.length >= 2) {
+        const rect = stage.getBoundingClientRect();
+        base = { distance: Math.max(1, distance(values[0],values[1])), scale, x, y,
+          cx: (values[0].x+values[1].x)/2-rect.left-rect.width/2,
+          cy: (values[0].y+values[1].y)/2-rect.top-rect.height/2 };
+      } else if (values.length) base = { point: values[0], x, y };
+      else base = null;
+    }
+    stage.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      event.preventDefault(); stage.setPointerCapture(event.pointerId);
+      points.set(event.pointerId, {x:event.clientX,y:event.clientY});
+      swipe = points.size === 1 ? {x:event.clientX,y:event.clientY,time:Date.now(),scale,moved:false} : null;
+      if (points.size > 1) lastTap = null;
+      rebase();
+    });
+    stage.addEventListener('pointermove', event => {
+      if (!points.has(event.pointerId)) return;
+      event.preventDefault(); points.set(event.pointerId,{x:event.clientX,y:event.clientY});
+      const values = [...points.values()];
+      if (swipe && Math.hypot(event.clientX-swipe.x,event.clientY-swipe.y)>10) swipe.moved=true;
+      if (values.length >= 2 && base.distance) {
+        const rect = stage.getBoundingClientRect();
+        scale = clamp(base.scale * distance(values[0],values[1])/base.distance,1,6);
+        const cx=(values[0].x+values[1].x)/2-rect.left-rect.width/2;
+        const cy=(values[0].y+values[1].y)/2-rect.top-rect.height/2;
+        x=cx-(base.cx-base.x)*scale/base.scale; y=cy-(base.cy-base.y)*scale/base.scale; paint();
+      } else if (values.length === 1 && base.point && scale > 1) {
+        x=base.x+event.clientX-base.point.x; y=base.y+event.clientY-base.point.y; paint();
+      }
+    });
+    function end(event, cancelled) {
+      if (!points.has(event.pointerId)) return;
+      const gesture=swipe; points.delete(event.pointerId); swipe=null;
+      if (!cancelled && points.size === 0 && gesture) {
+        const dx=event.clientX-gesture.x, dy=event.clientY-gesture.y;
+        if (gesture.scale === 1 && scale === 1 && Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.4 && Date.now()-gesture.time<900) {
+          lastTap=null; changePhoto(dx<0?1:-1); return;
+        }
+        if (!gesture.moved && Date.now()-gesture.time<350) {
+          const now=Date.now();
+          if (lastTap && now-lastTap.time<320 && Math.hypot(event.clientX-lastTap.x,event.clientY-lastTap.y)<25) { zoom(scale>1?1:2); lastTap=null; }
+          else lastTap={time:now,x:event.clientX,y:event.clientY};
+        } else lastTap=null;
+      }
+      rebase();
+    }
+    stage.addEventListener('pointerup', event => end(event,false));
+    stage.addEventListener('pointercancel', event => end(event,true));
+    stage.addEventListener('lostpointercapture', event => end(event,true));
+    stage.addEventListener('wheel', event => { event.preventDefault(); zoom(scale*Math.exp(-event.deltaY*0.002)); }, {passive:false});
+    stage.addEventListener('keydown', event => {
+      if (['ArrowLeft','ArrowRight','+','=','-','0'].includes(event.key)) event.preventDefault();
+      if(event.key==='ArrowLeft')changePhoto(-1);
+      if(event.key==='ArrowRight')changePhoto(1);
+      if(event.key==='+' || event.key==='=')zoom(scale*1.3);
+      if(event.key==='-')zoom(scale/1.3);
+      if(event.key==='0')reset();
+    });
+    img.draggable=false; paint();
+    return { zoomIn:()=>zoom(scale*1.3), zoomOut:()=>zoom(scale/1.3), reset };
+  }
   function showExhibitionPhoto() {
     const gallery = $('#exhibition-gallery');
     gallery.replaceChildren();
@@ -2263,14 +2346,14 @@
     }
     exhibitionIndex = Math.min(exhibitionIndex, exhibitionPhotos.length - 1);
     const work = exhibitionPhotos[exhibitionIndex];
-    const link = document.createElement('a');
+    const link = document.createElement('div');
     link.className = 'exhibition-stage';
-    link.href = work.zoom || work.image;
-    link.target = '_blank'; link.rel = 'noopener';
+    link.tabIndex = 0;
+    link.setAttribute('role', 'group');
     const label = field(work, 'title') || (lang === 'ko' ? '전시 기록 사진 ' : 'Exhibition photograph ') + (exhibitionIndex + 1);
-    link.setAttribute('aria-label', label + (lang === 'ko' ? ' — 원본 새 탭에서 열기' : ' — open original in new tab'));
+    link.setAttribute('aria-label', label + (lang === 'ko' ? ' — 좌우로 넘기기, 두 손가락 확대' : ' — swipe to navigate, pinch to zoom'));
     const img = document.createElement('img');
-    img.src = work.image; img.alt = label; img.decoding = 'async';
+    img.src = work.zoom || work.image; img.alt = label; img.decoding = 'async';
     link.appendChild(img);
     const controls = document.createElement('div'); controls.className = 'exhibition-controls';
     const prev = document.createElement('button'); prev.type = 'button'; prev.textContent = '←';
@@ -2282,6 +2365,7 @@
     next.setAttribute('aria-label', lang === 'ko' ? '다음 사진' : 'Next photograph');
     next.disabled = exhibitionIndex === exhibitionPhotos.length - 1;
     function move(delta) {
+      if (exhibitionIndex + delta < 0 || exhibitionIndex + delta >= exhibitionPhotos.length) return;
       exhibitionIndex += delta; showExhibitionPhoto();
       const buttons = gallery.querySelectorAll('.exhibition-controls button');
       const preferred = delta > 0 ? buttons[1] : buttons[0];
@@ -2291,7 +2375,14 @@
     next.addEventListener('click', () => move(1));
     const back = viewElement('button', 'views-back', lang === 'ko' ? '← 기록 목록' : '← Back to archives'); back.type = 'button';
     back.addEventListener('click', () => { showViewCards(); $('#exhibition-gallery .views-open')?.focus(); });
-    controls.append(prev, counter, next); gallery.append(back, link, controls);
+    const gestures = enableArchiveGestures(link, img, move);
+    const toolbar = viewElement('div', 'views-zoom');
+    [['−', lang === 'ko' ? '축소' : 'Zoom out', gestures.zoomOut],
+     ['1:1', lang === 'ko' ? '확대 초기화' : 'Reset zoom', gestures.reset],
+     ['+', lang === 'ko' ? '확대' : 'Zoom in', gestures.zoomIn]].forEach(([text,label,action]) => {
+      const button=viewElement('button','',text); button.type='button';button.setAttribute('aria-label',label);button.addEventListener('click',action);toolbar.appendChild(button);
+    });
+    controls.append(prev, counter, next); gallery.append(back, toolbar, link, controls);
   }
   async function renderExhibitionGallery() {
     if (currentViewRecord) { showExhibitionPhoto(); return; }
