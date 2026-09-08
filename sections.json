@@ -85,5 +85,12 @@
     "title_en": "Into the Manicure",
     "active": true,
     "order": 7
-  }
+  },
+{
+  "key": "exhibition",
+  "title_kr": "전시 모습",
+  "title_en": "Exhibition Views",
+  "active": true,
+  "order": 8
+}
 ]
