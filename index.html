@@ -942,7 +942,7 @@
     word-break: normal;
   }
 
-  html[data-lang="en"] .card .meta .t.has-underscore-break {
+  html .card .meta .t.has-underscore-break {
     white-space: pre-line;
     word-break: keep-all;
     overflow-wrap: normal;
@@ -3042,7 +3042,7 @@
   function buildCardHTML(work, index) {
     try {
       const title = field(work, 'title');
-      const breakTitle = lang === 'en' && getWorkSectionKey(work) === 'manicure' && typeof title === 'string' && title.includes('_');
+      const breakTitle = getWorkSectionKey(work) === 'manicure' && typeof title === 'string' && title.includes('_');
       const displayTitle = breakTitle ? title.replace('_', '_\n') : title;
       const material = field(work, 'material');
       const isYeosuWork = getWorkSectionKey(work) === 'yeosu';
