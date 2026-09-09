@@ -80,5 +80,26 @@
     ],
     "order": 1,
     "active": true
+  },
+  {
+    "id": "process-002",
+    "category": "process",
+    "title_kr": "작업 모습",
+    "title_en": "Working Process",
+    "date": "",
+    "location_kr": "",
+    "location_en": "",
+    "description_kr": "",
+    "description_en": "",
+    "cover": "js051.jpg",
+    "images": [
+      "js051.jpg",
+      "js052.jpg",
+      "js053.jpg",
+      "js054.jpg",
+      "js055.jpg"
+    ],
+    "order": 2,
+    "active": true
   }
 ]
