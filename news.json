@@ -1,0 +1,67 @@
+[
+  {
+    "id": "news001",
+    "title_kr": "",
+    "title_en": "",
+    "body_kr": "",
+    "body_en": "",
+    "date": "",
+    "image": "news/news001.jpg",
+    "alt_kr": "",
+    "alt_en": "",
+    "active": true,
+    "order": 1
+  },
+  {
+    "id": "news002",
+    "title_kr": "",
+    "title_en": "",
+    "body_kr": "",
+    "body_en": "",
+    "date": "",
+    "image": "news/news002.jpg",
+    "alt_kr": "",
+    "alt_en": "",
+    "active": true,
+    "order": 2
+  },
+  {
+    "id": "news003",
+    "title_kr": "",
+    "title_en": "",
+    "body_kr": "",
+    "body_en": "",
+    "date": "",
+    "image": "news/news003.jpg",
+    "alt_kr": "",
+    "alt_en": "",
+    "active": true,
+    "order": 3
+  },
+  {
+    "id": "news004",
+    "title_kr": "",
+    "title_en": "",
+    "body_kr": "",
+    "body_en": "",
+    "date": "",
+    "image": "news/news004.jpg",
+    "alt_kr": "",
+    "alt_en": "",
+    "active": true,
+    "order": 4
+  },
+  {
+    "id": "news005",
+    "title_kr": "",
+    "title_en": "",
+    "body_kr": "",
+    "body_en": "",
+    "date": "",
+    "image": "news/news005.jpg",
+    "alt_kr": "",
+    "alt_en": "",
+    "active": true,
+    "order": 5
+  }
+]
