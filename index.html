@@ -1578,6 +1578,30 @@
   #info-modal.is-exhibition button:focus-visible,
   #info-modal.is-exhibition .exhibition-stage:focus-visible { outline-color: #e4ce9d; }
   #info-modal.is-exhibition > .bio-backdrop { background: #071321; opacity: 1; backdrop-filter: none; }
+
+  /* News archive: scoped additions only. */
+  #news-archive[hidden] { display: none !important; }
+  #info-modal.is-news > .bio-backdrop { background: #071321; }
+  #info-modal.is-news .bio-card { width: calc(100% - 32px); max-width: 1180px; margin: 4vh auto; max-height: 92vh; max-height: 92dvh; padding: 28px; background: #10264b; color: #f0ecdf; border-color: #45666b; overscroll-behavior: contain; }
+  #info-modal.is-news #info-title { color: #f0ecdf; padding-right: 48px; }
+  #info-modal.is-news #info-modal-close { color: #f0ecdf; width: 44px; height: 44px; }
+  #info-modal.is-news button:focus-visible { outline: 2px solid #e4ce9d; outline-offset: 3px; }
+  #news-archive .news-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  #news-archive .news-languages { display: flex; gap: 10px; margin-bottom: 22px; }
+  #news-archive .news-languages button { background: transparent; border: 1px solid #45666b; border-radius: 4px; color: #f0ecdf; min-height: 44px; min-width: 44px; font: inherit; cursor: pointer; }
+  #news-archive .news-languages button[aria-pressed="true"] { color: #e4ce9d; border-color: #e4ce9d; }
+  #news-archive .news-card { min-width: 0; background: linear-gradient(145deg,#153744,#16443f); border: 1px solid #45666b; border-radius: 6px; overflow: hidden; }
+  #news-archive .news-image { display: block; width: 100%; height: auto; color: #f0ecdf; }
+  #news-archive .news-copy { padding: 24px; overflow-wrap: anywhere; }
+  #news-archive h3 { font-size: 1.35rem; line-height: 1.5; margin: 0 0 20px; color: #f0ecdf; }
+  #news-archive .news-body { white-space: pre-wrap; font-size: 1rem; line-height: 1.9; color: #f0ecdf; margin: 0; }
+  #news-archive .news-date { display: block; color: #e4ce9d; font-size: .875rem; margin-bottom: 12px; }
+  #news-archive .news-status { color: #f0ecdf; font-size: 1rem; line-height: 1.8; }
+  @media (max-width: 760px) {
+    #news-archive .news-grid { grid-template-columns: 1fr; }
+    #info-modal.is-news .bio-card { padding: 20px 16px; }
+    #news-archive .news-copy { padding: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -2071,6 +2095,7 @@
     <h2 id="info-title" style="font-family:var(--font-kr-display);"></h2>
     <p id="info-body" style="color:var(--text-dim);"></p>
     <div id="exhibition-gallery" hidden></div>
+    <div id="news-archive" hidden></div>
   </div>
 </div>
 
@@ -2437,29 +2462,124 @@
       gallery.textContent = lang === 'ko' ? '기록을 불러오지 못했습니다. 닫은 후 다시 열어 주세요.' : 'Unable to load archives. Please close and reopen.';
     }
   }
+
+  let newsRecords = null;
+  let newsRequest = 0;
+  let newsReturnFocus = null;
+  function newsText(record, field) {
+    return record[field + (lang === 'ko' ? '_kr' : '_en')];
+  }
+  async function renderNewsArchive() {
+    const request = ++newsRequest;
+    const root = $('#news-archive');
+    root.lang = lang === 'ko' ? 'ko' : 'en';
+    root.setAttribute('aria-busy', 'true');
+    const status = viewElement('p', 'news-status', lang === 'ko' ? '뉴스를 불러오는 중입니다.' : 'Loading news.');
+    status.setAttribute('role', 'status');
+    root.replaceChildren(status);
+    try {
+      if (!newsRecords) {
+        const response = await fetch('news.json', { cache: 'no-cache' });
+        if (!response.ok) throw new Error('News HTTP ' + response.status);
+        const records = await response.json();
+        if (!Array.isArray(records)) throw new Error('Invalid news array');
+        const ids = new Set();
+        const orders = new Set();
+        const active = records.filter(record => record && record.active === true);
+        for (const record of active) {
+          if (typeof record.id !== 'string' || !record.id || ids.has(record.id) ||
+              !Number.isFinite(record.order) || orders.has(record.order)) throw new Error('Invalid news identity/order');
+          ids.add(record.id); orders.add(record.order);
+          for (const field of ['title_kr','title_en','body_kr','body_en','alt_kr','alt_en','image']) {
+            if (typeof record[field] !== 'string' || !record[field].trim()) throw new Error('Incomplete news translation');
+          }
+          if (!/^https?:$/.test(new URL(record.image, document.baseURI).protocol)) throw new Error('Invalid image URL');
+        }
+        if (request !== newsRequest || currentInfoKey !== 'news') return;
+        newsRecords = active.sort((a,b) => a.order - b.order);
+      }
+      if (request !== newsRequest || currentInfoKey !== 'news') return;
+      const grid = viewElement('div', 'news-grid');
+      for (const record of newsRecords) {
+        const card = viewElement('article', 'news-card');
+        card.dataset.newsId = record.id;
+        const image = viewElement('img', 'news-image');
+        image.alt = newsText(record, 'alt');
+        image.loading = 'lazy'; image.decoding = 'async';
+        image.src = record.image;
+        const copy = viewElement('div', 'news-copy');
+        if (typeof record.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(record.date)) {
+          const date = viewElement('time', 'news-date', record.date);
+          date.dateTime = record.date; copy.append(date);
+        }
+        copy.append(viewElement('h3', '', newsText(record, 'title')),
+                    viewElement('p', 'news-body', newsText(record, 'body')));
+        card.append(image, copy); grid.append(card);
+      }
+      const languages = viewElement('div', 'news-languages');
+      for (const [code, label] of [['ko','KR'],['en','EN']]) {
+        const button = viewElement('button', '', label);
+        button.type = 'button';
+        button.setAttribute('aria-label', code === 'ko' ? '한국어' : 'English');
+        button.setAttribute('aria-pressed', String(lang === code));
+        button.addEventListener('click', () => setLang(code));
+        languages.append(button);
+      }
+      root.replaceChildren(languages, newsRecords.length ? grid : viewElement('p', 'news-status', lang === 'ko' ? '등록된 뉴스가 없습니다.' : 'No news is available.'));
+    } catch (error) {
+      if (request !== newsRequest || currentInfoKey !== 'news') return;
+      status.textContent = lang === 'ko' ? '뉴스를 불러오지 못했습니다. 닫은 후 다시 열어 주세요.' : 'Unable to load news. Please close and reopen.';
+    } finally {
+      if (request === newsRequest) root.setAttribute('aria-busy', 'false');
+    }
+  }
+  document.addEventListener('keydown', event => {
+    if (currentInfoKey !== 'news' || $('#info-modal').hidden) return;
+    if (event.key === 'Escape') { event.preventDefault(); closeInfoModal(); }
+    if (event.key === 'Tab') {
+      const buttons = Array.from($('#info-modal').querySelectorAll('button')).filter(button => button.getClientRects().length && !button.disabled);
+      const first = buttons[0], last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+
   let currentInfoKey = null;
   function openInfoModal(key) {
     const data = INFO_CONTENT[key];
     if (!data) return;
     if (key === 'exhibition' && currentInfoKey !== key) { exhibitionIndex = 0; viewCategory = 'exhibition'; currentViewRecord = null; }
+    if (key === 'news' && currentInfoKey !== key) newsReturnFocus = document.activeElement;
+    if (key !== 'news') newsRequest++;
     currentInfoKey = key;
     const d = data[lang] || data.ko;
     $('#info-title').textContent = d.title;
     $('#info-body').textContent = d.body;
     const isExhibition = key === 'exhibition';
-    document.documentElement.classList.toggle('archive-scroll-locked', isExhibition);
+    const isNews = key === 'news';
+    document.documentElement.classList.toggle('archive-scroll-locked', isExhibition || isNews);
+    $('#info-modal').classList.toggle('is-news', isNews);
+    $('#news-archive').hidden = !isNews;
     $('#info-modal').classList.toggle('is-exhibition', isExhibition);
-    $('#info-body').hidden = isExhibition;
+    $('#info-body').hidden = isExhibition || isNews;
     $('#exhibition-gallery').hidden = !isExhibition;
     if (isExhibition) renderExhibitionGallery();
     $('#info-modal').hidden = false;
+    if (isNews) { renderNewsArchive(); $('#info-modal-close').focus(); }
   }
   function closeInfoModal() {
+    const wasNews = currentInfoKey === 'news';
+    newsRequest++;
     $('#info-modal').hidden = true;
     document.documentElement.classList.remove('archive-scroll-locked');
     archiveWheelZoom = null;
     currentInfoKey = null;
     exhibitionRequest++;
+    if (wasNews) {
+      const target = newsReturnFocus && newsReturnFocus.getClientRects().length ? newsReturnFocus : $('#menu-toggle');
+      if (target) target.focus();
+      newsReturnFocus = null;
+    }
   }
   $('#info-modal').addEventListener('wheel', event => {
     if (currentInfoKey !== 'exhibition' || $('#info-modal').hidden) return;
