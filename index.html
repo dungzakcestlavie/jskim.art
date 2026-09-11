@@ -1628,6 +1628,42 @@
   #news-archive .news-photo-stage img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; transform-origin:center; pointer-events:none; }
   #news-archive .news-photo-stage:focus-visible { outline:2px solid #e4ce9d; }
   #news-archive > [hidden] { display:none !important; }
+
+  /* EN expanded article typography only; inherited font family retained. */
+  #news-archive[lang="en"] .news-copy.news-en-expanded {
+    padding-left:24px; padding-right:24px;
+    overflow-wrap:break-word; word-break:normal;
+  }
+  #news-archive[lang="en"] .news-copy.news-en-expanded h3 {
+    font-size:32px; font-weight:600; line-height:1.33;
+    max-width:820px; color:#f4eedf; margin-bottom:22px;
+  }
+  #news-archive[lang="en"] .news-en-expanded .news-body {
+    font-size:20px; font-weight:400; line-height:1.68;
+    color:#f5f0e5; max-width:760px; white-space:normal;
+    overflow-wrap:break-word; word-break:normal;
+  }
+  #news-archive[lang="en"] .news-en-expanded .news-paragraph {
+    display:block; white-space:pre-line; margin:0 0 1em;
+  }
+  #news-archive[lang="en"] .news-en-expanded .news-paragraph:last-child { margin-bottom:0; }
+  #news-archive[lang="en"] .news-en-expanded .news-info,
+  #news-archive[lang="en"] .news-en-expanded .news-date {
+    font-size:19px; font-weight:400; line-height:1.60;
+  }
+  @media (min-width:768px) and (max-width:1199px) {
+    #news-archive[lang="en"] .news-copy.news-en-expanded h3 { font-size:30px; }
+    #news-archive[lang="en"] .news-en-expanded .news-body { font-size:19px; line-height:1.67; }
+    #news-archive[lang="en"] .news-en-expanded .news-info,
+    #news-archive[lang="en"] .news-en-expanded .news-date { font-size:18.5px; }
+  }
+  @media (max-width:767px) {
+    #news-archive[lang="en"] .news-copy.news-en-expanded { padding-left:16px; padding-right:16px; }
+    #news-archive[lang="en"] .news-copy.news-en-expanded h3 { font-size:27px; line-height:1.33; margin-bottom:18px; }
+    #news-archive[lang="en"] .news-en-expanded .news-body { font-size:18px; line-height:1.65; }
+    #news-archive[lang="en"] .news-en-expanded .news-info,
+    #news-archive[lang="en"] .news-en-expanded .news-date { font-size:17.5px; }
+  }
 </style>
 </head>
 <body>
@@ -2537,6 +2573,25 @@
     stage.focus({preventScroll:true});
   }
 
+
+  function newsEnglishParagraphs(text, title) {
+    const lines = text.replace(/\r\n?/g, '\n').split('\n');
+    const first = lines.findIndex(line => line.trim());
+    // Suppress only an exact leading title match, never a partial match.
+    if (first >= 0 && lines[first].trim() === title.trim()) lines.splice(first, 1);
+    const info = /^(Dates?|Venue|Visiting Hours|Address|Tel):/;
+    const blocks = lines.join('\n').trim().split(/\n[ \t]*\n+/).filter(Boolean);
+    const result = [];
+    blocks.forEach(block => {
+      const value = block.trim();
+      const metadata = value.split('\n').every(line => info.test(line.trim()));
+      const last = result[result.length - 1];
+      if (metadata && last && last.metadata) last.text += '\n' + value;
+      else result.push({text:value, metadata});
+    });
+    return result;
+  }
+
   const expandedNews = new Set();
   let newsRecords = null;
   let newsRequest = 0;
@@ -2612,7 +2667,11 @@
         toggle.setAttribute('aria-controls', body.id);
         const updateBody = () => {
           const expanded = expandedNews.has(record.id);
-          body.textContent = expanded ? fullText : preview;
+          copy.classList.toggle('news-en-expanded', expanded && lang === 'en');
+          if (expanded && lang === 'en') {
+            body.replaceChildren(...newsEnglishParagraphs(fullText, newsText(record, 'title')).map(part =>
+              viewElement('span', 'news-paragraph' + (part.metadata ? ' news-info' : ''), part.text)));
+          } else body.textContent = expanded ? fullText : preview;
           toggle.textContent = expanded ? (lang === 'ko' ? '접기' : 'Show less') : (lang === 'ko' ? '전체보기' : 'Read more');
           toggle.setAttribute('aria-expanded', String(expanded));
         };
