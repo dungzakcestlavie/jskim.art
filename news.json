@@ -10,7 +10,34 @@
     "alt_kr": "김연식의 여수섬 365 — 전설과 비밀 전시 이미지",
     "alt_en": "Exhibition image for KIM YUN SIK’s 365 Islands of Yeosu — Legends and Secrets",
     "active": true,
-    "order": 1
+    "order": 1,
+    "images": [
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news001.jpg",
+        "alt_kr": "김연식의 여수섬 365 — 전설과 비밀 전시 이미지 1",
+        "alt_en": "KIM YUN SIK’s 365 Islands of Yeosu — Legends and Secrets, exhibition image 1"
+      },
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news002.jpg",
+        "alt_kr": "김연식의 여수섬 365 — 전설과 비밀 전시 이미지 2",
+        "alt_en": "KIM YUN SIK’s 365 Islands of Yeosu — Legends and Secrets, exhibition image 2"
+      },
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news003.jpg",
+        "alt_kr": "김연식의 여수섬 365 — 전설과 비밀 전시 이미지 3",
+        "alt_en": "KIM YUN SIK’s 365 Islands of Yeosu — Legends and Secrets, exhibition image 3"
+      },
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news004.jpg",
+        "alt_kr": "김연식의 여수섬 365 — 전설과 비밀 전시 이미지 4",
+        "alt_en": "KIM YUN SIK’s 365 Islands of Yeosu — Legends and Secrets, exhibition image 4"
+      },
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news005.jpg",
+        "alt_kr": "김연식의 여수섬 365 — 전설과 비밀 전시 이미지 5",
+        "alt_en": "KIM YUN SIK’s 365 Islands of Yeosu — Legends and Secrets, exhibition image 5"
+      }
+    ]
   },
   {
     "id": "news002",
