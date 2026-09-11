@@ -1602,6 +1602,18 @@
     #info-modal.is-news .bio-card { padding: 20px 16px; }
     #news-archive .news-copy { padding: 20px; }
   }
+
+  /* One article may contain multiple photographs. */
+  #news-archive .news-card:only-child { grid-column: 1 / -1; }
+  #news-archive .news-images { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 16px; background: #0c2136; }
+  #news-archive .news-images .news-image { width: 100%; height: 320px; object-fit: contain; background: #091b2c; }
+  #news-archive .news-body { max-width: 78ch; }
+  #news-archive .news-read-more { display: inline-block; margin-top: 20px; min-height: 44px; padding: 10px 20px; color: #f0ecdf; background: #143c40; border: 1px solid #d1b67c; border-radius: 5px; font: inherit; cursor: pointer; }
+  #news-archive .news-read-more:hover { background: #245353; }
+  @media (max-width:760px) {
+    #news-archive .news-images { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    #news-archive .news-images .news-image { height: auto; max-height: 420px; object-fit: contain; }
+  }
 </style>
 </head>
 <body>
@@ -2463,6 +2475,7 @@
     }
   }
 
+  const expandedNews = new Set();
   let newsRecords = null;
   let newsRequest = 0;
   let newsReturnFocus = null;
@@ -2494,6 +2507,13 @@
             if (typeof record[field] !== 'string' || !record[field].trim()) throw new Error('Incomplete news translation');
           }
           if (!/^https?:$/.test(new URL(record.image, document.baseURI).protocol)) throw new Error('Invalid image URL');
+          if (record.images !== undefined) {
+            if (!Array.isArray(record.images)) throw new Error('Invalid news images');
+            for (const photo of record.images) {
+              if (!photo || ['image','alt_kr','alt_en'].some(key => typeof photo[key] !== 'string' || !photo[key].trim())) throw new Error('Incomplete news image');
+              if (!/^https?:$/.test(new URL(photo.image, document.baseURI).protocol)) throw new Error('Invalid news image URL');
+            }
+          }
         }
         if (request !== newsRequest || currentInfoKey !== 'news') return;
         newsRecords = active.sort((a,b) => a.order - b.order);
@@ -2503,18 +2523,45 @@
       for (const record of newsRecords) {
         const card = viewElement('article', 'news-card');
         card.dataset.newsId = record.id;
-        const image = viewElement('img', 'news-image');
-        image.alt = newsText(record, 'alt');
-        image.loading = 'lazy'; image.decoding = 'async';
-        image.src = record.image;
+        const images = viewElement('div', 'news-images');
+        const photos = Array.isArray(record.images) && record.images.length ? record.images : [record];
+        photos.forEach(photo => {
+          const image = viewElement('img', 'news-image');
+          image.alt = newsText(photo, 'alt');
+          image.loading = 'lazy'; image.decoding = 'async';
+          image.src = photo.image;
+          images.append(image);
+        });
         const copy = viewElement('div', 'news-copy');
         if (typeof record.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(record.date)) {
           const date = viewElement('time', 'news-date', record.date);
           date.dateTime = record.date; copy.append(date);
         }
-        copy.append(viewElement('h3', '', newsText(record, 'title')),
-                    viewElement('p', 'news-body', newsText(record, 'body')));
-        card.append(image, copy); grid.append(card);
+        const body = viewElement('p', 'news-body');
+        body.id = 'news-body-' + record.id;
+        const fullText = newsText(record, 'body');
+        const compactText = fullText.replace(/\s+/g, ' ').trim();
+        const previewLength = lang === 'ko' ? 160 : 260;
+        const preview = compactText.length > previewLength ? compactText.slice(0, previewLength).trimEnd() + '…' : compactText;
+        const toggle = viewElement('button', 'news-read-more');
+        toggle.type = 'button';
+        toggle.setAttribute('aria-controls', body.id);
+        const updateBody = () => {
+          const expanded = expandedNews.has(record.id);
+          body.textContent = expanded ? fullText : preview;
+          toggle.textContent = expanded ? (lang === 'ko' ? '접기' : 'Show less') : (lang === 'ko' ? '전체보기' : 'Read more');
+          toggle.setAttribute('aria-expanded', String(expanded));
+        };
+        toggle.addEventListener('click', () => {
+          const collapsing = expandedNews.has(record.id);
+          if (collapsing) expandedNews.delete(record.id); else expandedNews.add(record.id);
+          updateBody();
+          if (collapsing) toggle.scrollIntoView({ block: 'nearest' });
+        });
+        updateBody();
+        copy.append(viewElement('h3', '', newsText(record, 'title')), body);
+        if (compactText.length > previewLength) copy.append(toggle);
+        card.append(images, copy); grid.append(card);
       }
       const languages = viewElement('div', 'news-languages');
       for (const [code, label] of [['ko','KR'],['en','EN']]) {
