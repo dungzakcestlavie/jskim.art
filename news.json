@@ -41,16 +41,28 @@
   },
   {
     "id": "news002",
-    "title_kr": "",
-    "title_en": "",
-    "body_kr": "",
-    "body_en": "",
-    "date": "",
-    "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news002.jpg",
-    "alt_kr": "",
-    "alt_en": "",
-    "active": false,
-    "order": 2
+    "title_kr": "시인 윤동주 — 그리고 쓰고 노래하다",
+    "title_en": "Poet Yun Dong-ju — Painting, Writing, and Singing",
+    "body_kr": "장소: 갤러리 모나리자 산촌\n일시: 2026.1.28.~2.23\n\n윤동주 서거 81주년을 추모하는 ‘김연식 AI 아트 특별전’이 ‘갤러리 모나리자 산촌’에서 열린다. ‘갤러리 모나리자 산촌’과 사찰음식 전문점 ‘산촌’의 대표 정산 김연식 스님이 ‘시인 윤동주-그리고 쓰고 노래하다’라는 주제로 직접 전시를 기획하고 작품들을 선보이는 것이다. ‘AI’로 그린 작품들과 함께 3차원의 공간에 펼쳐지는 설치 미술들은 현대 미술의 감각을 추종하는 정산 스님의 아이디어의 산물이다. 그는 자신의 예술세계를 AI 기술로 한층 더 확장하여 고 윤동주 시인의 시를 토대로 한 시화전을 기획했다. 이번 전시를 위해 그는 AI 아트 전에 걸맞게 고안한 그림들뿐만 아니라 윤동주 시인의 시를 모티브로 AI를 이용한 작사, 작곡으로 USB로 제작한 음원도 마련하였다.\n\n전시의 오픈식은 2026년 1월 28일 오후 3시이다. 이번 전시의 특별 이벤트로 매주 토요일 6시~7시에 정기 공연을 펼치는 그룹사운드 ‘키보이스’ 멤버들이 정산 김연식 대표가 직접 작곡한 ‘윤동주 추모곡’들을 노래로 선사한다. 매주 수요일에는 시 낭송회를 통해 친목을 다지며 갤러리 안에서의 ‘티 타임’도 있을 예정이다.",
+    "body_en": "Venue: Gallery Mona Lisa Sanchon\nDates: January 28–February 23, 2026\n\nA special exhibition of AI art by KIM YUN SIK commemorating the 81st anniversary of poet Yun Dong-ju’s passing will be held at Gallery Mona Lisa Sanchon. Buddhist monk JUNGSAN KIM YUN SIK, who runs both the gallery and the temple cuisine restaurant Sanchon, has personally curated the exhibition and will present his works under the theme “Poet Yun Dong-ju — Painting, Writing, and Singing.”\n\nThe AI-generated artworks and three-dimensional installations embody JUNGSAN’s ideas and his engagement with contemporary artistic sensibilities. Expanding his artistic practice through AI technology, he has conceived an exhibition of poetry-inspired art based on the works of the late Yun Dong-ju. Alongside the visual works created for the exhibition, he has prepared audio recordings on USB drives, featuring lyrics and music created with AI and inspired by Yun Dong-ju’s poetry.\n\nThe opening ceremony will take place at 3:00 p.m. on January 28, 2026. As a special exhibition program, members of the band Key Boys, who perform regularly every Saturday from 6:00 to 7:00 p.m., will sing tribute songs to Yun Dong-ju composed by JUNGSAN KIM YUN SIK himself. Poetry readings will also take place every Wednesday, offering opportunities to gather and connect, with tea time in the gallery.",
+    "date": "2026-01-28",
+    "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news006.jpg",
+    "alt_kr": "시인 윤동주 — 그리고 쓰고 노래하다 전시 이미지 1",
+    "alt_en": "Poet Yun Dong-ju — Painting, Writing, and Singing, exhibition image 1",
+    "active": true,
+    "order": 2,
+    "images": [
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news006.jpg",
+        "alt_kr": "시인 윤동주 — 그리고 쓰고 노래하다 전시 이미지 1",
+        "alt_en": "Poet Yun Dong-ju — Painting, Writing, and Singing, exhibition image 1"
+      },
+      {
+        "image": "https://raw.githubusercontent.com/dungzakcestlavie/jskim-images/main/news/news007.jpg",
+        "alt_kr": "시인 윤동주 — 그리고 쓰고 노래하다 전시 이미지 2",
+        "alt_en": "Poet Yun Dong-ju — Painting, Writing, and Singing, exhibition image 2"
+      }
+    ]
   },
   {
     "id": "news003",
