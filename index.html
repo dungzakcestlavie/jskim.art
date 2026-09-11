@@ -1614,6 +1614,20 @@
     #news-archive .news-images { grid-template-columns: repeat(2,minmax(0,1fr)); }
     #news-archive .news-images .news-image { height: auto; max-height: 420px; object-fit: contain; }
   }
+
+  #news-archive .news-images { display:block; }
+  #news-archive .news-cover-button { display:block; width:100%; padding:0; border:0; background:#091b2c; color:#eee9db; cursor:zoom-in; }
+  #news-archive .news-cover-button .news-image { height:320px; width:100%; object-fit:contain; }
+  #news-archive .news-cover-label { display:block; padding:12px; font-size:1rem; }
+  #news-archive .news-photo-viewer { display:flex; flex-direction:column; gap:16px; }
+  #news-archive .news-photo-viewer button { min-width:44px; min-height:44px; padding:8px 14px; border:1px solid #45666b; border-radius:4px; background:#14383e; color:#eee9db; font:inherit; cursor:pointer; }
+  #news-archive .news-photo-viewer button:disabled { opacity:.35; cursor:default; }
+  #news-archive .news-photo-back { align-self:flex-start; }
+  #news-archive .news-photo-tools { display:flex; align-items:center; justify-content:center; gap:14px; }
+  #news-archive .news-photo-stage { height:55vh; height:55dvh; min-height:180px; overflow:hidden; touch-action:none; user-select:none; display:flex; align-items:center; justify-content:center; background:#091b2c; }
+  #news-archive .news-photo-stage img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; transform-origin:center; pointer-events:none; }
+  #news-archive .news-photo-stage:focus-visible { outline:2px solid #e4ce9d; }
+  #news-archive > [hidden] { display:none !important; }
 </style>
 </head>
 <body>
@@ -2475,6 +2489,54 @@
     }
   }
 
+
+  let newsPhotoState = null;
+  function closeNewsPhoto() {
+    const state = newsPhotoState;
+    if (!state) return;
+    newsPhotoState = null;
+    $('#news-archive .news-photo-viewer')?.remove();
+    Array.from($('#news-archive').children).forEach(node => node.hidden = false);
+    $('#info-modal .bio-card').scrollTop = state.scroll;
+    if (state.cover?.isConnected) state.cover.focus({preventScroll:true});
+  }
+  function openNewsPhoto(record, index, cover) {
+    const root = $('#news-archive');
+    const photos = Array.isArray(record.images) && record.images.length ? record.images : [record];
+    const old = newsPhotoState;
+    newsPhotoState = {record, index, cover: cover || old?.cover, scroll: old?.scroll ?? $('#info-modal .bio-card').scrollTop};
+    root.querySelector('.news-photo-viewer')?.remove();
+    Array.from(root.children).forEach(node => node.hidden = true);
+    const viewer = viewElement('div', 'news-photo-viewer');
+    const button = (label, action) => { const b = viewElement('button','',label); b.type='button'; b.addEventListener('click', action); return b; };
+    const back = button(lang === 'ko' ? '← 뉴스로 돌아가기' : '← Back to news', closeNewsPhoto);
+    back.className='news-photo-back';
+    const stage = viewElement('div','news-photo-stage'); stage.tabIndex=0;
+    stage.setAttribute('role','group');
+    stage.setAttribute('aria-label', lang === 'ko' ? '작품 뷰어: 좌우 넘기기, 두 손가락 확대·축소' : 'Artwork viewer: swipe to navigate, pinch to zoom');
+    const photo=photos[index];
+    const img=viewElement('img',''); img.alt=newsText(photo,'alt'); img.src=photo.zoom || photo.image;
+    stage.append(img);
+    const change = delta => { const next=index+delta; if(next>=0 && next<photos.length) openNewsPhoto(record,next); };
+    const gestures=enableArchiveGestures(stage,img,change);
+    stage.addEventListener('wheel', event => { event.preventDefault(); event.stopPropagation(); gestures.wheelZoom(event); }, {passive:false});
+    const zoom=viewElement('div','news-photo-tools');
+    const minus=button('−',gestures.zoomOut), reset=button('1:1',gestures.reset), plus=button('+',gestures.zoomIn);
+    minus.setAttribute('aria-label',lang==='ko'?'축소':'Zoom out');
+    reset.setAttribute('aria-label',lang==='ko'?'원래 배율':'Reset zoom');
+    plus.setAttribute('aria-label',lang==='ko'?'확대':'Zoom in');
+    zoom.append(minus,reset,plus);
+    const controls=viewElement('div','news-photo-tools');
+    const prev=button('←',()=>change(-1)), next=button('→',()=>change(1));
+    prev.disabled=index===0; next.disabled=index===photos.length-1;
+    prev.setAttribute('aria-label',lang==='ko'?'이전 작품':'Previous artwork');
+    next.setAttribute('aria-label',lang==='ko'?'다음 작품':'Next artwork');
+    const count=viewElement('span','',(index+1)+' / '+photos.length); count.setAttribute('aria-live','polite');
+    controls.append(prev,count,next); viewer.append(back,zoom,stage,controls);root.append(viewer);
+    $('#info-modal .bio-card').scrollTop=0;
+    stage.focus({preventScroll:true});
+  }
+
   const expandedNews = new Set();
   let newsRecords = null;
   let newsRequest = 0;
@@ -2483,6 +2545,7 @@
     return record[field + (lang === 'ko' ? '_kr' : '_en')];
   }
   async function renderNewsArchive() {
+    closeNewsPhoto();
     const request = ++newsRequest;
     const root = $('#news-archive');
     root.lang = lang === 'ko' ? 'ko' : 'en';
@@ -2525,13 +2588,14 @@
         card.dataset.newsId = record.id;
         const images = viewElement('div', 'news-images');
         const photos = Array.isArray(record.images) && record.images.length ? record.images : [record];
-        photos.forEach(photo => {
-          const image = viewElement('img', 'news-image');
-          image.alt = newsText(photo, 'alt');
-          image.loading = 'lazy'; image.decoding = 'async';
-          image.src = photo.image;
-          images.append(image);
-        });
+        const cover = viewElement('button', 'news-cover-button');
+        cover.type = 'button';
+        const image = viewElement('img', 'news-image');
+        image.alt = newsText(photos[0], 'alt');
+        image.loading = 'lazy'; image.decoding = 'async'; image.src = photos[0].image;
+        cover.append(image, viewElement('span', 'news-cover-label', lang === 'ko' ? '작품 보기 · ' + photos.length + '점' : 'View artworks · ' + photos.length));
+        cover.addEventListener('click', () => openNewsPhoto(record, 0, cover));
+        images.append(cover);
         const copy = viewElement('div', 'news-copy');
         if (typeof record.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(record.date)) {
           const date = viewElement('time', 'news-date', record.date);
@@ -2582,9 +2646,9 @@
   }
   document.addEventListener('keydown', event => {
     if (currentInfoKey !== 'news' || $('#info-modal').hidden) return;
-    if (event.key === 'Escape') { event.preventDefault(); closeInfoModal(); }
+    if (event.key === 'Escape') { event.preventDefault(); if (newsPhotoState) closeNewsPhoto(); else closeInfoModal(); }
     if (event.key === 'Tab') {
-      const buttons = Array.from($('#info-modal').querySelectorAll('button')).filter(button => button.getClientRects().length && !button.disabled);
+      const buttons = Array.from($('#info-modal').querySelectorAll('button, [tabindex="0"]')).filter(button => button.getClientRects().length && !button.disabled);
       const first = buttons[0], last = buttons[buttons.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
@@ -2616,6 +2680,7 @@
   }
   function closeInfoModal() {
     const wasNews = currentInfoKey === 'news';
+    if (wasNews) closeNewsPhoto();
     newsRequest++;
     $('#info-modal').hidden = true;
     document.documentElement.classList.remove('archive-scroll-locked');
